@@ -12,8 +12,8 @@ export const objectToString = Object.prototype.toString;
 export const supportWasm = typeof WebAssembly === 'object';
 
 export const raf: (fn: (...args: Array<any>) => any) => void =
-  typeof window.requestAnimationFrame === 'function'
-    ? window.requestAnimationFrame.bind(window)
+  typeof requestAnimationFrame === 'function'
+    ? (fn: () => void) => requestAnimationFrame(fn)
     : (fn: () => void) => setTimeout(fn, 17);
 
 export const now =
