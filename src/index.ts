@@ -112,6 +112,10 @@ export const loopSlice = (
   taskTime = 50,
 ) => {
   return new Promise<void>((resolve) => {
+    if (l === 0) {
+      resolve();
+      return;
+    }
     let i = -1;
     let start = now();
     const run = () => {
