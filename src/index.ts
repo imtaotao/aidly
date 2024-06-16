@@ -106,7 +106,11 @@ export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
 
 // Give the current task one frame of time (13ms).
 // If it exceeds one frame, the remaining tasks will be put into the next frame.
-export const loopSlice = (l: number, fn: (i: number) => void | boolean) => {
+export const loopSlice = (
+  l: number,
+  fn: (i: number) => void | boolean,
+  taskTime = 50,
+) => {
   return new Promise<void>((resolve) => {
     let i = -1;
     let start = now();
@@ -120,7 +124,7 @@ export const loopSlice = (l: number, fn: (i: number) => void | boolean) => {
           resolve();
         } else {
           const t = now();
-          if (t - start > 13) {
+          if (t - start > taskTime) {
             start = t;
             raf(run);
             break;
