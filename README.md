@@ -21,7 +21,7 @@ import { isObject } from 'aidly';
 <!DOCTYPE html>
 <html lang="en">
 <body>
-  <script src="https://unpkg.com/outil/dist/aidly.umd.js"></script>
+  <script src="https://unpkg.com/aidly/dist/aidly.umd.js"></script>
   <script>
     const { isObject } = window.Aidly;
     // ...
