@@ -7,6 +7,8 @@ export type BaseType =
   | null
   | undefined;
 
+export const noop = () => {};
+
 export const objectToString = Object.prototype.toString;
 
 export const supportWasm = typeof WebAssembly === 'object';
@@ -53,13 +55,21 @@ export const isNativeValue = (v: unknown): v is BaseType => {
   );
 };
 
-export const isAbsolute = (url: string) => {
-  if (!/^[a-zA-Z]:\\/.test(url)) {
-    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)) {
+/**
+ * In Browser.
+ */
+export const isAbsolute = (p: string) => {
+  if (!/^[a-zA-Z]:\\/.test(p)) {
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(p)) {
       return true;
     }
   }
   return false;
+};
+
+export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
+  for (const _ in val) return false;
+  return true;
 };
 
 // TypeScript cannot use arrowFunctions for assertions.
@@ -102,6 +112,75 @@ export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
     }
     return false;
   }
+};
+
+export const last = <T>(list: Array<T>, i = 0) => {
+  return list[list.length + i - 1];
+};
+
+export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
+  let first = true;
+  function wrap(this: unknown, ...args: Array<unknown>) {
+    if (!first) return;
+    first = false;
+    return fn.apply(this, args);
+  }
+  return wrap;
+};
+
+export const defered = <T = void>() => {
+  let reject: (reason?: any) => void;
+  let resolve: (value: T | PromiseLike<T>) => void;
+  const promise = new Promise<T>((rs, rj) => {
+    reject = rs;
+    resolve = rj;
+  });
+  return { promise, resolve, reject };
+};
+
+export const sleep = (t: number) => {
+  return new Promise<void>((resolve) => {
+    if (!t) return resolve();
+    let timer = setTimeout(() => {
+      clearTimeout(timer);
+      timer = null;
+      resolve();
+    }, t);
+  });
+};
+
+/**
+ * 1. aa_bb-cc => aaBbCc
+ * 2. aa_bb-cc => AaBbCc
+ */
+export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
+  return val
+    .split(reg)
+    .map((k, i) => {
+      if (!k) return null;
+      return !upper && i === 0
+        ? k.toLocaleLowerCase()
+        : k.charAt(0).toLocaleUpperCase() + k.slice(1).toLocaleLowerCase();
+    })
+    .join('');
+};
+
+/**
+ * a.js => .js
+ */
+export const getExtname = (p: string) => {
+  let extra = '';
+  if (isAbsolute(p)) {
+    p = new URL(p).pathname;
+  }
+  let len = p.length;
+  while (~--len) {
+    const c = p[len];
+    if (c === '/') return '';
+    if (c === '.') return c + extra;
+    extra = c + extra;
+  }
+  return '';
 };
 
 // Give the current task one frame of time (13ms).
