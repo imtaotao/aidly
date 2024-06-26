@@ -238,9 +238,7 @@ export const getExtname = (p: string) => {
   return '';
 };
 
-export const throttle = <
-  T extends (this: unknown, ...args: Array<any>) => undefined,
->(
+export const throttle = <T extends (...args: Array<any>) => any>(
   delay: number,
   fn: T,
 ) => {
@@ -251,7 +249,7 @@ export const throttle = <
     timer && clearTimeout(timer);
     timer = null;
   };
-  function wrapper(this: ThisParameterType<T>, ...args: Parameters<T>): void {
+  function wrapper(this: unknown, ...args: Parameters<T>): void {
     if (cancelled) return;
     clear();
     const cur = now();
