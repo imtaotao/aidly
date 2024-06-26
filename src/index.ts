@@ -16,6 +16,8 @@ export const supportWasm = typeof WebAssembly === 'object';
 export const raf: (fn: (...args: Array<any>) => any) => void =
   typeof requestAnimationFrame === 'function'
     ? (fn: () => void) => requestAnimationFrame(fn)
+    : typeof process && typeof process.nextTick === 'function'
+    ? (fn: () => void) => process.nextTick(fn)
     : (fn: () => void) => setTimeout(fn, 17);
 
 export const now =
@@ -32,6 +34,30 @@ export const isObject = (v: unknown) => typeof v === 'object' && v !== null;
 
 export const isPlainObject = (v: unknown): v is object =>
   objectToString.call(v) === '[object Object]';
+
+export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
+  typeof Set !== 'function' || !Set.prototype.has
+    ? ((() => false) as any)
+    : (v) => isObject(v) && v instanceof Set;
+
+export const isWeakSet: <T extends object = object>(
+  v: unknown,
+) => v is WeakSet<T> =
+  typeof WeakSet !== 'function' || !WeakSet.prototype.has
+    ? ((() => false) as any)
+    : (v) => isObject(v) && v instanceof WeakSet;
+
+export const isMap: <K = unknown, V = unknown>(v: unknown) => v is Map<K, V> =
+  typeof Map !== 'function' || !Map.prototype.has
+    ? ((() => false) as any)
+    : (v) => isObject(v) && v instanceof Map;
+
+export const isWeakMap: <K extends object = object, V = unknown>(
+  v: unknown,
+) => v is WeakMap<K, V> =
+  typeof WeakMap !== 'function' || !WeakMap.prototype.has
+    ? ((() => false) as any)
+    : (v) => isObject(v) && v instanceof WeakMap;
 
 export const isPromise = (v: unknown): v is Promise<unknown> =>
   isObject(v) && typeof (v as any).then === 'function';
@@ -72,8 +98,8 @@ export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
   return true;
 };
 
-// TypeScript cannot use arrowFunctions for assertions.
 export function assert(condition: unknown, error?: string): asserts condition {
+  // TypeScript cannot use arrowFunctions for assertions.
   if (!condition) throw new Error(error);
 }
 
@@ -81,10 +107,10 @@ export const hasOwn = <T extends unknown>(obj: T, key: string) =>
   Object.hasOwnProperty.call(obj, key) as boolean;
 
 export const toUpperCase = ([v, ...args]: string) =>
-  v.toUpperCase() + args.join('');
+  v.toLocaleUpperCase() + args.join('');
 
 export const toLowerCase = ([v, ...args]: string) =>
-  v.toLowerCase() + args.join('');
+  v.toLocaleLowerCase() + args.join('');
 
 export const getValueType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
@@ -97,32 +123,13 @@ export const makeMap = <T extends Array<PropertyKey>>(list: T) => {
   return (v: PropertyKey) => Boolean(map[v]);
 };
 
-export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
-  if (isArray(list)) {
-    const i = list.indexOf(el);
-    if (i > -1) {
-      list.splice(i, 1);
-      return true;
-    }
-    return false;
-  } else {
-    if (list.has(el)) {
-      list.delete(el);
-      return true;
-    }
-    return false;
-  }
-};
-
-export const last = <T>(list: Array<T>, i = 0) => {
-  return list[list.length + i - 1];
-};
+export const last = <T>(list: Array<T>, i = 0) => list[list.length + i - 1];
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
-  let first = true;
+  let called = false;
   function wrap(this: unknown, ...args: Array<unknown>) {
-    if (!first) return;
-    first = false;
+    if (called) return;
+    called = true;
     return fn.apply(this, args);
   }
   return wrap;
@@ -149,9 +156,54 @@ export const sleep = (t: number) => {
   });
 };
 
+export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
+  if (isArray(list)) {
+    const i = list.indexOf(el);
+    if (i > -1) {
+      list.splice(i, 1);
+      return true;
+    }
+    return false;
+  } else {
+    if (list.has(el)) {
+      list.delete(el);
+      return true;
+    }
+    return false;
+  }
+};
+
 /**
- * 1. aa_bb-cc => aaBbCc
- * 2. aa_bb-cc => AaBbCc
+ * const val = map(new Set(), (val) => val)
+ * const val = map([...], (val, i) => val)
+ * const val = map({...}, (val, key) => val)
+ */
+export function map<T>(data: Set<T>, fn?: (val: T) => T): Set<T>;
+export function map<T>(data: Array<T>, fn?: (val: T, i: number) => T): Array<T>;
+export function map<T extends Record<PropertyKey, any>>(
+  data: T,
+  fn?: (val: T[keyof T], key: keyof T) => T[keyof T],
+): T;
+export function map(data: unknown, fn?: any): any {
+  fn = fn || ((val) => val);
+  if (isArray(data)) {
+    return data.map((val, i) => fn(val, i));
+  } else if (isSet(data)) {
+    const cloned = new Set<unknown>();
+    for (const val of data) cloned.add(fn(val));
+    return cloned;
+  } else if (isPlainObject(data)) {
+    const cloned = {};
+    for (const key in data) cloned[key] = fn(data[key], key);
+    return cloned;
+  } else {
+    throw new Error(`Invalid type "${getValueType(data)}"`);
+  }
+}
+
+/**
+ * aa_bb-cc => aaBbCc
+ * aa_bb-cc => AaBbCc
  */
 export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
   return val
@@ -166,7 +218,7 @@ export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
 };
 
 /**
- * a.js => .js
+ * `a.js => .js` In Browser.
  */
 export const getExtname = (p: string) => {
   let extra = '';
@@ -183,12 +235,14 @@ export const getExtname = (p: string) => {
   return '';
 };
 
-// Give the current task one frame of time (13ms).
-// If it exceeds one frame, the remaining tasks will be put into the next frame.
+/**
+ * Give the current task one frame of time (default is 17ms).
+ * If it exceeds one frame, the remaining tasks will be put into the next frame.
+ */
 export const loopSlice = (
   l: number,
   fn: (i: number) => void | boolean,
-  taskTime = 50,
+  taskTime = 17,
 ) => {
   return new Promise<void>((resolve) => {
     if (l === 0) {
