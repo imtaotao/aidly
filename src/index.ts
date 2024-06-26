@@ -28,11 +28,12 @@ export const idleCallback =
 
 export const isArray = Array.isArray;
 
-export const isNil = (v: unknown) => v === undefined || v === null;
+export const isNil = <T = unknown>(v: T): v is Exclude<T, NonNullable<T>> =>
+  v === undefined || v === null;
 
 export const isObject = (v: unknown) => typeof v === 'object' && v !== null;
 
-export const isPlainObject = (v: unknown): v is object =>
+export const isPlainObject = <T extends object>(v: unknown): v is T =>
   objectToString.call(v) === '[object Object]';
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
@@ -59,7 +60,7 @@ export const isWeakMap: <K extends object = object, V = unknown>(
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof WeakMap;
 
-export const isPromise = (v: unknown): v is Promise<unknown> =>
+export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> =>
   isObject(v) && typeof (v as any).then === 'function';
 
 export const isInBounds = ([a, b]: Array<number>, v: number) => {
