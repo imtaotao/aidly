@@ -10,9 +10,9 @@ A small utility function in pure js runtime.
 ### Demo
 
 ```js
-import { isObject } from 'aidly';
+import { isNil } from 'aidly';
 
-// ...
+console.log(isNil(null)); // true
 ```
 
 ### CDN
@@ -23,8 +23,9 @@ import { isObject } from 'aidly';
 <body>
   <script src="https://unpkg.com/aidly/dist/aidly.umd.js"></script>
   <script>
-    const { isObject } = window.Aidly;
-    // ...
+    const { isNil } = window.Aidly;
+    
+    console.log(isNil(null)); // true
   </script>
 </body>
 </html>

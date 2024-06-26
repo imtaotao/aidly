@@ -98,8 +98,8 @@ export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
   return true;
 };
 
+// TypeScript cannot use arrowFunctions for assertions.
 export function assert(condition: unknown, error?: string): asserts condition {
-  // TypeScript cannot use arrowFunctions for assertions.
   if (!condition) throw new Error(error);
 }
 
@@ -184,7 +184,10 @@ export function map<T extends Record<PropertyKey, any>>(
   data: T,
   fn?: (val: T[keyof T], key: keyof T) => T[keyof T],
 ): T;
-export function map(data: unknown, fn?: any): any {
+export function map(
+  data: unknown,
+  fn?: (val: any, i?: any) => unknown,
+): unknown {
   fn = fn || ((val) => val);
   if (isArray(data)) {
     return data.map((val, i) => fn(val, i));
@@ -233,6 +236,41 @@ export const getExtname = (p: string) => {
     extra = c + extra;
   }
   return '';
+};
+
+export const throttle = <
+  T extends (this: unknown, ...args: Array<any>) => undefined,
+>(
+  delay: number,
+  fn: T,
+) => {
+  let lastExec = 0;
+  let cancelled = false;
+  let timer: NodeJS.Timeout | string | number | null = null;
+  const clear = () => {
+    timer && clearTimeout(timer);
+    timer = null;
+  };
+  function wrapper(this: ThisParameterType<T>, ...args: Parameters<T>): void {
+    if (cancelled) return;
+    clear();
+    const cur = now();
+    const elapsed = cur - lastExec;
+    const exec = (cur?: number) => {
+      lastExec = cur || now();
+      fn.apply(this, args);
+    };
+    if (elapsed > delay) {
+      exec(cur);
+    } else {
+      timer = setTimeout(exec, delay - elapsed);
+    }
+  }
+  wrapper.cancel = () => {
+    clear();
+    cancelled = true;
+  };
+  return wrapper as T & { cancel: () => void };
 };
 
 /**
