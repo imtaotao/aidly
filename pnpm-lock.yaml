@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      aidly:
+        specifier: 'link:'
+        version: 'link:'
+      small-queue:
+        specifier: ^1.0.1
+        version: 1.0.1
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^21.0.1
@@ -20,9 +27,6 @@ importers:
       '@types/jest':
         specifier: ^27.4.0
         version: 27.5.2
-      '@types/lodash':
-        specifier: ^4.17.5
-        version: 4.17.5
       '@types/node':
         specifier: ^20.14.9
         version: 20.14.9
@@ -394,9 +398,6 @@ packages:
 
   '@types/jest@27.5.2':
     resolution: {integrity: sha512-mpT8LJJ4CMeeahobofYWIjFo0xonRS/HfxnVEPMPFSQdGUt1uHCnoPT7Zhb+sjDU2wz0oKV0OLUR0WzrHNgfeA==}
-
-  '@types/lodash@4.17.5':
-    resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
 
   '@types/node@20.14.9':
     resolution: {integrity: sha512-06OCtnTXtWOZBJlRApleWndH4JsRVs1pDCc8dLSQp+7PpUpX3ePdHyeNSFTeSe7FtKyQkrlPvHwJOW3SLd8Oyg==}
@@ -1418,6 +1419,9 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
+  small-queue@1.0.1:
+    resolution: {integrity: sha512-+T/HHAoiyDIyBwR9Utt/0q7WZhWeA6zBf5O+DUs97gJkme9IgX1nkgfa8W5VfF3PWPoZ0dZqjUq6eBFjc4gUsQ==}
+
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
@@ -2181,8 +2185,6 @@ snapshots:
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
-
-  '@types/lodash@4.17.5': {}
 
   '@types/node@20.14.9':
     dependencies:
@@ -3376,6 +3378,8 @@ snapshots:
   skip-regex@1.0.2: {}
 
   slash@3.0.0: {}
+
+  small-queue@1.0.1: {}
 
   source-map-support@0.5.21:
     dependencies:

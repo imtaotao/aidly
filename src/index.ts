@@ -1,3 +1,5 @@
+export { Queue } from 'small-queue';
+
 export type BaseType =
   | number
   | bigint
@@ -37,6 +39,18 @@ export const isObject = <T extends unknown>(
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
+
+export const isDate = (v: unknown): v is Date =>
+  objectToString.call(v) === '[object Date]';
+
+export const isRegExp = (v: unknown): v is RegExp =>
+  objectToString.call(v) === '[object RegExp]';
+
+export const isBrowser = typeof window !== 'undefined';
+
+export const isWindow = (val: any): boolean =>
+  typeof window !== 'undefined' &&
+  objectToString.call(val) === '[object Window]';
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
   typeof Set !== 'function' || !Set.prototype.has
@@ -127,6 +141,8 @@ export const makeMap = <T extends Array<PropertyKey>>(list: T) => {
 };
 
 export const last = <T>(list: Array<T>, i = 0) => list[list.length + i - 1];
+
+export const uniq = <T>(list: Array<T>): Array<T> => Array.from(new Set(list));
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
   let called = false;
