@@ -28,12 +28,14 @@ export const idleCallback =
 
 export const isArray = Array.isArray;
 
-export const isNil = <T = unknown>(v: T): v is Exclude<T, NonNullable<T>> =>
+export const isNil = <T = unknown>(v: T): v is null | undefined =>
   v === undefined || v === null;
 
-export const isObject = (v: unknown) => typeof v === 'object' && v !== null;
+export const isObject = <T extends unknown>(
+  v: T,
+): v is Exclude<T, BaseType | void> => typeof v === 'object' && v !== null;
 
-export const isPlainObject = <T extends object>(v: unknown): v is T =>
+export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
@@ -193,7 +195,7 @@ export function map(
   if (isArray(data)) {
     return data.map((val, i) => fn(val, i));
   } else if (isSet(data)) {
-    const cloned = new Set<unknown>();
+    const cloned = new Set();
     for (const val of data) cloned.add(fn(val));
     return cloned;
   } else if (isPlainObject(data)) {
@@ -239,7 +241,7 @@ export const getExtname = (p: string) => {
   return '';
 };
 
-export const throttle = <T extends (...args: Array<any>) => any>(
+export const throttle = <T extends (...args: Array<any>) => undefined | void>(
   delay: number,
   fn: T,
 ) => {
