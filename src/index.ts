@@ -30,7 +30,7 @@ export const idleCallback =
 
 export const isArray = Array.isArray;
 
-export const isNil = <T = unknown>(v: T): v is null | undefined =>
+export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
 
 export const isObject = <T extends unknown>(

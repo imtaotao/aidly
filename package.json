@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Tool library.",
   "unpkg": "./dist/aidly.umd.js",
   "exports": {
@@ -54,7 +54,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "aidly": "link:",
     "small-queue": "^1.0.1"
   }
 }
