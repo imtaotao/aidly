@@ -257,39 +257,6 @@ export const getExtname = (p: string) => {
   return '';
 };
 
-export const throttle = <T extends (...args: Array<any>) => undefined | void>(
-  delay: number,
-  fn: T,
-) => {
-  let lastExec = 0;
-  let cancelled = false;
-  let timer: NodeJS.Timeout | string | number | null = null;
-  const clear = () => {
-    timer && clearTimeout(timer);
-    timer = null;
-  };
-  function wrapper(this: unknown, ...args: Parameters<T>): void {
-    if (cancelled) return;
-    clear();
-    const cur = now();
-    const elapsed = cur - lastExec;
-    const exec = (cur?: number) => {
-      lastExec = cur || now();
-      fn.apply(this, args);
-    };
-    if (elapsed > delay) {
-      exec(cur);
-    } else {
-      timer = setTimeout(exec, delay - elapsed);
-    }
-  }
-  wrapper.cancel = () => {
-    clear();
-    cancelled = true;
-  };
-  return wrapper as T & { cancel: () => void };
-};
-
 /**
  * Give the current task one frame of time (default is 17ms).
  * If it exceeds one frame, the remaining tasks will be put into the next frame.
@@ -326,4 +293,50 @@ export const loopSlice = (
     };
     run();
   });
+};
+
+export const debounce = <T extends (...args: Array<any>) => undefined | void>(
+  delay: number,
+  fn: T,
+) => throttle(delay, fn, true);
+
+export const throttle = <T extends (...args: Array<any>) => undefined | void>(
+  delay: number,
+  fn: T,
+  _isDebounce?: boolean,
+) => {
+  let lastExec = 0;
+  let cancelled = false;
+  let timer: NodeJS.Timeout | string | number | null = null;
+  const clear = () => (timer = null);
+
+  function wrapper(this: unknown, ...args: Parameters<T>): void {
+    if (cancelled) return;
+    const cur = Date.now();
+    const elapsed = cur - lastExec;
+    const exec = (cur?: number) => {
+      lastExec = cur || Date.now();
+      fn.apply(this, args);
+    };
+    if (_isDebounce && !timer) {
+      exec(cur);
+    }
+    if (timer) {
+      clearTimeout(timer);
+    }
+    if (!_isDebounce && elapsed > delay) {
+      exec(cur);
+    } else {
+      timer = setTimeout(
+        _isDebounce ? clear : exec,
+        _isDebounce ? delay : delay - elapsed,
+      );
+    }
+  }
+  wrapper.cancel = () => {
+    if (timer) clearTimeout(timer);
+    clear();
+    cancelled = true;
+  };
+  return wrapper as T & { cancel: () => void };
 };
