@@ -1,10 +1,10 @@
+import type { BaseType } from './types';
+
 export { Queue } from 'small-queue';
 export { uuid } from './uuid';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
 export type { BaseType } from './types';
-
-import type { BaseType } from './types';
 
 export const noop = () => {};
 
