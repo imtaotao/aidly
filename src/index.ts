@@ -15,6 +15,11 @@ export const objectToString = Object.prototype.toString;
 
 export const supportWasm = typeof WebAssembly === 'object';
 
+// TypeScript cannot use arrowFunctions for assertions.
+export function assert(condition: unknown, error?: string): asserts condition {
+  if (!condition) throw new Error(error);
+}
+
 export const raf: (fn: (...args: Array<any>) => any) => void =
   typeof requestAnimationFrame === 'function'
     ? (fn: () => void) => requestAnimationFrame(fn)
@@ -87,6 +92,11 @@ export const isInBounds = ([a, b]: Array<number>, v: number) => {
   return min < v && v < max;
 };
 
+export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
+  for (const _ in val) return false;
+  return true;
+};
+
 export const isNativeValue = (v: unknown): v is BaseType => {
   return (
     typeof v === 'number' ||
@@ -111,15 +121,9 @@ export const isAbsolute = (p: string) => {
   return false;
 };
 
-export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
-  for (const _ in val) return false;
-  return true;
-};
+export const last = <T>(list: Array<T>, i = 0) => list[list.length + i - 1];
 
-// TypeScript cannot use arrowFunctions for assertions.
-export function assert(condition: unknown, error?: string): asserts condition {
-  if (!condition) throw new Error(error);
-}
+export const uniq = <T>(list: Array<T>): Array<T> => Array.from(new Set(list));
 
 export const hasOwn = <T extends unknown>(obj: T, key: string) =>
   Object.hasOwnProperty.call(obj, key) as boolean;
@@ -140,10 +144,6 @@ export const makeMap = <T extends Array<PropertyKey>>(list: T) => {
   }
   return (v: PropertyKey) => Boolean(map[v]);
 };
-
-export const last = <T>(list: Array<T>, i = 0) => list[list.length + i - 1];
-
-export const uniq = <T>(list: Array<T>): Array<T> => Array.from(new Set(list));
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
   let called = false;
@@ -193,11 +193,6 @@ export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
   }
 };
 
-/**
- * const val = map(new Set(), (val) => val)
- * const val = map([...], (val, i) => val)
- * const val = map({...}, (val, key) => val)
- */
 export function map<T>(data: Set<T>, fn?: (val: T) => T): Set<T>;
 export function map<T>(data: Array<T>, fn?: (val: T, i: number) => T): Array<T>;
 export function map<T extends Record<PropertyKey, any>>(
@@ -211,23 +206,20 @@ export function map(
   fn = fn || ((val) => val);
   if (isArray(data)) {
     return data.map((val, i) => fn(val, i));
-  } else if (isSet(data)) {
+  }
+  if (isSet(data)) {
     const cloned = new Set();
     for (const val of data) cloned.add(fn(val));
     return cloned;
-  } else if (isPlainObject(data)) {
+  }
+  if (isPlainObject(data)) {
     const cloned = {};
     for (const key in data) cloned[key] = fn(data[key], key);
     return cloned;
-  } else {
-    throw new Error(`Invalid type "${getValueType(data)}"`);
   }
+  throw new Error(`Invalid type "${getValueType(data)}"`);
 }
 
-/**
- * aa_bb-cc => aaBbCc
- * aa_bb-cc => AaBbCc
- */
 export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
   return val
     .split(reg)
@@ -240,9 +232,6 @@ export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
     .join('');
 };
 
-/**
- * `a.js => .js` In Browser.
- */
 export const getExtname = (p: string) => {
   let extra = '';
   if (isAbsolute(p)) {
@@ -258,12 +247,8 @@ export const getExtname = (p: string) => {
   return '';
 };
 
-// `@@iterator` from `iterator interface` of simulate
 const ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
-/**
- * `getIteratorFn('')` => `IterableIterator<string>`
- */
-export const getIteratorFn = <T, K = typeof Symbol.iterator | '@@iterator'>(
+export const getIteratorFn = <T, K = typeof Symbol.iterator>(
   v: T,
 ): K extends keyof T ? T[K] : null => {
   if (!v) return null;
