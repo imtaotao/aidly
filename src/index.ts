@@ -2,15 +2,9 @@ export { Queue } from 'small-queue';
 export { uuid } from './uuid';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
+export type { BaseType } from './types';
 
-export type BaseType =
-  | number
-  | bigint
-  | string
-  | symbol
-  | boolean
-  | null
-  | undefined;
+import type { BaseType } from './types';
 
 export const noop = () => {};
 
