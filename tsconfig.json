@@ -10,6 +10,7 @@
     "allowJs": true,
     "sourceMap": true,
     "declaration": true,
+    "strict": true,
     "noImplicitThis": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,

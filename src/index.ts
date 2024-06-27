@@ -137,12 +137,12 @@ export const toLowerCase = ([v, ...args]: string) =>
 export const getValueType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
 
-export const makeMap = <T extends Array<PropertyKey>>(list: T) => {
-  const map: { [k in T[number]]: true } = Object.create(null);
+export const makeMap = <T extends string>(list: Array<T>) => {
+  const map: { [key in T]: true } = Object.create(null);
   for (let i = 0; i < list.length; i++) {
     map[list[i]] = true;
   }
-  return (v: PropertyKey) => Boolean(map[v]);
+  return (v: keyof typeof map) => Boolean(map[v]);
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
@@ -156,11 +156,11 @@ export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
 };
 
 export const defered = <T = void>() => {
-  let reject: (reason?: any) => void;
-  let resolve: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: any) => void;
+  let resolve!: (value: T | PromiseLike<T>) => void;
   const promise = new Promise<T>((rs, rj) => {
-    reject = rs;
-    resolve = rj;
+    reject = rj;
+    resolve = rs;
   });
   return { promise, resolve, reject };
 };
@@ -168,8 +168,9 @@ export const defered = <T = void>() => {
 export const sleep = (t: number) => {
   return new Promise<void>((resolve) => {
     if (!t) return resolve();
-    let timer = setTimeout(() => {
-      clearTimeout(timer);
+    let timer: NodeJS.Timeout | string | number | null;
+    timer = setTimeout(() => {
+      timer && clearTimeout(timer);
       timer = null;
       resolve();
     }, t);
@@ -205,16 +206,20 @@ export function map(
 ): unknown {
   fn = fn || ((val) => val);
   if (isArray(data)) {
-    return data.map((val, i) => fn(val, i));
+    return data.map((val, i) => fn!(val, i));
   }
   if (isSet(data)) {
-    const cloned = new Set();
-    for (const val of data) cloned.add(fn(val));
+    const cloned = new Set<unknown>();
+    for (const val of data) {
+      cloned.add(fn(val));
+    }
     return cloned;
   }
   if (isPlainObject(data)) {
-    const cloned = {};
-    for (const key in data) cloned[key] = fn(data[key], key);
+    const cloned: Record<PropertyKey, unknown> = {};
+    for (const key in data) {
+      cloned[key] = fn(data[key], key);
+    }
     return cloned;
   }
   throw new Error(`Invalid type "${getValueType(data)}"`);
@@ -247,13 +252,18 @@ export const getExtname = (p: string) => {
   return '';
 };
 
+// From `iterator interface` of simulate
+const FAUX_ITERATOR_SYMBOL = '@@iterator';
 const ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
-export const getIteratorFn = <T, K = typeof Symbol.iterator>(
-  v: T,
-): K extends keyof T ? T[K] : null => {
-  if (!v) return null;
-  const iterator = (ITERATOR_SYMBOL && v[ITERATOR_SYMBOL]) || v['@@iterator'];
-  return typeof iterator === 'function' ? iterator : null;
+export const getIteratorFn = <T, K = typeof Symbol.iterator>(v: T) => {
+  let res;
+  if (v) {
+    res =
+      (ITERATOR_SYMBOL &&
+        (v as { [K in typeof ITERATOR_SYMBOL]?: unknown })[ITERATOR_SYMBOL]) ||
+      (v as { [k in string]?: unknown })[FAUX_ITERATOR_SYMBOL];
+  }
+  return res as K extends keyof T ? T[K] : unknown;
 };
 
 /**
