@@ -5,7 +5,7 @@ module.exports = {
   clearMocks: true,
   rootDir: __dirname,
   preset: "ts-jest",
-  testMatch: ["<rootDir>/src/**/*spec.[jt]s?(x)"],
+  testMatch: ["<rootDir>/src/__tests__/**/*spec.[jt]s?(x)"],
   coverageProvider: "v8",
   coverageDirectory: "coverage",
   transform: { "\\.ts$": "ts-jest" }

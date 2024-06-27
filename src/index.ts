@@ -1,4 +1,7 @@
 export { Queue } from 'small-queue';
+export { uuid } from './uuid';
+export { loopSlice } from './loopSlice';
+export { throttle, debounce } from './throttle';
 
 export type BaseType =
   | number
@@ -35,6 +38,8 @@ export const idleCallback =
 
 export const isArray = Array.isArray;
 
+export const isBrowser = typeof window !== 'undefined';
+
 export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
 
@@ -51,8 +56,6 @@ export const isDate = (v: unknown): v is Date =>
 
 export const isRegExp = (v: unknown): v is RegExp =>
   objectToString.call(v) === '[object RegExp]';
-
-export const isBrowser = typeof window !== 'undefined';
 
 export const isWindow = (val: any): boolean =>
   typeof window !== 'undefined' &&
@@ -121,9 +124,9 @@ export const isAbsolute = (p: string) => {
   return false;
 };
 
-export const last = <T>(list: Array<T>, i = 0) => list[list.length + i - 1];
+export const last = <T>(arr: Array<T>, i = 0) => arr[arr.length + i - 1];
 
-export const uniq = <T>(list: Array<T>): Array<T> => Array.from(new Set(list));
+export const uniq = <T>(arr: Array<T>): Array<T> => Array.from(new Set(arr));
 
 export const hasOwn = <T extends unknown>(obj: T, key: string) =>
   Object.hasOwnProperty.call(obj, key) as boolean;
@@ -137,10 +140,10 @@ export const toLowerCase = ([v, ...args]: string) =>
 export const getValueType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
 
-export const makeMap = <T extends string>(list: Array<T>) => {
+export const makeMap = <T extends string>(arr: Array<T>) => {
   const map: { [key in T]: true } = Object.create(null);
-  for (let i = 0; i < list.length; i++) {
-    map[list[i]] = true;
+  for (let i = 0; i < arr.length; i++) {
+    map[arr[i]] = true;
   }
   return (v: keyof typeof map) => Boolean(map[v]);
 };
@@ -177,17 +180,17 @@ export const sleep = (t: number) => {
   });
 };
 
-export const remove = <T>(list: Array<T> | Set<T>, el: T) => {
-  if (isArray(list)) {
-    const i = list.indexOf(el);
+export const remove = <T>(arr: Array<T> | Set<T>, el: T) => {
+  if (isArray(arr)) {
+    const i = arr.indexOf(el);
     if (i > -1) {
-      list.splice(i, 1);
+      arr.splice(i, 1);
       return true;
     }
     return false;
   } else {
-    if (list.has(el)) {
-      list.delete(el);
+    if (arr.has(el)) {
+      arr.delete(el);
       return true;
     }
     return false;
@@ -267,85 +270,15 @@ export const getIteratorFn = <T, K = typeof Symbol.iterator>(v: T) => {
 };
 
 /**
- * Give the current task one frame of time (default is 17ms).
- * If it exceeds one frame, the remaining tasks will be put into the next frame.
+ * Default values `max=0, min=0`
  */
-export const loopSlice = (
-  l: number,
-  fn: (i: number) => void | boolean,
-  taskTime = 17,
-) => {
-  return new Promise<void>((resolve) => {
-    if (l === 0) {
-      resolve();
-      return;
-    }
-    let i = -1;
-    let start = now();
-    const run = () => {
-      while (++i < l) {
-        if (fn(i) === false) {
-          resolve();
-          break;
-        }
-        if (i === l - 1) {
-          resolve();
-        } else {
-          const t = now();
-          if (t - start > taskTime) {
-            start = t;
-            raf(run);
-            break;
-          }
-        }
-      }
-    };
-    run();
-  });
-};
-
-export const debounce = <T extends (...args: Array<any>) => undefined | void>(
-  delay: number,
-  fn: T,
-) => throttle(delay, fn, true);
-
-export const throttle = <T extends (...args: Array<any>) => undefined | void>(
-  delay: number,
-  fn: T,
-  _isDebounce?: boolean,
-) => {
-  let lastExec = 0;
-  let cancelled = false;
-  let timer: NodeJS.Timeout | string | number | null = null;
-  const clear = () => (timer = null);
-
-  function wrapper(this: unknown, ...args: Parameters<T>): void {
-    if (cancelled) return;
-    const cur = Date.now();
-    const elapsed = cur - lastExec;
-    const exec = (cur?: number) => {
-      lastExec = cur || Date.now();
-      fn.apply(this, args);
-    };
-    if (_isDebounce && !timer) {
-      exec(cur);
-    }
-    if (timer) {
-      clearTimeout(timer);
-    }
-    if (!_isDebounce && elapsed > delay) {
-      exec(cur);
-    } else {
-      timer = setTimeout(
-        _isDebounce ? clear : exec,
-        _isDebounce ? delay : delay - elapsed,
-      );
-    }
+export const randomNumber = (min = 0, max = 0) => {
+  let r;
+  if (max === min) {
+    r = max;
+  } else {
+    if (max < min) min = [max, (max = min)][0];
+    r = Math.random() * (max - min) + min;
   }
-  wrapper.cancel = () => {
-    if (timer) clearTimeout(timer);
-    clear();
-    cancelled = true;
-  };
-  return wrapper as T & { cancel: () => void };
+  return Number(r.toFixed(0));
 };
