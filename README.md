@@ -7,6 +7,14 @@
 
 A small utility function in pure js runtime.
 
+
+### API
+
+View type declaration file retrieval api.
+
+> https://unpkg.com/aidly@1.1.1/dist/index.d.ts
+
+
 ### Demo
 
 ```js
