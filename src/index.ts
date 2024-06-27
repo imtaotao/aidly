@@ -35,7 +35,8 @@ export const isNil = <T = unknown>(v: T): v is null | undefined =>
 
 export const isObject = <T extends unknown>(
   v: T,
-): v is Exclude<T, BaseType | void> => typeof v === 'object' && v !== null;
+): v is Exclude<T, BaseType | void | ((...args: Array<any>) => any)> =>
+  typeof v === 'object' && v !== null;
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
@@ -255,6 +256,19 @@ export const getExtname = (p: string) => {
     extra = c + extra;
   }
   return '';
+};
+
+// `@@iterator` from `iterator interface` of simulate
+const ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+/**
+ * `getIteratorFn('')` => `IterableIterator<string>`
+ */
+export const getIteratorFn = <T, K = typeof Symbol.iterator | '@@iterator'>(
+  v: T,
+): K extends keyof T ? T[K] : null => {
+  if (!v) return null;
+  const iterator = (ITERATOR_SYMBOL && v[ITERATOR_SYMBOL]) || v['@@iterator'];
+  return typeof iterator === 'function' ? iterator : null;
 };
 
 /**
