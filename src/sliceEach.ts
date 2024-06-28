@@ -4,7 +4,7 @@ import { raf } from './index';
  * Give the current task one frame of time (default is 17ms).
  * If it exceeds one frame, the remaining tasks will be put into the next frame.
  */
-export const loopSlice = (
+export const sliceEach = (
   l: number,
   fn: (i: number) => void | boolean,
   taskTime = 17,
