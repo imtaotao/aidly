@@ -30,53 +30,56 @@ describe('test', () => {
 
   it('throttle', () => {
     const d = defered();
-    let i = 0;
-    let j = 0;
-    const throttleFunc = throttle(100, (num: number) => {
-      i = num;
-    });
-    throttleFunc(1); // Will execute the callback
-    expect(i).toBe(1);
-    throttleFunc(2); // Won’t execute callback
-    expect(i).toBe(1);
-    throttleFunc(3); // Won’t execute callback
-    expect(i).toBe(1);
-    throttleFunc(4); // Will execute the callback
-    expect(i).toBe(1);
-
+    // The uuid test loops multiple times, which will block the process.
+    // So use timeout.
     setTimeout(() => {
-      j++;
+      let i = 0;
+      let j = 0;
+      const throttleFunc = throttle(100, (num: number) => {
+        i = num;
+      });
+      throttleFunc(1); // Will execute the callback
       expect(i).toBe(1);
-    }, 50);
+      throttleFunc(2); // Won’t execute callback
+      expect(i).toBe(1);
+      throttleFunc(3); // Won’t execute callback
+      expect(i).toBe(1);
+      throttleFunc(4); // Will execute the callback
+      expect(i).toBe(1);
 
-    setTimeout(() => {
-      j++;
-      expect(i).toBe(4);
-      throttleFunc(10); // Won’t execute callback
-      expect(i).toBe(4);
-    }, 110);
+      setTimeout(() => {
+        j++;
+        expect(i).toBe(1);
+      }, 50);
 
-    setTimeout(() => {
-      j++;
-      expect(i).toBe(4);
-      throttleFunc(11); // Will execute the callback
-      expect(i).toBe(4);
-    }, 150);
+      setTimeout(() => {
+        j++;
+        expect(i).toBe(4);
+        throttleFunc(10); // Won’t execute callback
+        expect(i).toBe(4);
+      }, 120);
 
-    setTimeout(() => {
-      j++;
-      expect(i).toBe(11);
-    }, 220);
+      setTimeout(() => {
+        j++;
+        expect(i).toBe(4);
+        throttleFunc(11); // Will execute the callback
+        expect(i).toBe(4);
+      }, 150);
 
-    setTimeout(() => {
-      j++;
-      expect(i).toBe(11);
-      throttleFunc(12); // Will execute the callback
-      expect(i).toBe(12);
-      expect(j).toBe(5);
-      d.resolve();
-    }, 320);
+      setTimeout(() => {
+        j++;
+        expect(i).toBe(11);
+      }, 220);
 
+      setTimeout(() => {
+        j++;
+        expect(i).toBe(11);
+        throttleFunc(12); // Will execute the callback
+        expect(i).toBe(12);
+        expect(j).toBe(5);
+        d.resolve();
+      }, 320);
+    });
     return d.promise;
   });
 

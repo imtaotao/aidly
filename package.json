@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Tool library.",
   "main": "./dist/aidly.cjs.js",
   "unpkg": "./dist/aidly.umd.js",
