@@ -39,8 +39,7 @@ export const isBrowser = typeof window !== 'undefined';
 export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
 
-export const isObject = (v: unknown): v is object =>
-  v !== null && (typeof v === 'object' || typeof v === 'function');
+export const isObject = (v: unknown) => v !== null && typeof v === 'object';
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
@@ -111,9 +110,6 @@ export const isNativeValue = (v: unknown): v is BaseType => {
   );
 };
 
-/**
- * In Browser.
- */
 export const isAbsolute = (p: string) => {
   if (!/^[a-zA-Z]:\\/.test(p)) {
     if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(p)) {
@@ -174,16 +170,6 @@ export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
     return fn.apply(this, args);
   }
   return wrap;
-};
-
-export const defered = <T = void>() => {
-  let reject!: (reason?: any) => void;
-  let resolve!: (value: T | PromiseLike<T>) => void;
-  const promise = new Promise<T>((rs, rj) => {
-    reject = rj;
-    resolve = rs;
-  });
-  return { promise, resolve, reject };
 };
 
 export const sleep = (t: number) => {
@@ -302,4 +288,14 @@ export const sortKeys = <T extends Record<PropertyKey, unknown>>(
     map[key as keyof T] = val[key as keyof T];
   }
   return map;
+};
+
+export const defered = <T = void>() => {
+  let reject!: (reason?: any) => void;
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  const promise = new Promise<T>((rs, rj) => {
+    reject = rj;
+    resolve = rs;
+  });
+  return { promise, resolve, reject };
 };

@@ -4,11 +4,10 @@ import {
   isDate,
   isArray,
   isRegExp,
-  regFlags,
   isTypedArray,
+  regFlags,
 } from './index';
 
-// https://github.com/pvorb/clone/blob/master/clone.js
 export const clone = <T>(val: T, includeNonEnumerable = false): T => {
   const allChildren = new WeakMap();
 
