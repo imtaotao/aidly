@@ -20,7 +20,7 @@
     "test": "jest",
     "prepare": "husky",
     "dev": "ts-node ./test.ts",
-    "build": "rimraf ./dist && rollup --config",
+    "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
     "format": "prettier --write --parser typescript \"(src|dist)/**/*.(js|ts?(x))\""
   },
   "lint-staged": {
