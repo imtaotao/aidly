@@ -1,15 +1,11 @@
-const getRandomValues = (buf: Uint8Array) => {
-  for (let i = 0; i < buf.length; i++) {
-    buf[i] = Math.floor(Math.random() * 256);
-  }
-  return buf;
-};
-
-const byteToHex: Array<string> = [];
-for (let i = 0; i < 256; ++i) {
-  byteToHex.push((i + 0x100).toString(16).slice(1));
-}
+let byteToHex: Array<string>;
 const unsafeStringify = (arr: Uint8Array) => {
+  if (!byteToHex) {
+    byteToHex = [];
+    for (let i = 0; i < 256; ++i) {
+      byteToHex.push((i + 0x100).toString(16).slice(1));
+    }
+  }
   return (
     byteToHex[arr[0]] +
     byteToHex[arr[1]] +
@@ -34,11 +30,17 @@ const unsafeStringify = (arr: Uint8Array) => {
   ).toLowerCase() as `${string}-${string}-${string}-${string}-${string}`;
 };
 
-const rnds8Pool = new Uint8Array(256);
-let poolPtr = rnds8Pool.length;
+let poolPtr: number;
+let rnds8Pool: Uint8Array;
 const rng = () => {
-  if (poolPtr > rnds8Pool.length - 16) {
-    getRandomValues(rnds8Pool);
+  if (!rnds8Pool) {
+    rnds8Pool = new Uint8Array(256);
+    poolPtr = rnds8Pool.length;
+  }
+  if (poolPtr > 256 - 16) {
+    for (let i = 0; i < 256; i++) {
+      rnds8Pool[i] = Math.floor(Math.random() * 256);
+    }
     poolPtr = 0;
   }
   return rnds8Pool.slice(poolPtr, (poolPtr += 16));
@@ -46,12 +48,8 @@ const rng = () => {
 
 // https://github.com/uuidjs/uuid/blob/main/src/v4.js
 export const uuid = () => {
-  if (crypto && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  } else {
-    const rnds = rng();
-    rnds[6] = (rnds[6] & 0x0f) | 0x40;
-    rnds[8] = (rnds[8] & 0x3f) | 0x80;
-    return unsafeStringify(rnds);
-  }
+  const rnds = rng();
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+  return unsafeStringify(rnds);
 };
