@@ -12,7 +12,7 @@ A small utility function in pure js runtime.
 
 View type declaration file retrieval api.
 
-> https://unpkg.com/aidly/dist/index.d.ts
+> https://unpkg.com/aidly/dist/
 
 
 ### Demo
