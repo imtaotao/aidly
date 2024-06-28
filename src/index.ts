@@ -4,7 +4,7 @@ export { Queue } from 'small-queue';
 export { root } from './root';
 export { uuid } from './uuid';
 export { clone } from './clone';
-export { sliceEach } from './sliceEach';
+export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
 export type { BaseType, Prettify, TypedArray } from './types';
 
