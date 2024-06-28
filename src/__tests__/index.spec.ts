@@ -1,6 +1,26 @@
-import { debounce, throttle, defered, getIteratorFn } from '../index';
+import {
+  root,
+  regFlags,
+  debounce,
+  throttle,
+  defered,
+  getIteratorFn,
+} from '../index';
 
 describe('test', () => {
+  it('root', () => {
+    expect(root === global).toBe(true);
+    expect(root === globalThis).toBe(true);
+  });
+
+  it('regFlags', () => {
+    expect(regFlags(/a/)).toBe('');
+    expect(regFlags(/a/i)).toBe('i');
+    expect(regFlags(/a/g)).toBe('g');
+    expect(regFlags(/a/gi)).toBe('gi');
+    expect(regFlags(/a/m)).toBe('m');
+  });
+
   it('getIteratorFn', () => {
     expect(getIteratorFn(1) === undefined).toBe(true);
     expect(getIteratorFn(() => {}) === undefined).toBe(true);

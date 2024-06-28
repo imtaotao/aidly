@@ -5,7 +5,7 @@
 
 </div>
 
-A small utility function in pure js runtime.
+A small utility function in pure js runtime, capable of effective tree-shaking.
 
 
 ### API
@@ -18,9 +18,9 @@ View type declaration file retrieval api.
 ### Demo
 
 ```js
-import { isNil } from 'aidly';
+import { clone } from 'aidly';
 
-console.log(isNil(null)); // true
+console.log(clone(/a/ig)); // `/a/gi`
 ```
 
 ### CDN
@@ -31,9 +31,9 @@ console.log(isNil(null)); // true
 <body>
   <script src="https://unpkg.com/aidly/dist/aidly.umd.js"></script>
   <script>
-    const { isNil } = window.Aidly;
+    const { clone } = window.Aidly;
     
-    console.log(isNil(null)); // true
+    console.log(clone(/a/ig)); // `/a/gi`
   </script>
 </body>
 </html>

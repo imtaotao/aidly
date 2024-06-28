@@ -1,4 +1,3 @@
-import { root } from './root';
 import type { BaseType, TypedArray } from './types';
 
 export { Queue } from 'small-queue';
@@ -36,11 +35,6 @@ export const idleCallback =
 export const isArray = Array.isArray;
 
 export const isBrowser = typeof window !== 'undefined';
-
-export const isBuffer =
-  root && root.Buffer && typeof root.Buffer.isBuffer === 'function'
-    ? root.Buffer.isBuffer
-    : (_: unknown): _ is Buffer => false;
 
 export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
@@ -145,7 +139,7 @@ export const toLowerCase = ([v, ...args]: string) =>
 export const toRawType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
 
-export const getRegExpFlags = (reg: RegExp) => {
+export const regFlags = (reg: RegExp) => {
   let flags = '';
   if (reg.global) flags += 'g';
   if (reg.ignoreCase) flags += 'i';
