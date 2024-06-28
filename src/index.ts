@@ -110,14 +110,10 @@ export const isNativeValue = (v: unknown): v is BaseType => {
   );
 };
 
-export const isAbsolute = (p: string) => {
-  if (!/^[a-zA-Z]:\\/.test(p)) {
-    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(p)) {
-      return true;
-    }
-  }
-  return false;
-};
+const unc = /^[a-zA-Z]:\\/;
+const uri = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
+export const isUnc = (p: string) => unc.test(p);
+export const isAbsolute = (p: string) => !unc.test(p) && uri.test(p);
 
 export const last = <T>(arr: Array<T>, i = 0) => arr[arr.length + i - 1];
 

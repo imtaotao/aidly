@@ -4,6 +4,7 @@ import {
   debounce,
   throttle,
   defered,
+  isAbsolute,
   getIteratorFn,
 } from '../index';
 
@@ -46,6 +47,18 @@ describe('test', () => {
     await d.promise.then((r) => {
       expect(r).toBe(1);
     });
+  });
+
+  it('isAbsolute', () => {
+    expect(isAbsolute('a.js')).toBe(false);
+    expect(isAbsolute('/a.js')).toBe(false);
+    expect(isAbsolute('./a.js')).toBe(false);
+    expect(isAbsolute('http://x.com/a.js')).toBe(true);
+    expect(isAbsolute('http://x.com/a.js?x=1')).toBe(true);
+    expect(isAbsolute('data:text/html;base64,YQ==')).toBe(true);
+    expect(
+      isAbsolute('blob:https://a.com/832a2821-8580-4099-85c8-509bf48aee50'),
+    ).toBe(true);
   });
 
   it('throttle', () => {
