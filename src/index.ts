@@ -1,10 +1,13 @@
-import type { BaseType } from './types';
+import { root } from './root';
+import type { BaseType, TypedArray } from './types';
 
 export { Queue } from 'small-queue';
+export { root } from './root';
 export { uuid } from './uuid';
+export { clone } from './clone';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
-export type { BaseType } from './types';
+export type { BaseType, Prettify, TypedArray } from './types';
 
 export const noop = () => {};
 
@@ -34,13 +37,16 @@ export const isArray = Array.isArray;
 
 export const isBrowser = typeof window !== 'undefined';
 
+export const isBuffer =
+  root && root.Buffer && typeof root.Buffer.isBuffer === 'function'
+    ? root.Buffer.isBuffer
+    : (_: unknown): _ is Buffer => false;
+
 export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
 
-export const isObject = <T extends unknown>(
-  v: T,
-): v is Exclude<T, BaseType | void | ((...args: Array<any>) => any)> =>
-  typeof v === 'object' && v !== null;
+export const isObject = (v: unknown): v is object =>
+  v !== null && (typeof v === 'object' || typeof v === 'function');
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
@@ -54,6 +60,11 @@ export const isRegExp = (v: unknown): v is RegExp =>
 export const isWindow = (val: any): boolean =>
   typeof window !== 'undefined' &&
   objectToString.call(val) === '[object Window]';
+
+const typeArrTag =
+  /^\[object (?:Float(?:32|64)|(?:Int|Uint)(?:8|16|32)|Uint8Clamped)Array\]$/;
+export const isTypedArray = (val: unknown): val is TypedArray =>
+  typeArrTag.test(objectToString.call(val));
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
   typeof Set !== 'function' || !Set.prototype.has
@@ -131,8 +142,16 @@ export const toUpperCase = ([v, ...args]: string) =>
 export const toLowerCase = ([v, ...args]: string) =>
   v.toLocaleLowerCase() + args.join('');
 
-export const getValueType = (v: unknown) =>
+export const toRawType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
+
+export const getRegExpFlags = (reg: RegExp) => {
+  let flags = '';
+  if (reg.global) flags += 'g';
+  if (reg.ignoreCase) flags += 'i';
+  if (reg.multiline) flags += 'm';
+  return flags as '' | 'i' | 'g' | 'm' | 'gi' | 'gm' | 'im' | 'gim';
+};
 
 export const makeMap = <T extends string>(arr: Array<T>) => {
   const map: { [key in T]: true } = Object.create(null);
@@ -140,6 +159,17 @@ export const makeMap = <T extends string>(arr: Array<T>) => {
     map[arr[i]] = true;
   }
   return (v: keyof typeof map) => Boolean(map[v]);
+};
+
+export const randomNumber = (min = 0, max = 0) => {
+  let r;
+  if (max === min) {
+    r = max;
+  } else {
+    if (max < min) min = [max, (max = min)][0];
+    r = Math.random() * (max - min) + min;
+  }
+  return Number(r.toFixed(0));
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
@@ -219,7 +249,7 @@ export function map(
     }
     return cloned;
   }
-  throw new Error(`Invalid type "${getValueType(data)}"`);
+  throw new Error(`Invalid type "${toRawType(data)}"`);
 }
 
 export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
@@ -263,16 +293,19 @@ export const getIteratorFn = <T, K = typeof Symbol.iterator>(v: T) => {
   return res as K extends keyof T ? T[K] : unknown;
 };
 
-/**
- * Default values `max=0, min=0`
- */
-export const randomNumber = (min = 0, max = 0) => {
-  let r;
-  if (max === min) {
-    r = max;
-  } else {
-    if (max < min) min = [max, (max = min)][0];
-    r = Math.random() * (max - min) + min;
+export const sortStrings = (arr: Array<string>, locales = 'en') => {
+  return [...arr].sort((a, b) => a.localeCompare(b, locales));
+};
+
+// If there is a deep sort, the user can handle it by themselves
+export const sortKeys = <T extends Record<PropertyKey, unknown>>(
+  val: T,
+  locales?: string,
+): T => {
+  const map = {} as T;
+  const keys = sortStrings(Object.keys(val), locales);
+  for (const key of keys) {
+    map[key as keyof T] = val[key as keyof T];
   }
-  return Number(r.toFixed(0));
+  return map;
 };
