@@ -1,18 +1,47 @@
+import type { Prettify } from './types';
 import {
   isSet,
   isMap,
   isDate,
   isArray,
   isRegExp,
+  isObject,
+  isWeakSet,
   isTypedArray,
   regFlags,
 } from './index';
 
-export const clone = <T>(val: T, includeNonEnumerable = false): T => {
-  const allChildren = new WeakMap();
+const _new = (val: object, ...args: Array<any>) =>
+  new (val as any).constructor(...args);
 
-  const _new = (val: object, ...args: Array<any>) =>
-    new (val as any).constructor(...args);
+const _isRes =
+  typeof Response === 'undefined'
+    ? (v: unknown): v is Response => false
+    : (v: unknown): v is Response => v instanceof Response;
+
+export interface CloneOptions {
+  ignoreError?: boolean;
+  includeNonEnum?: boolean;
+  exclude?: Set<unknown> | WeakSet<object>;
+}
+
+export function clone<T>(val: T, options?: Prettify<CloneOptions>): T;
+export function clone<T>(val: T, exclude?: CloneOptions['exclude']): T;
+export function clone<T>(val: T, options?: CloneOptions['includeNonEnum']): T;
+export function clone<T>(val: T, options?: unknown): T {
+  let exclude: CloneOptions['exclude'];
+  let ignoreError: CloneOptions['ignoreError'];
+  let includeNonEnum: CloneOptions['includeNonEnum'];
+
+  if (typeof options === 'boolean') {
+    includeNonEnum = options;
+  } else if (isSet(options) || isWeakSet(options)) {
+    exclude = options;
+  } else if (isObject(options)) {
+    ({ exclude, ignoreError, includeNonEnum } = options as CloneOptions);
+  }
+
+  const allChildren = new WeakMap();
 
   const _cv = (
     child: unknown,
@@ -30,7 +59,9 @@ export const clone = <T>(val: T, includeNonEnumerable = false): T => {
         Object.defineProperty(child, key, descriptor);
       } catch (e) {
         // when in strict mode, TypeError will be thrown if parent[k] property only has a getter
-        console.error(e);
+        if (!ignoreError) {
+          console.error(e);
+        }
       }
     }
   };
@@ -39,12 +70,15 @@ export const clone = <T>(val: T, includeNonEnumerable = false): T => {
     if (parent === null || typeof parent !== 'object') {
       return parent;
     }
+    if (exclude && exclude.has(parent)) {
+      return parent;
+    }
     if (allChildren.has(parent as object)) {
       return allChildren.get(parent as object);
     }
     let child: unknown;
 
-    // Create a copy
+    // Create a child
     if (isMap(parent)) {
       child = _new(parent);
     } else if (isSet(parent)) {
@@ -62,6 +96,8 @@ export const clone = <T>(val: T, includeNonEnumerable = false): T => {
       child = _new(parent, parent.getTime());
     } else if (parent instanceof Error) {
       child = Object.create(parent);
+    } else if (_isRes(parent)) {
+      child = parent.clone();
     } else if (parent instanceof Promise) {
       child = _new(
         parent,
@@ -104,14 +140,14 @@ export const clone = <T>(val: T, includeNonEnumerable = false): T => {
       for (let i = 0; i < symbols.length; i++) {
         const symbol = symbols[i];
         const descriptor = Object.getOwnPropertyDescriptor(parent, symbol);
-        if (!descriptor || (!descriptor.enumerable && !includeNonEnumerable)) {
+        if (!descriptor || (!descriptor.enumerable && !includeNonEnum)) {
           continue;
         }
         _cv(child, symbol, descriptor);
       }
     }
     // Copy non-enumerable properties
-    if (includeNonEnumerable) {
+    if (includeNonEnum) {
       const ns = Object.getOwnPropertyNames(parent);
       for (let i = 0; i < ns.length; i++) {
         const n = ns[i];
@@ -126,4 +162,4 @@ export const clone = <T>(val: T, includeNonEnumerable = false): T => {
   };
 
   return _cl(val);
-};
+}

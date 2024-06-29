@@ -404,7 +404,7 @@ describe('clone.ts', () => {
       enumerable: false,
     });
 
-    const cloned = clone(source, true);
+    const cloned = clone(source, { includeNonEnum: true });
 
     expect(Object.getOwnPropertyDescriptor(cloned, 'x')!.enumerable).toBe(true);
     expect(Object.getOwnPropertyDescriptor(cloned, 'y')!.enumerable).toBe(
@@ -416,5 +416,32 @@ describe('clone.ts', () => {
     expect(Object.getOwnPropertyDescriptor(cloned, symbol2)!.enumerable).toBe(
       false,
     );
+  });
+
+  it('check exclude', () => {
+    const obj = {
+      a: { num: 1 },
+      b: { num: 2 },
+      c: { num: 3 },
+    };
+    let cloned = clone(obj);
+
+    expect(cloned !== obj).toBe(true);
+    expect(cloned.a !== obj.a).toBe(true);
+    expect(cloned.b !== obj.b).toBe(true);
+    expect(cloned.c !== obj.c).toBe(true);
+    expect(cloned.a.num === obj.a.num).toBe(true);
+    expect(cloned.b.num === obj.b.num).toBe(true);
+    expect(cloned.c.num === obj.c.num).toBe(true);
+
+    cloned = clone(obj, new WeakSet([obj.b]));
+
+    expect(cloned !== obj).toBe(true);
+    expect(cloned.a !== obj.a).toBe(true);
+    expect(cloned.b === obj.b).toBe(true);
+    expect(cloned.c !== obj.c).toBe(true);
+    expect(cloned.a.num === obj.a.num).toBe(true);
+    expect(cloned.b.num === obj.b.num).toBe(true);
+    expect(cloned.c.num === obj.c.num).toBe(true);
   });
 });

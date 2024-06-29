@@ -6,7 +6,7 @@ export { uuid } from './uuid';
 export { clone } from './clone';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
-export type { BaseType, Prettify, TypedArray } from './types';
+export type { BaseType, TypedArray, Prettify, DeepPrettify } from './types';
 
 export const noop = () => {};
 
@@ -112,7 +112,6 @@ export const isNativeValue = (v: unknown): v is BaseType => {
 
 const unc = /^[a-zA-Z]:\\/;
 const uri = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
-export const isUnc = (p: string) => unc.test(p);
 export const isAbsolute = (p: string) => !unc.test(p) && uri.test(p);
 
 export const last = <T>(arr: Array<T>, i = 0) => arr[arr.length + i - 1];
@@ -122,14 +121,16 @@ export const uniq = <T>(arr: Array<T>): Array<T> => Array.from(new Set(arr));
 export const hasOwn = <T extends unknown>(obj: T, key: string) =>
   Object.hasOwnProperty.call(obj, key) as boolean;
 
-export const toUpperCase = ([v, ...args]: string) =>
-  v.toLocaleUpperCase() + args.join('');
+export const capitalize = ([v, ...args]: string) =>
+  v.toUpperCase() + args.join('').toLowerCase();
 
-export const toLowerCase = ([v, ...args]: string) =>
-  v.toLocaleLowerCase() + args.join('');
+export const uncapitalize = ([v, ...args]: string) =>
+  v.toLowerCase() + args.join('').toUpperCase();
 
 export const toRawType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
+
+export const slash = (val: string) => val.replace(/\\/g, '/');
 
 export const regFlags = (reg: RegExp) => {
   let flags = '';
@@ -148,14 +149,14 @@ export const makeMap = <T extends string>(arr: Array<T>) => {
 };
 
 export const randomNumber = (min = 0, max = 0) => {
-  let r;
+  let res;
   if (max === min) {
-    r = max;
+    res = max;
   } else {
     if (max < min) min = [max, (max = min)][0];
-    r = Math.random() * (max - min) + min;
+    res = Math.random() * (max - min) + min;
   }
-  return Number(r.toFixed(0));
+  return Number(res.toFixed(0));
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
@@ -234,8 +235,8 @@ export const toCamelCase = (val: string, upper = false, reg = /[_-]/g) => {
     .map((k, i) => {
       if (!k) return null;
       return !upper && i === 0
-        ? k.toLocaleLowerCase()
-        : k.charAt(0).toLocaleUpperCase() + k.slice(1).toLocaleLowerCase();
+        ? k.toLowerCase()
+        : k.charAt(0).toUpperCase() + k.slice(1).toLowerCase();
     })
     .join('');
 };
@@ -284,6 +285,60 @@ export const sortKeys = <T extends Record<PropertyKey, unknown>>(
     map[key as keyof T] = val[key as keyof T];
   }
   return map;
+};
+
+export const clearUndef = <T extends object>(val: T): T => {
+  Object.keys(val).forEach((key: string) => {
+    if (val[key as keyof T]) {
+      delete val[key as keyof T];
+    }
+  });
+  return val;
+};
+
+export const pick = <O extends object, T extends keyof O>(
+  val: O,
+  keys: Array<T>,
+  omitUndefined = false,
+) => {
+  return keys.reduce((n, k) => {
+    if (k in val) {
+      if (!omitUndefined || val[k] !== undefined) {
+        n[k] = val[k];
+      }
+    }
+    return n;
+  }, {} as Pick<O, T>);
+};
+
+const _reFullWs = /^\s*$/;
+export const unindent = (str: TemplateStringsArray | string) => {
+  const lines = (typeof str === 'string' ? str : str[0]).split('\n');
+  const whitespaceLines = lines.map((line) => _reFullWs.test(line));
+
+  const commonIndent = lines.reduce((min, line, idx) => {
+    if (whitespaceLines[idx]) return min;
+    const indent = line.match(/^\s*/)?.[0].length;
+    return indent === undefined ? min : Math.min(min, indent);
+  }, Number.POSITIVE_INFINITY);
+
+  let emptyLinesHead = 0;
+  while (emptyLinesHead < lines.length && whitespaceLines[emptyLinesHead]) {
+    emptyLinesHead++;
+  }
+
+  let emptyLinesTail = 0;
+  while (
+    emptyLinesTail < lines.length &&
+    whitespaceLines[lines.length - emptyLinesTail - 1]
+  ) {
+    emptyLinesTail++;
+  }
+
+  return lines
+    .slice(emptyLinesHead, lines.length - emptyLinesTail)
+    .map((line) => line.slice(commonIndent))
+    .join('\n');
 };
 
 export const defered = <T = void>() => {
