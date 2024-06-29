@@ -124,9 +124,6 @@ export const hasOwn = <T extends unknown>(obj: T, key: string) =>
 export const capitalize = ([v, ...args]: string) =>
   v.toUpperCase() + args.join('').toLowerCase();
 
-export const uncapitalize = ([v, ...args]: string) =>
-  v.toLowerCase() + args.join('').toUpperCase();
-
 export const toRawType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
 
@@ -148,15 +145,19 @@ export const makeMap = <T extends string>(arr: Array<T>) => {
   return (v: keyof typeof map) => Boolean(map[v]);
 };
 
-export const randomNumber = (min = 0, max = 0) => {
-  let res;
-  if (max === min) {
-    res = max;
-  } else {
-    if (max < min) min = [max, (max = min)][0];
-    res = Math.random() * (max - min) + min;
-  }
-  return Number(res.toFixed(0));
+export const decimalPlaces = (n: number) =>
+  !Number.isFinite(n) || Number.isInteger(n)
+    ? 0
+    : String(n).split('.')[1].length;
+
+export const rand = (min = 0, max = 0) => {
+  if (max === min) return max;
+  if (max < min) min = [max, (max = min)][0];
+  return Number(
+    (Math.random() * (max - min) + min).toFixed(
+      Math.max(decimalPlaces(min), decimalPlaces(max)),
+    ),
+  );
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {

@@ -1,3 +1,11 @@
+export type Awaitable<T> = T | PromiseLike<T>;
+
+export type Nullable<T> = T | null | undefined;
+
+export type Arrayable<T> = T | Array<T>;
+
+export type ElementOf<T> = T extends Array<infer E> ? E : never;
+
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export type DeepPrettify<T> = { [K in keyof T]: Prettify<T[K]> } & {};

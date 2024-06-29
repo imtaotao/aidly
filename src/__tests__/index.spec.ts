@@ -1,6 +1,7 @@
 import {
   root,
   slash,
+  rand,
   unindent,
   regFlags,
   debounce,
@@ -8,6 +9,7 @@ import {
   defered,
   capitalize,
   isAbsolute,
+  decimalPlaces,
   getIteratorFn,
 } from '../index';
 
@@ -15,6 +17,29 @@ describe('test', () => {
   it('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
+  });
+
+  it('rand', () => {
+    const a = 10;
+    for (let i = 0; i < 100; i++) {
+      const res = rand(a);
+      expect(decimalPlaces(res) === 0).toBe(true);
+      expect(res <= a).toBe(true);
+    }
+
+    const b = 10.5;
+    for (let i = 0; i < 100; i++) {
+      const res = rand(b);
+      expect(decimalPlaces(res) <= 1).toBe(true);
+      expect(res <= b).toBe(true);
+    }
+
+    const c = 10.55;
+    for (let i = 0; i < 100; i++) {
+      const res = rand(c);
+      expect(decimalPlaces(res) <= 2).toBe(true);
+      expect(res <= c).toBe(true);
+    }
   });
 
   it('regFlags', () => {
@@ -76,6 +101,26 @@ describe('test', () => {
     expect(capitalize('中国')).toEqual('中国');
     expect(capitalize('āÁĂÀ')).toEqual('Āáăà');
     expect(capitalize('a')).toEqual('A');
+  });
+
+  it('decimalPlaces', () => {
+    expect(decimalPlaces(0)).toBe(0);
+    expect(decimalPlaces(123.456)).toBe(3);
+    expect(decimalPlaces(123.4)).toBe(1);
+    expect(decimalPlaces(123)).toBe(0);
+    expect(decimalPlaces(0.001)).toBe(3);
+    expect(decimalPlaces(1.23e-2)).toBe(4);
+    expect(decimalPlaces(NaN)).toBe(0);
+    expect(decimalPlaces(Infinity)).toBe(0);
+    expect(decimalPlaces(-Infinity)).toBe(0);
+    expect(decimalPlaces(1.0)).toBe(0);
+    expect(decimalPlaces(0.00001)).toBe(5);
+    expect(decimalPlaces(1.0e-6)).toBe(6);
+    expect(decimalPlaces(1e6)).toBe(0);
+    expect(decimalPlaces(1.0e6)).toBe(0);
+    expect(decimalPlaces(1.234567e-1)).toBe(7);
+    expect(decimalPlaces(-0.1)).toBe(1);
+    expect(decimalPlaces(-0.11)).toBe(2);
   });
 
   it('unindent', () => {
