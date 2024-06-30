@@ -5,6 +5,7 @@ export { root } from './root';
 export { uuid } from './uuid';
 export { clone } from './clone';
 export { loopSlice } from './loopSlice';
+export { qsParse, qsStringify } from './qs';
 export { throttle, debounce } from './throttle';
 export type { BaseType, TypedArray, Prettify, DeepPrettify } from './types';
 
