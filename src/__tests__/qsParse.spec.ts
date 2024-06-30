@@ -16,7 +16,11 @@ describe('qsParse', () => {
     expect(qsParse('foo2=bar2&baz2=')).toEqual({ foo2: 'bar2', baz2: '' });
     expect(qsParse('foo=bar&baz')).toEqual({ foo: 'bar', baz: '' });
     expect(qsParse('foo=bar&foo=baz')).toEqual({ foo: ['bar', 'baz'] });
-    expect(qsParse('cht=p3&chd=t:60,40&chs=250x100&chl=Hello|World')).toEqual({
+    expect(
+      qsParse('cht=p3&chd=t:60,40&chs=250x100&chl=Hello|World', {
+        comma: false,
+      }),
+    ).toEqual({
       cht: 'p3',
       chd: 't:60,40',
       chs: '250x100',
@@ -31,19 +35,21 @@ describe('qsParse', () => {
   });
 
   it('comma: false', () => {
-    expect(qsParse('a[]=b&a[]=c')).toEqual({ a: ['b', 'c'] });
-    expect(qsParse('a[0]=b&a[1]=c')).toEqual({ a: ['b', 'c'] });
-    expect(qsParse('a=b,c')).toEqual({ a: 'b,c' });
-    expect(qsParse('a=b&a=c')).toEqual({ a: ['b', 'c'] });
-  });
-
-  it('comma: true', () => {
-    expect(qsParse('a[]=b&a[]=c', { comma: true })).toEqual({ a: ['b', 'c'] });
-    expect(qsParse('a[0]=b&a[1]=c', { comma: true })).toEqual({
+    expect(qsParse('a[]=b&a[]=c', { comma: false })).toEqual({ a: ['b', 'c'] });
+    expect(qsParse('a[0]=b&a[1]=c', { comma: false })).toEqual({
       a: ['b', 'c'],
     });
-    expect(qsParse('a=b,c', { comma: true })).toEqual({ a: ['b', 'c'] });
-    expect(qsParse('a=b&a=c', { comma: true })).toEqual({ a: ['b', 'c'] });
+    expect(qsParse('a=b,c', { comma: false })).toEqual({ a: 'b,c' });
+    expect(qsParse('a=b&a=c', { comma: false })).toEqual({ a: ['b', 'c'] });
+  });
+
+  it('comma: default true', () => {
+    expect(qsParse('a[]=b&a[]=c')).toEqual({ a: ['b', 'c'] });
+    expect(qsParse('a[0]=b&a[1]=c')).toEqual({
+      a: ['b', 'c'],
+    });
+    expect(qsParse('a=b,c')).toEqual({ a: ['b', 'c'] });
+    expect(qsParse('a=b&a=c')).toEqual({ a: ['b', 'c'] });
   });
 
   it('decode dot keys correctly', () => {
@@ -66,7 +72,7 @@ describe('qsParse', () => {
   });
 
   it('array index', () => {
-    expect(qsParse('a[20]=a')).toEqual({ a: ['a'] });
+    expect(qsParse('a[20]=a', { allowSparse: false })).toEqual({ a: ['a'] });
     expect(qsParse('a[12b]=c')).toEqual({ a: { '12b': 'c' } });
   });
 
@@ -81,7 +87,7 @@ describe('qsParse', () => {
 
   it('allows brackets in the value', () => {
     expect(qsParse('pets=["tobi"]')).toEqual({ pets: '["tobi"]' });
-    expect(qsParse('operators=[">=", "<="]')).toEqual({
+    expect(qsParse('operators=[">=", "<="]', { comma: false })).toEqual({
       operators: '[">=", "<="]',
     });
   });
@@ -153,7 +159,9 @@ describe('qsParse', () => {
   it('allows for empty strings in arrays', () => {
     expect(qsParse('a[]=b&a[]=&a[]=c')).toEqual({ a: ['b', '', 'c'] });
 
-    expect(qsParse('a[0]=b&a[1]&a[2]=c&a[19]=')).toEqual({
+    expect(
+      qsParse('a[0]=b&a[1]&a[2]=c&a[19]=', { allowSparse: false }),
+    ).toEqual({
       a: ['b', '', 'c', ''],
     });
     expect(qsParse('a[]=b&a[]&a[]=c&a[]=')).toEqual({ a: ['b', '', 'c', ''] });
@@ -162,24 +170,31 @@ describe('qsParse', () => {
   });
 
   it('compacts sparse arrays', () => {
-    expect(qsParse('a[10]=1&a[2]=2')).toEqual({ a: ['2', '1'] });
-    expect(qsParse('a[1][b][2][c]=1')).toEqual({ a: [{ b: [{ c: '1' }] }] });
-    expect(qsParse('a[1][2][3][c]=1')).toEqual({ a: [[[{ c: '1' }]]] });
-    expect(qsParse('a[1][2][3][c][1]=1')).toEqual({ a: [[[{ c: ['1'] }]]] });
+    expect(qsParse('a[10]=1&a[2]=2', { allowSparse: false })).toEqual({
+      a: ['2', '1'],
+    });
+    expect(qsParse('a[1][b][2][c]=1', { allowSparse: false })).toEqual({
+      a: [{ b: [{ c: '1' }] }],
+    });
+    expect(qsParse('a[1][2][3][c]=1', { allowSparse: false })).toEqual({
+      a: [[[{ c: '1' }]]],
+    });
+    expect(qsParse('a[1][2][3][c][1]=1', { allowSparse: false })).toEqual({
+      a: [[[{ c: ['1'] }]]],
+    });
   });
 
-  it('parses sparse arrays', () => {
-    /* eslint no-sparse-arrays: 0 */
-    expect(qsParse('a[4]=1&a[1]=2', { allowSparse: true })).toEqual({
+  it('parses sparse arrays: default true', () => {
+    expect(qsParse('a[4]=1&a[1]=2')).toEqual({
       a: [, '2', , , '1'],
     });
-    expect(qsParse('a[1][b][2][c]=1', { allowSparse: true })).toEqual({
+    expect(qsParse('a[1][b][2][c]=1')).toEqual({
       a: [, { b: [, , { c: '1' }] }],
     });
-    expect(qsParse('a[1][2][3][c]=1', { allowSparse: true })).toEqual({
+    expect(qsParse('a[1][2][3][c]=1')).toEqual({
       a: [, [, , [, , , { c: '1' }]]],
     });
-    expect(qsParse('a[1][2][3][c][1]=1', { allowSparse: true })).toEqual({
+    expect(qsParse('a[1][2][3][c][1]=1')).toEqual({
       a: [, [, , [, , , { c: [, '1'] }]]],
     });
   });

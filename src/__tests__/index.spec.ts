@@ -1,11 +1,9 @@
 import {
   root,
   slash,
-  rand,
+  random,
   unindent,
   regFlags,
-  debounce,
-  throttle,
   defered,
   capitalize,
   isAbsolute,
@@ -17,29 +15,6 @@ describe('test', () => {
   it('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
-  });
-
-  it('rand', () => {
-    const a = 10;
-    for (let i = 0; i < 100; i++) {
-      const res = rand(a);
-      expect(decimalPlaces(res) === 0).toBe(true);
-      expect(res <= a).toBe(true);
-    }
-
-    const b = 10.5;
-    for (let i = 0; i < 100; i++) {
-      const res = rand(b);
-      expect(decimalPlaces(res) <= 1).toBe(true);
-      expect(res <= b).toBe(true);
-    }
-
-    const c = 10.55;
-    for (let i = 0; i < 100; i++) {
-      const res = rand(c);
-      expect(decimalPlaces(res) <= 2).toBe(true);
-      expect(res <= c).toBe(true);
-    }
   });
 
   it('regFlags', () => {
@@ -123,6 +98,29 @@ describe('test', () => {
     expect(decimalPlaces(-0.11)).toBe(2);
   });
 
+  it('random', () => {
+    const a = 10;
+    for (let i = 0; i < 100; i++) {
+      const res = random(a);
+      expect(decimalPlaces(res) === 0).toBe(true);
+      expect(res <= a).toBe(true);
+    }
+
+    const b = 10.5;
+    for (let i = 0; i < 100; i++) {
+      const res = random(b);
+      expect(decimalPlaces(res) <= 1).toBe(true);
+      expect(res <= b).toBe(true);
+    }
+
+    const c = 10.55;
+    for (let i = 0; i < 100; i++) {
+      const res = random(c);
+      expect(decimalPlaces(res) <= 2).toBe(true);
+      expect(res <= c).toBe(true);
+    }
+  });
+
   it('unindent', () => {
     expect(
       unindent`
@@ -178,70 +176,4 @@ if (a) {
       `,
     ).toMatchSnapshot('indent deep');
   });
-
-  it('throttle', () => {
-    const d = defered();
-    // The uuid test loops multiple times, which will block the process.
-    // So use timeout.
-    setTimeout(() => {
-      let i = 0;
-      let j = 0;
-      const throttleFunc = throttle(100, (num: number) => {
-        i = num;
-      });
-      throttleFunc(1); // Will execute the callback
-      expect(i).toBe(1);
-      throttleFunc(2); // Won’t execute callback
-      expect(i).toBe(1);
-      throttleFunc(3); // Won’t execute callback
-      expect(i).toBe(1);
-      throttleFunc(4); // Will execute the callback
-      expect(i).toBe(1);
-
-      setTimeout(() => {
-        j++;
-        expect(i).toBe(1);
-      }, 50);
-
-      setTimeout(() => {
-        j++;
-        expect(i).toBe(4);
-        throttleFunc(10); // Won’t execute callback
-        expect(i).toBe(4);
-      }, 120);
-
-      setTimeout(() => {
-        j++;
-        expect(i).toBe(4);
-        throttleFunc(11); // Will execute the callback
-        expect(i).toBe(4);
-      }, 150);
-
-      setTimeout(() => {
-        j++;
-        expect(i).toBe(11);
-      }, 220);
-
-      setTimeout(() => {
-        j++;
-        expect(i).toBe(11);
-        throttleFunc(12); // Will execute the callback
-        expect(i).toBe(12);
-        expect(j).toBe(5);
-        d.resolve();
-      }, 320);
-    });
-    return d.promise;
-  });
-
-  // it('debounce', () => {
-  //   const d = defered();
-  //   let i = 0;
-  //   let j = 0;
-  //   const debounceFunc = debounce(100, (num: number) => {
-  //     i = num;
-  //   });
-
-  //   return d.promise;
-  // });
 });

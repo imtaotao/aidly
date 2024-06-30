@@ -1,9 +1,6 @@
 import type { Prettify } from './types';
 import { hasOwn, isArray, isObject } from './index';
 
-const depth = 5;
-const arrLimit = 20;
-
 const decode = (s: string) => {
   s = s.replace(/\+/g, ' ');
   try {
@@ -102,12 +99,16 @@ const merge = (target: unknown, source?: unknown) => {
   );
 };
 
-const parseArray = (s: string, options?: ParseOptions) =>
-  s && typeof s === 'string' && options && options.comma && s.indexOf(',') > -1
+const parseArray = (s: string, options: QsParseOptions) =>
+  s && typeof s === 'string' && options.comma && s.indexOf(',') > -1
     ? s.split(',')
     : s;
 
-const parseObject = (chain: Array<string>, leaf: unknown) => {
+const parseObject = (
+  chain: Array<string>,
+  leaf: unknown,
+  options: QsParseOptions,
+) => {
   for (let i = chain.length - 1; i >= 0; i--) {
     let obj;
     const root = chain[i];
@@ -127,7 +128,7 @@ const parseObject = (chain: Array<string>, leaf: unknown) => {
         root !== cleanRoot &&
         String(index) === cleanRoot &&
         index >= 0 &&
-        index <= arrLimit
+        index <= options.arrayLimit
       ) {
         obj = [];
         obj[index] = leaf;
@@ -141,7 +142,11 @@ const parseObject = (chain: Array<string>, leaf: unknown) => {
   return leaf;
 };
 
-const parseKeys = (key: string, val: string | Array<string>) => {
+const parseKeys = (
+  key: string,
+  val: string | Array<string>,
+  options: QsParseOptions,
+) => {
   if (!key) return;
   const keys = [];
 
@@ -155,7 +160,7 @@ const parseKeys = (key: string, val: string | Array<string>) => {
     keys.push(parent);
   }
   let i = 0;
-  while ((segment = child.exec(key)) !== null && i < depth) {
+  while ((segment = child.exec(key)) !== null && i < options.depth) {
     i += 1;
     if (hasOwn(Object.prototype, segment[1].slice(1, -1))) {
       return;
@@ -165,12 +170,12 @@ const parseKeys = (key: string, val: string | Array<string>) => {
   if (segment) {
     keys.push('[' + key.slice(segment.index) + ']');
   }
-  return parseObject(keys, val);
+  return parseObject(keys, val, options);
 };
 
 const parse = (
   s: string,
-  options?: ParseOptions,
+  options: QsParseOptions,
 ): Record<string, string | Array<string>> => {
   s = s.replace(/^\?/, '');
   const parts = s.split('&');
@@ -197,25 +202,40 @@ const parse = (
   return res;
 };
 
-export interface ParseOptions {
-  comma?: boolean;
-  allowSparse?: boolean;
+export interface QsParseOptions {
+  comma: boolean;
+  depth: number;
+  arrayLimit: number;
+  allowSparse: boolean;
 }
+
+const defaultOptions: QsParseOptions = {
+  depth: 5,
+  arrayLimit: 20,
+  comma: true,
+  allowSparse: true,
+};
 
 // https://github.com/ljharb/qs/blob/main/lib/parse.js
 export const qsParse = <T = Record<PropertyKey, unknown>>(
   s?: unknown,
-  options?: Prettify<ParseOptions>,
+  options?: Prettify<Partial<QsParseOptions>>,
 ) => {
   if (!s || typeof s !== 'string') return {} as T;
+  options = Object.assign({}, defaultOptions, options);
   let obj = {} as unknown;
-  const tempObj = parse(s, options);
+  const tempObj = parse(s, options as QsParseOptions);
   const keys = Object.keys(tempObj);
 
   for (let i = 0; i < keys.length; i++) {
-    obj = merge(obj, parseKeys(keys[i], tempObj[keys[i]]));
+    const newObj = parseKeys(
+      keys[i],
+      tempObj[keys[i]],
+      options as QsParseOptions,
+    );
+    obj = merge(obj, newObj);
   }
-  return (options && options.allowSparse ? obj : compact(obj)) as T;
+  return (options.allowSparse ? obj : compact(obj)) as T;
 };
 
 // https://github.com/ljharb/qs/blob/main/lib/stringify.js

@@ -151,7 +151,7 @@ export const decimalPlaces = (n: number) =>
     ? 0
     : String(n).split('.')[1].length;
 
-export const rand = (min = 0, max = 0) => {
+export const random = (min = 0, max = 0) => {
   if (max === min) return max;
   if (max < min) min = [max, (max = min)][0];
   return Number(
@@ -290,7 +290,7 @@ export const sortKeys = <T extends Record<PropertyKey, unknown>>(
 };
 
 export const clearUndef = <T extends object>(val: T): T => {
-  Object.keys(val).forEach((key: string) => {
+  Object.keys(val).forEach((key) => {
     if (val[key as keyof T]) {
       delete val[key as keyof T];
     }

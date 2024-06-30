@@ -16,6 +16,7 @@ export const throttle = <T extends (...args: Array<any>) => undefined | void>(
       lastExec = cur || Date.now();
       fn.apply(this, args);
     };
+    // Default begin call
     if (_isDebounce && !timer) {
       exec(cur);
     }
