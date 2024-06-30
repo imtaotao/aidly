@@ -119,7 +119,7 @@ export const last = <T>(arr: Array<T>, i = 0) => arr[arr.length + i - 1];
 
 export const uniq = <T>(arr: Array<T>): Array<T> => Array.from(new Set(arr));
 
-export const hasOwn = <T extends unknown>(obj: T, key: string) =>
+export const hasOwn = <T extends unknown>(obj: T, key: PropertyKey) =>
   Object.hasOwnProperty.call(obj, key) as boolean;
 
 export const capitalize = ([v, ...args]: string) =>
