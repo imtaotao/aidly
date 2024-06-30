@@ -1,6 +1,6 @@
 import { qsParse } from '../index';
 
-describe('qs', () => {
+describe('qsParse', () => {
   it('parses', () => {
     expect(qsParse('0=foo')).toEqual({ 0: 'foo' });
     expect(qsParse('foo=c++')).toEqual({ foo: 'c  ' });
