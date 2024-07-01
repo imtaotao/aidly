@@ -6,12 +6,14 @@
   <title>Aidly</title>
 </head>
 <body>
-  <div>Please open the console for debugging.</div>
+  <div>Please open the console for debugging. (请打开控制台进行调试)</div>
   <script src="https://unpkg.com/aidly/dist/aidly.umd.js"></script>
   <script>
     Object.assign(window, window.Aidly);
 
     console.log('All APIs have been placed on the window and can be used directly, such as `window.clone({})`.');
+    console.log('所有的 API 都已经放在 window 上，可以直接使用，比如 `window.clone({})`。');
+    console.log(window.Aidly);
   </script>
 </body>
 </html>
