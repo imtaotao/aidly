@@ -5,6 +5,7 @@ export { root } from './root';
 export { uuid } from './uuid';
 export { clone } from './clone';
 export { loopSlice } from './loopSlice';
+export { deepMerge } from './deepMerge';
 export { throttle, debounce } from './throttle';
 export {
   qsParse,
