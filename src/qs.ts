@@ -2,11 +2,40 @@ import type { Prettify } from './types';
 import {
   hasOwn,
   isNil,
+  isDate,
   isArray,
   isObject,
   isBuffer,
-  isNativeValue,
+  isPrimitiveValue,
 } from './index';
+
+export interface QsStringifyOptions {
+  encode?: boolean;
+  addPrfix?: boolean;
+  commaRoundTrip?: boolean;
+  arrayFormat?: keyof typeof arrayPrefixFns;
+}
+
+const defaultStringifyOptions = {
+  encode: true,
+  addPrfix: true,
+  commaRoundTrip: false,
+  arrayFormat: 'indices',
+};
+
+export interface QsParseOptions {
+  comma: boolean;
+  depth: number;
+  arrayLimit: number;
+  allowSparse: boolean;
+}
+
+const defaultParseOptions: QsParseOptions = {
+  depth: 5,
+  arrayLimit: 20,
+  comma: true,
+  allowSparse: true,
+};
 
 const decode = (s: string) => {
   s = s.replace(/\+/g, ' ');
@@ -85,11 +114,15 @@ const encode = (str: any) => {
   return out;
 };
 
-const indices = (prefix: string, key: string | number) =>
-  prefix + '[' + key + ']';
-
 const pushToArray = (arr: Array<any>, valueOrArray: unknown) => {
   arr.push.apply(arr, isArray(valueOrArray) ? valueOrArray : [valueOrArray]);
+};
+
+const arrayPrefixFns = {
+  comma: (p: string) => p,
+  repeat: (p: string) => p,
+  brackets: (p: string) => `${p}[]`,
+  indices: (p: string, k: string) => `${p}[${k}]`,
 };
 
 const sentinel = {};
@@ -97,53 +130,83 @@ const sentinel = {};
 const stringify = (
   object: any,
   prefix: string,
+  commaRoundTrip: boolean,
   sideChannel: WeakMap<object, any>,
+  options: QsStringifyOptions,
 ) => {
+  let step = 0;
   let obj = object;
   let tmpSc = sideChannel;
-  let step = 0;
   let findFlag = false;
 
   while ((tmpSc = tmpSc.get(sentinel)) !== void undefined && !findFlag) {
-    // Where object last appeared in the ref tree
-    var pos = tmpSc.get(object);
+    const pos = tmpSc.get(object);
     step += 1;
+
     if (typeof pos !== 'undefined') {
       if (pos === step) {
         throw new RangeError('Cyclic object value');
-      } else {
-        findFlag = true; // Break while
       }
+      findFlag = true; // Break while
     }
     if (typeof tmpSc.get(sentinel) === 'undefined') {
       step = 0;
     }
   }
 
-  if (obj instanceof Date) obj = obj.toISOString();
-  if (obj === null) obj = '';
-  if ((isNativeValue(obj) && !isNil(obj)) || isBuffer(obj)) {
-    const keyValue = encode(prefix);
-    return [String(keyValue) + '=' + String(encode(obj))];
+  if (isDate(obj)) {
+    obj = obj.toISOString();
+  } else if (options.arrayFormat === 'comma' && isArray(obj)) {
+    obj = obj.map((val) => (isDate(val) ? val.toISOString() : val));
   }
+
+  if (obj === null) {
+    obj = '';
+  }
+
+  if ((!isNil(obj) && isPrimitiveValue(obj)) || isBuffer(obj)) {
+    return !options.encode
+      ? [`${prefix}=${obj}`]
+      : [`${encode(prefix)}=${encode(obj)}`];
+  }
+
   const values = [] as Array<unknown>;
   if (typeof obj === 'undefined') return values;
 
-  const objKeys = Object.keys(obj);
+  let objKeys;
+  if (options.arrayFormat === 'comma' && isArray(obj)) {
+    objKeys = [{ value: obj.length > 0 ? obj.join(',') || null : undefined }];
+  } else {
+    objKeys = Object.keys(obj);
+  }
+
+  const adjustedPrefix =
+    commaRoundTrip && isArray(obj) && obj.length === 1 ? `${prefix}[]` : prefix;
+
   for (let j = 0; j < objKeys.length; j++) {
     const key = objKeys[j];
     const value =
-      typeof key === 'object' && typeof (key as any).value !== 'undefined'
-        ? (key as any).value
-        : obj[key];
-    const keyPrefix = isArray(obj)
-      ? indices(prefix, key)
-      : prefix + ('[' + key + ']');
+      typeof key === 'object' && typeof key.value !== 'undefined'
+        ? key.value
+        : obj[key as string];
+    let keyPrefix;
+    if (isArray(obj)) {
+      keyPrefix = arrayPrefixFns[options.arrayFormat!](
+        adjustedPrefix,
+        key as string,
+      );
+    } else {
+      keyPrefix = `${adjustedPrefix}[${key}]`;
+    }
 
     sideChannel.set(object, step);
     const valueSideChannel = new Map<object, any>();
     valueSideChannel.set(sentinel, sideChannel);
-    pushToArray(values, stringify(value, keyPrefix, valueSideChannel));
+
+    pushToArray(
+      values,
+      stringify(value, keyPrefix, commaRoundTrip, valueSideChannel, options),
+    );
   }
   return values;
 };
@@ -166,7 +229,6 @@ const compact = (value: unknown) => {
       }
     }
   }
-
   while (queue.length > 1) {
     const item = queue.pop();
     const obj = (item as any).obj[(item as any).prop];
@@ -181,7 +243,6 @@ const compact = (value: unknown) => {
       (item as any).obj[(item as any).prop] = compacted;
     }
   }
-
   return value;
 };
 
@@ -276,7 +337,6 @@ const parseObject = (
     }
     leaf = obj;
   }
-
   return leaf;
 };
 
@@ -340,27 +400,13 @@ const parse = (
   return res;
 };
 
-export interface QsParseOptions {
-  comma: boolean;
-  depth: number;
-  arrayLimit: number;
-  allowSparse: boolean;
-}
-
-const defaultOptions: QsParseOptions = {
-  depth: 5,
-  arrayLimit: 20,
-  comma: true,
-  allowSparse: true,
-};
-
 // https://github.com/ljharb/qs/blob/main/lib/parse.js
 export const qsParse = <T = Record<PropertyKey, unknown>>(
   s?: unknown,
   options?: Prettify<Partial<QsParseOptions>>,
 ) => {
   if (!s || typeof s !== 'string') return {} as T;
-  options = Object.assign({}, defaultOptions, options);
+  options = Object.assign({}, defaultParseOptions, options);
   let obj = {} as unknown;
   const tempObj = parse(s, options as QsParseOptions);
   const keys = Object.keys(tempObj);
@@ -377,18 +423,26 @@ export const qsParse = <T = Record<PropertyKey, unknown>>(
 };
 
 // https://github.com/ljharb/qs/blob/main/lib/stringify.js
-export const qsStringify = (obj: unknown, options?: { addPrfix?: boolean }) => {
+export const qsStringify = (obj: unknown, options?: QsStringifyOptions) => {
   if (!isObject(obj)) return '';
-  options = Object.assign({}, { addPrfix: true }, options);
+  options = Object.assign({}, defaultStringifyOptions, options);
   const keys = [] as Array<unknown>;
   const objKeys = Object.keys(obj);
   const sideChannel = new WeakMap();
-
+  const commaRoundTrip = Boolean(
+    options.arrayFormat === 'comma' && options.commaRoundTrip,
+  );
   for (let i = 0; i < objKeys.length; ++i) {
     const key = objKeys[i];
     pushToArray(
       keys,
-      stringify((obj as Record<PropertyKey, any>)[key], key, sideChannel),
+      stringify(
+        (obj as Record<PropertyKey, any>)[key],
+        key,
+        commaRoundTrip,
+        sideChannel,
+        options,
+      ),
     );
   }
   const res = keys.join('&');

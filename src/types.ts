@@ -10,7 +10,7 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export type DeepPrettify<T> = { [K in keyof T]: Prettify<T[K]> } & {};
 
-export type BaseType =
+export type PrimitiveType =
   | number
   | bigint
   | string

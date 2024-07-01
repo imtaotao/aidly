@@ -1,13 +1,23 @@
-import type { BaseType, TypedArray } from './types';
+import type { TypedArray, PrimitiveType } from './types';
 
 export { Queue } from 'small-queue';
 export { root } from './root';
 export { uuid } from './uuid';
 export { clone } from './clone';
 export { loopSlice } from './loopSlice';
-export { qsParse, qsStringify } from './qs';
 export { throttle, debounce } from './throttle';
-export type { BaseType, TypedArray, Prettify, DeepPrettify } from './types';
+export {
+  qsParse,
+  qsStringify,
+  type QsParseOptions,
+  type QsStringifyOptions,
+} from './qs';
+export type {
+  TypedArray,
+  PrimitiveType,
+  Prettify,
+  DeepPrettify,
+} from './types';
 
 export const noop = () => {};
 
@@ -90,10 +100,10 @@ export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> =>
 
 export const isBuffer = (v: unknown) => {
   if (!isObject(v)) return false;
-  return !!(
+  return Boolean(
     v.constructor &&
-    (v.constructor as any).isBuffer &&
-    (v.constructor as any).isBuffer(v)
+      (v.constructor as any).isBuffer &&
+      (v.constructor as any).isBuffer(v),
   );
 };
 
@@ -109,7 +119,7 @@ export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
   return true;
 };
 
-export const isNativeValue = (v: unknown): v is BaseType => {
+export const isPrimitiveValue = (v: unknown): v is PrimitiveType => {
   return (
     typeof v === 'number' ||
     typeof v === 'bigint' ||
