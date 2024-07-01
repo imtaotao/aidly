@@ -17,7 +17,7 @@ A small utility function in pure js runtime, capable of effective tree-shaking.
 
 View type declaration file retrieval api.
 
-> https://unpkg.com/aidly/dist/
+> https://unpkg.com/browse/aidly/dist/index.d.ts
 
 
 ### Demo
