@@ -2,7 +2,7 @@ import { isDate, isRegExp, isArray, isObject, isPrimitiveValue } from './index';
 
 type O = Record<PropertyKey, unknown>;
 
-const noCloneOrClone = (val: unknown, set?: WeakSet<object>) =>
+const noCloneOrMerge = (val: unknown, set?: WeakSet<object>) =>
   set && set.has(val as object);
 
 const isMergeableObject = (val: unknown) => {
@@ -14,7 +14,7 @@ const isMergeableObject = (val: unknown) => {
   );
 };
 
-const clone = (val: unknown, set?: WeakSet<object>) => {
+const cl = (val: unknown, set?: WeakSet<object>) => {
   if (isMergeableObject(val)) {
     return deepMerge(isArray(val) ? [] : {}, val, set);
   }
@@ -26,7 +26,7 @@ const mergeArray = (
   source: Array<unknown>,
   set?: WeakSet<object>,
 ) => {
-  return target.concat(source).map((val) => clone(val, set));
+  return target.concat(source).map((val) => cl(val, set));
 };
 
 const getEnumerableSymbols = (target: object) => {
@@ -64,24 +64,24 @@ const mergeObject = (target: O, source: O, set?: WeakSet<object>) => {
     const keys = getKeys(target);
     for (const key of keys) {
       const val = target[key];
-      res[key] = noCloneOrClone(val, set) ? val : clone(val, set);
+      res[key] = noCloneOrMerge(val, set) ? val : cl(val, set);
     }
   }
   const keys = getKeys(source);
   for (const key of keys) {
     if (propertyIsUnsafe(target, key)) continue;
     if (propertyIsOnObject(target, key) && isMergeableObject(source[key])) {
-      if (noCloneOrClone(source[key], set)) {
+      if (noCloneOrMerge(source[key], set)) {
         res[key] = source[key];
-      } else if (noCloneOrClone(target[key], set)) {
+      } else if (noCloneOrMerge(target[key], set)) {
         res[key] = target[key];
       } else {
         res[key] = deepMerge(target[key], source[key], set);
       }
     } else {
-      res[key] = noCloneOrClone(source[key], set)
+      res[key] = noCloneOrMerge(source[key], set)
         ? source[key]
-        : clone(source[key], set);
+        : cl(source[key], set);
     }
   }
   return res;
@@ -98,7 +98,7 @@ export const deepMerge = <T = unknown>(
   const targetIsArray = isArray(target);
 
   if (sourceIsArray !== targetIsArray) {
-    return clone(source, filterSet) as T;
+    return cl(source, filterSet) as T;
   } else if (sourceIsArray) {
     return mergeArray(target as Array<unknown>, source, filterSet) as T;
   } else {

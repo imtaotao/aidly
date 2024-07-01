@@ -13,4 +13,10 @@ const freeGlobalThis =
   globalThis.Object === Object &&
   globalThis;
 
-export const root = freeGlobalThis || freeGlobal || freeSelf;
+export const root =
+  freeGlobalThis ||
+  freeGlobal ||
+  freeSelf ||
+  (function (this: unknown) {
+    return this as Window & typeof globalThis;
+  })();
