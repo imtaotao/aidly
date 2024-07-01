@@ -8,6 +8,11 @@
 A small utility function in pure js runtime, capable of effective tree-shaking.
 
 
+### Debugging platform
+
+> https://imtaotao.github.io/aidly/
+
+
 ### API
 
 View type declaration file retrieval api.
