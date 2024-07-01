@@ -40,7 +40,8 @@ export const isBrowser = typeof window !== 'undefined';
 export const isNil = (v: unknown): v is null | undefined =>
   v === undefined || v === null;
 
-export const isObject = (v: unknown) => v !== null && typeof v === 'object';
+export const isObject = (v: unknown): v is object =>
+  v !== null && typeof v === 'object';
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
   objectToString.call(v) === '[object Object]';
@@ -86,6 +87,15 @@ export const isWeakMap: <K extends object = object, V = unknown>(
 
 export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> =>
   isObject(v) && typeof (v as any).then === 'function';
+
+export const isBuffer = (v: unknown) => {
+  if (!isObject(v)) return false;
+  return !!(
+    v.constructor &&
+    (v.constructor as any).isBuffer &&
+    (v.constructor as any).isBuffer(v)
+  );
+};
 
 export const isInBounds = ([a, b]: Array<number>, v: number) => {
   if (v === a || v === b) return true;

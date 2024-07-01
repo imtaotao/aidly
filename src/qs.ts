@@ -1,5 +1,12 @@
 import type { Prettify } from './types';
-import { hasOwn, isArray, isObject } from './index';
+import {
+  hasOwn,
+  isNil,
+  isArray,
+  isObject,
+  isBuffer,
+  isNativeValue,
+} from './index';
 
 const decode = (s: string) => {
   s = s.replace(/\+/g, ' ');
@@ -8,6 +15,137 @@ const decode = (s: string) => {
   } catch (e) {
     return s; // Error case {%:%}
   }
+};
+
+let hexTable: Array<string>;
+
+const encode = (str: any) => {
+  // This code was originally written by Brian White (mscdex) for the io.js core querystring library.
+  // It has been adapted here for stricter adherence to RFC 3986
+  if (str.length === 0) return str;
+  let s: string = str;
+  const limit = 1024;
+  if (typeof str === 'symbol') {
+    s = Symbol.prototype.toString.call(str);
+  } else if (typeof str !== 'string') {
+    s = String(str);
+  }
+  if (!hexTable) {
+    hexTable = [];
+    for (let i = 0; i < 256; i++) {
+      hexTable.push('%' + ((i < 16 ? '0' : '') + i.toString(16)).toUpperCase());
+    }
+  }
+
+  let out = '';
+  for (let j = 0; j < s.length; j += limit) {
+    const arr = [];
+    const segment = s.length >= limit ? s.slice(j, j + limit) : s;
+
+    for (let i = 0; i < segment.length; i++) {
+      let c = segment.charCodeAt(i);
+      if (
+        c === 0x2d || // -
+        c === 0x2e || // .
+        c === 0x5f || // _
+        c === 0x7e || // ~
+        (c >= 0x30 && c <= 0x39) || // 0-9
+        (c >= 0x41 && c <= 0x5a) || // a-z
+        (c >= 0x61 && c <= 0x7a) // A-Z
+      ) {
+        arr[arr.length] = segment.charAt(i);
+        continue;
+      }
+      if (c < 0x80) {
+        arr[arr.length] = hexTable[c];
+        continue;
+      }
+      if (c < 0x800) {
+        arr[arr.length] =
+          hexTable[0xc0 | (c >> 6)] + hexTable[0x80 | (c & 0x3f)];
+        continue;
+      }
+      if (c < 0xd800 || c >= 0xe000) {
+        arr[arr.length] =
+          hexTable[0xe0 | (c >> 12)] +
+          hexTable[0x80 | ((c >> 6) & 0x3f)] +
+          hexTable[0x80 | (c & 0x3f)];
+        continue;
+      }
+      i += 1;
+      c = 0x10000 + (((c & 0x3ff) << 10) | (segment.charCodeAt(i) & 0x3ff));
+      arr[arr.length] =
+        hexTable[0xf0 | (c >> 18)] +
+        hexTable[0x80 | ((c >> 12) & 0x3f)] +
+        hexTable[0x80 | ((c >> 6) & 0x3f)] +
+        hexTable[0x80 | (c & 0x3f)];
+    }
+    out += arr.join('');
+  }
+  return out;
+};
+
+const indices = (prefix: string, key: string | number) =>
+  prefix + '[' + key + ']';
+
+const pushToArray = (arr: Array<any>, valueOrArray: unknown) => {
+  arr.push.apply(arr, isArray(valueOrArray) ? valueOrArray : [valueOrArray]);
+};
+
+const sentinel = {};
+
+const stringify = (
+  object: any,
+  prefix: string,
+  sideChannel: WeakMap<object, any>,
+) => {
+  let obj = object;
+  let tmpSc = sideChannel;
+  let step = 0;
+  let findFlag = false;
+
+  while ((tmpSc = tmpSc.get(sentinel)) !== void undefined && !findFlag) {
+    // Where object last appeared in the ref tree
+    var pos = tmpSc.get(object);
+    step += 1;
+    if (typeof pos !== 'undefined') {
+      if (pos === step) {
+        throw new RangeError('Cyclic object value');
+      } else {
+        findFlag = true; // Break while
+      }
+    }
+    if (typeof tmpSc.get(sentinel) === 'undefined') {
+      step = 0;
+    }
+  }
+
+  if (obj instanceof Date) obj = obj.toISOString();
+  if (obj === null) obj = '';
+  if ((isNativeValue(obj) && !isNil(obj)) || isBuffer(obj)) {
+    const keyValue = encode(prefix);
+    return [String(keyValue) + '=' + String(encode(obj))];
+  }
+  const values = [] as Array<unknown>;
+  if (typeof obj === 'undefined') return values;
+
+  const objKeys = Object.keys(obj);
+  for (let j = 0; j < objKeys.length; j++) {
+    const key = objKeys[j];
+    const value =
+      typeof key === 'object' && typeof (key as any).value !== 'undefined'
+        ? (key as any).value
+        : obj[key];
+    const keyPrefix = isArray(obj)
+      ? indices(prefix, key)
+      : prefix + ('[' + key + ']');
+
+    sideChannel.set(object, step);
+    const valueSideChannel = new Map<object, any>();
+    valueSideChannel.set(sentinel, sideChannel);
+    pushToArray(values, stringify(value, keyPrefix, valueSideChannel));
+  }
+  return values;
 };
 
 const compact = (value: unknown) => {
@@ -239,4 +377,20 @@ export const qsParse = <T = Record<PropertyKey, unknown>>(
 };
 
 // https://github.com/ljharb/qs/blob/main/lib/stringify.js
-export const qsStringify = () => {};
+export const qsStringify = (obj: unknown, options?: { addPrfix?: boolean }) => {
+  if (!isObject(obj)) return '';
+  options = Object.assign({}, { addPrfix: true }, options);
+  const keys = [] as Array<unknown>;
+  const objKeys = Object.keys(obj);
+  const sideChannel = new WeakMap();
+
+  for (let i = 0; i < objKeys.length; ++i) {
+    const key = objKeys[i];
+    pushToArray(
+      keys,
+      stringify((obj as Record<PropertyKey, any>)[key], key, sideChannel),
+    );
+  }
+  const res = keys.join('&');
+  return options.addPrfix ? `?${res}` : res;
+};
