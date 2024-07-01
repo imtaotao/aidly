@@ -1,17 +1,17 @@
-import { deepMerge } from '../index';
+import { merge } from '../index';
 
-describe('deepMerge.ts', () => {
+describe('merge.ts', () => {
   it('add keys in target that do not exist at the root', () => {
     const src = { key1: 'value1', key2: 'value2' };
     const target = {};
 
-    const res = deepMerge(target, src);
+    const res = merge(target, src);
 
     expect(target).toStrictEqual({});
     expect(res).toStrictEqual(src);
   });
 
-  it('deepMerge existing simple keys in target at the roots', () => {
+  it('merge existing simple keys in target at the roots', () => {
     const src = { key1: 'changed', key2: 'value2' };
     const target = { key1: 'value1', key3: 'value3' };
 
@@ -22,10 +22,10 @@ describe('deepMerge.ts', () => {
     };
 
     expect(target).toStrictEqual({ key1: 'value1', key3: 'value3' });
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('deepMerge nested objects into target', () => {
+  it('merge nested objects into target', () => {
     const src = {
       key1: {
         subkey1: 'changed',
@@ -53,7 +53,7 @@ describe('deepMerge.ts', () => {
         subkey2: 'value2',
       },
     });
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('replace simple key with nested object in target', () => {
@@ -77,7 +77,7 @@ describe('deepMerge.ts', () => {
     };
 
     expect(target).toStrictEqual({ key1: 'value1', key2: 'value2' });
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should add nested object in target', () => {
@@ -98,7 +98,7 @@ describe('deepMerge.ts', () => {
       },
     };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should clone source and target', () => {
@@ -123,7 +123,7 @@ describe('deepMerge.ts', () => {
       },
     };
 
-    const merged = deepMerge<any>(target, src);
+    const merged = merge<any>(target, src);
 
     expect(merged).toStrictEqual(expected);
     expect(merged.a !== target.a).toBe(true);
@@ -143,7 +143,7 @@ describe('deepMerge.ts', () => {
       },
     };
 
-    const merged = deepMerge<any>(target, src);
+    const merged = merge<any>(target, src);
     expect(merged.a !== target.a).toBe(true);
     expect(merged.a !== src.b).toBe(true);
   });
@@ -167,7 +167,7 @@ describe('deepMerge.ts', () => {
       },
       key2: 'value2',
     });
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should replace objects with arrays', () => {
@@ -177,7 +177,7 @@ describe('deepMerge.ts', () => {
 
     const expected = { key1: ['subkey'] };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should replace arrays with objects', () => {
@@ -187,7 +187,7 @@ describe('deepMerge.ts', () => {
 
     const expected = { key1: { subkey: 'one' } };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should replace dates with arrays', () => {
@@ -197,7 +197,7 @@ describe('deepMerge.ts', () => {
 
     const expected = { key1: ['subkey'] };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should replace null with arrays', () => {
@@ -213,7 +213,7 @@ describe('deepMerge.ts', () => {
       key1: ['subkey'],
     };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it('should work on simple array', () => {
@@ -222,8 +222,8 @@ describe('deepMerge.ts', () => {
 
     const expected = ['one', 'two', 'one', 'three'];
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
-    expect(Array.isArray(deepMerge(target, src))).toBe(true);
+    expect(merge(target, src)).toStrictEqual(expected);
+    expect(Array.isArray(merge(target, src))).toBe(true);
   });
 
   it('should work on another simple array', () => {
@@ -244,8 +244,8 @@ describe('deepMerge.ts', () => {
       'p3',
     ];
     expect(target).toStrictEqual(['a1', 'a2', 'c1', 'f1', 'p1']);
-    expect(deepMerge(target, src)).toStrictEqual(expected);
-    expect(Array.isArray(deepMerge(target, src))).toBe(true);
+    expect(merge(target, src)).toStrictEqual(expected);
+    expect(Array.isArray(merge(target, src))).toBe(true);
   });
 
   it('should work on array properties', () => {
@@ -262,9 +262,9 @@ describe('deepMerge.ts', () => {
       key2: ['four'],
     };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
-    expect(Array.isArray(deepMerge<typeof src>(target, src).key1)).toBe(true);
-    expect(Array.isArray(deepMerge<typeof src>(target, src).key2)).toBe(true);
+    expect(merge(target, src)).toStrictEqual(expected);
+    expect(Array.isArray(merge<typeof src>(target, src).key1)).toBe(true);
+    expect(Array.isArray(merge<typeof src>(target, src).key2)).toBe(true);
   });
 
   it('should work on array properties with clone option', () => {
@@ -279,7 +279,7 @@ describe('deepMerge.ts', () => {
     expect(target).toStrictEqual({
       key1: ['one', 'two'],
     });
-    const merged = deepMerge<any>(target, src);
+    const merged = merge<any>(target, src);
     expect(merged.key1 !== src.key1).toBe(true);
     expect(merged.key1 !== target.key1).toBe(true);
     expect(merged.key2 !== src.key2).toBe(true);
@@ -296,9 +296,9 @@ describe('deepMerge.ts', () => {
       { key3: ['five'] },
     ];
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
-    expect(Array.isArray(deepMerge(target, src))).toBe(true);
-    expect(Array.isArray(deepMerge<any>(target, src)[0].key1)).toBe(true);
+    expect(merge(target, src)).toStrictEqual(expected);
+    expect(Array.isArray(merge(target, src))).toBe(true);
+    expect(Array.isArray(merge<any>(target, src)[0].key1)).toBe(true);
   });
 
   it('should work on array of objects with clone option', () => {
@@ -312,10 +312,10 @@ describe('deepMerge.ts', () => {
       { key3: ['five'] },
     ];
 
-    const merged = deepMerge<any>(target, src);
+    const merged = merge<any>(target, src);
     expect(merged).toStrictEqual(expected);
-    expect(Array.isArray(deepMerge<any>(target, src)));
-    expect(Array.isArray(deepMerge<any>(target, src)[0].key1));
+    expect(Array.isArray(merge<any>(target, src)));
+    expect(Array.isArray(merge<any>(target, src)[0].key1));
     expect(merged[0].key1 !== src[0].key1);
     expect(merged[0].key1 !== target[0].key1);
     expect(merged[0].key2 !== src[0].key2);
@@ -328,15 +328,15 @@ describe('deepMerge.ts', () => {
     const src = { key1: /efg/ };
     const expected = { key1: /efg/ };
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
-    expect(deepMerge<any>(target, src).key1.test('efg')).toBe(true);
+    expect(merge(target, src)).toStrictEqual(expected);
+    expect(merge<any>(target, src).key1.test('efg')).toBe(true);
   });
 
   it('should treat regular expressions like primitive values and should not clone even with clone option', () => {
     const target = { key1: /abc/ };
     const src = { key1: /efg/ };
 
-    const output = deepMerge<any>(target, src);
+    const output = merge<any>(target, src);
 
     expect(output.key1).toEqual(src.key1);
   });
@@ -355,7 +355,7 @@ describe('deepMerge.ts', () => {
     const expected = {
       key: tuesday,
     };
-    const actual = deepMerge<any>(target, source);
+    const actual = merge<any>(target, source);
 
     expect(actual).toStrictEqual(expected);
     expect(actual.key.valueOf()).toEqual(tuesday.valueOf());
@@ -372,7 +372,7 @@ describe('deepMerge.ts', () => {
       key: tuesday,
     };
 
-    const actual = deepMerge<any>(target, source);
+    const actual = merge<any>(target, source);
 
     expect(actual.key).toEqual(tuesday);
   });
@@ -384,7 +384,7 @@ describe('deepMerge.ts', () => {
 
     const expected = [null];
 
-    expect(deepMerge(target, src)).toStrictEqual(expected);
+    expect(merge(target, src)).toStrictEqual(expected);
   });
 
   it("should clone array's element if it is object", () => {
@@ -392,7 +392,7 @@ describe('deepMerge.ts', () => {
     const target = [] as Array<unknown>;
     const source = [a];
 
-    const output = deepMerge<any>(target, source);
+    const output = merge<any>(target, source);
 
     expect(output[0] !== a).toBe(true);
     expect(output[0].key).toEqual('yup');
@@ -402,7 +402,7 @@ describe('deepMerge.ts', () => {
     const someObject = {};
     const target = {};
     const source = { ary: [someObject] };
-    const output = deepMerge<any>(target, source);
+    const output = merge<any>(target, source);
 
     expect(output).toStrictEqual({ ary: [{}] });
     expect(output.ary[0] !== someObject).toBe(true);
@@ -420,9 +420,9 @@ describe('deepMerge.ts', () => {
       expect(typeof o.value === 'undefined').toBe(true);
     };
 
-    hasUndefinedProperty(deepMerge(target1, src));
-    hasUndefinedProperty(deepMerge(target2, src));
-    hasUndefinedProperty(deepMerge(target3, src));
+    hasUndefinedProperty(merge(target1, src));
+    hasUndefinedProperty(merge(target2, src));
+    hasUndefinedProperty(merge(target3, src));
   });
 
   it('dates should copy correctly in an array', () => {
@@ -433,7 +433,7 @@ describe('deepMerge.ts', () => {
     const source = [tuesday, 'lol'];
 
     const expected = [monday, 'dude', tuesday, 'lol'];
-    const actual = deepMerge(target, source);
+    const actual = merge(target, source);
 
     expect(actual).toStrictEqual(expected);
   });
@@ -443,7 +443,7 @@ describe('deepMerge.ts', () => {
     const src = { [mySymbol]: 'value1' };
     const target = {};
 
-    const res = deepMerge<any>(target, src);
+    const res = merge<any>(target, src);
 
     expect(res[mySymbol]).toBe('value1');
     expect(Object.getOwnPropertySymbols(res)).toStrictEqual(
@@ -456,7 +456,7 @@ describe('deepMerge.ts', () => {
     const src = { [mySymbol]: 'value1' };
     const target = { [mySymbol]: 'wat' };
 
-    const res = deepMerge<any>(target, src);
+    const res = merge<any>(target, src);
 
     expect(res[mySymbol]).toBe('value1');
   });
@@ -472,7 +472,7 @@ describe('deepMerge.ts', () => {
       c: { key: 4 },
     };
 
-    let res = deepMerge<any>(source, src);
+    let res = merge<any>(source, src);
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -481,7 +481,7 @@ describe('deepMerge.ts', () => {
     expect(res.b === source.b).toBe(false);
     expect(res.b === src.b).toBe(false);
 
-    res = deepMerge<any>(source, src, new WeakSet([source.b]));
+    res = merge<any>(source, src, new WeakSet([source.b]));
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 2 },
@@ -491,7 +491,7 @@ describe('deepMerge.ts', () => {
     expect(res.b === src.b).toBe(false);
     expect(res.c === src.c).toBe(false);
 
-    res = deepMerge<any>(source, src, new WeakSet([src.b]));
+    res = merge<any>(source, src, new WeakSet([src.b]));
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -501,7 +501,7 @@ describe('deepMerge.ts', () => {
     expect(res.b === src.b).toBe(true);
     expect(res.c === src.c).toBe(false);
 
-    res = deepMerge<any>(source, src, new WeakSet([source.b, src.b]));
+    res = merge<any>(source, src, new WeakSet([source.b, src.b]));
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -511,7 +511,7 @@ describe('deepMerge.ts', () => {
     expect(res.b === src.b).toBe(true);
     expect(res.c === src.c).toBe(false);
 
-    res = deepMerge<any>(source, src, new WeakSet([src.c]));
+    res = merge<any>(source, src, new WeakSet([src.c]));
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },

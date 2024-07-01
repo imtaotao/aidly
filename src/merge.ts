@@ -1,4 +1,4 @@
-import { isDate, isRegExp, isArray, isObject, isPrimitiveValue } from './index';
+import { isDate, isRegExp, isArray, isObject } from './index';
 
 type O = Record<PropertyKey, unknown>;
 
@@ -15,10 +15,8 @@ const isMergeableObject = (val: unknown) => {
 };
 
 const cl = (val: unknown, set?: WeakSet<object>) => {
-  if (isMergeableObject(val)) {
-    return deepMerge(isArray(val) ? [] : {}, val, set);
-  }
-  return val;
+  if (!isMergeableObject(val)) return val;
+  return merge(isArray(val) ? [] : {}, val, set);
 };
 
 const mergeArray = (
@@ -76,7 +74,7 @@ const mergeObject = (target: O, source: O, set?: WeakSet<object>) => {
       } else if (noCloneOrMerge(target[key], set)) {
         res[key] = target[key];
       } else {
-        res[key] = deepMerge(target[key], source[key], set);
+        res[key] = merge(target[key], source[key], set);
       }
     } else {
       res[key] = noCloneOrMerge(source[key], set)
@@ -89,7 +87,7 @@ const mergeObject = (target: O, source: O, set?: WeakSet<object>) => {
 
 // https://github.com/TehShrike/deepmerge
 // This should not be a structure with circular references
-export const deepMerge = <T = unknown>(
+export const merge = <T = unknown>(
   target: unknown,
   source: unknown,
   filterSet?: WeakSet<object>,
