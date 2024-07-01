@@ -2,6 +2,7 @@
   "name": "aidly",
   "version": "1.2.0",
   "description": "Tool library.",
+  "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
   "unpkg": "./dist/aidly.umd.js",
   "module": "./dist/aidly.esm-bundler.js",
