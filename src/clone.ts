@@ -8,7 +8,6 @@ import {
   isObject,
   isWeakSet,
   isTypedArray,
-  regFlags,
 } from './index';
 
 const _new = (val: object, ...args: Array<any>) =>
@@ -88,7 +87,7 @@ export function clone<T>(val: T, options?: unknown): T {
     } else if (isTypedArray(parent)) {
       child = parent.slice();
     } else if (isRegExp(parent)) {
-      child = _new(parent, parent.source, regFlags(parent));
+      child = _new(parent, parent.source, parent.flags);
       if (parent.lastIndex) {
         (child as RegExp).lastIndex = parent.lastIndex;
       }

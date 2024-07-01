@@ -3,7 +3,6 @@ import {
   slash,
   random,
   unindent,
-  regFlags,
   defered,
   capitalize,
   isAbsolute,
@@ -15,14 +14,6 @@ describe('test', () => {
   it('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
-  });
-
-  it('regFlags', () => {
-    expect(regFlags(/a/)).toBe('');
-    expect(regFlags(/a/i)).toBe('i');
-    expect(regFlags(/a/g)).toBe('g');
-    expect(regFlags(/a/gi)).toBe('gi');
-    expect(regFlags(/a/m)).toBe('m');
   });
 
   it('getIteratorFn', () => {

@@ -150,14 +150,6 @@ export const toRawType = (v: unknown) =>
 
 export const slash = (val: string) => val.replace(/\\/g, '/');
 
-export const regFlags = (reg: RegExp) => {
-  let flags = '';
-  if (reg.global) flags += 'g';
-  if (reg.ignoreCase) flags += 'i';
-  if (reg.multiline) flags += 'm';
-  return flags as '' | 'i' | 'g' | 'm' | 'gi' | 'gm' | 'im' | 'gim';
-};
-
 export const makeMap = <T extends string>(arr: Array<T>) => {
   const map: { [key in T]: true } = Object.create(null);
   for (let i = 0; i < arr.length; i++) {
