@@ -11,15 +11,15 @@ import {
 
 export interface QsStringifyOptions {
   encode?: boolean;
-  addPrfix?: boolean;
+  addQueryPrefix?: boolean;
   commaRoundTrip?: boolean;
   arrayFormat?: keyof typeof arrayPrefixFns;
 }
 
 const defaultStringifyOptions = {
   encode: true,
-  addPrfix: true,
-  commaRoundTrip: false,
+  addQueryPrefix: true,
+  commaRoundTrip: true,
   arrayFormat: 'indices',
 };
 
@@ -446,5 +446,6 @@ export const qsStringify = (obj: unknown, options?: QsStringifyOptions) => {
     );
   }
   const res = keys.join('&');
-  return options.addPrfix ? `?${res}` : res;
+  if (res.length === 0) return '';
+  return options.addQueryPrefix ? `?${res}` : res;
 };
