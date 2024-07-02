@@ -40,12 +40,13 @@ export function assert(condition: unknown, error?: string): asserts condition {
   if (!condition) throw new Error(error);
 }
 
-export const raf: (fn: (...args: Array<any>) => any) => void =
+export const raf = (fn: (...args: Array<any>) => any) => {
   typeof requestAnimationFrame === 'function'
-    ? (fn: () => void) => requestAnimationFrame(fn)
-    : typeof process && typeof process.nextTick === 'function'
-    ? (fn: () => void) => process.nextTick(fn)
-    : (fn: () => void) => setTimeout(fn, 17);
+    ? requestAnimationFrame(fn)
+    : typeof process !== 'undefined' && typeof process.nextTick === 'function'
+    ? process.nextTick(fn)
+    : setTimeout(fn, 17);
+};
 
 export const now =
   typeof performance.now === 'function' ? () => performance.now() : Date.now;
