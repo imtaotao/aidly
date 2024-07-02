@@ -246,7 +246,7 @@ const compact = (value: unknown) => {
   return value;
 };
 
-const merge = (target: unknown, source?: unknown) => {
+const mg = (target: unknown, source?: unknown) => {
   if (!source) return target;
   if (typeof source !== 'object') {
     if (isArray(target)) {
@@ -278,7 +278,7 @@ const merge = (target: unknown, source?: unknown) => {
       if (hasOwn(target, i)) {
         const targetItem = target[i];
         if (isObject(targetItem) && isObject(item)) {
-          target[i] = merge(targetItem, item);
+          target[i] = mg(targetItem, item);
         } else {
           target.push(item);
         }
@@ -291,7 +291,7 @@ const merge = (target: unknown, source?: unknown) => {
   return Object.keys(source).reduce(
     (acc: Record<PropertyKey, any>, key: PropertyKey) => {
       const value = (source as any)[key];
-      acc[key] = hasOwn(acc, key) ? merge(acc[key], value) : value;
+      acc[key] = hasOwn(acc, key) ? mg(acc[key], value) : value;
       return acc;
     },
     mergeTarget,
@@ -417,7 +417,7 @@ export const qsParse = <T = Record<PropertyKey, unknown>>(
       tempObj[keys[i]],
       options as QsParseOptions,
     );
-    obj = merge(obj, newObj);
+    obj = mg(obj, newObj);
   }
   return (options.allowSparse ? obj : compact(obj)) as T;
 };

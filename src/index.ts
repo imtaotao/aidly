@@ -20,6 +20,7 @@ export {
   hslToRgb,
   hexToRgb,
   ansi256ToRgb,
+  randomColor,
 } from './color';
 export type {
   TypedArray,

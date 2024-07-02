@@ -1,3 +1,6 @@
+import { random } from './index';
+import type { Nullable } from './types';
+
 // https://github.com/Qix-/color-convert/blob/master/conversions.js
 export const rgbToHsl = (rgb: Array<number>) => {
   let h: number;
@@ -5,6 +8,7 @@ export const rgbToHsl = (rgb: Array<number>) => {
   const r = rgb[0] / 255;
   const g = rgb[1] / 255;
   const b = rgb[2] / 255;
+  const a = rgb[3];
   const min = Math.min(r, g, b);
   const max = Math.max(r, g, b);
   const delta = max - min;
@@ -23,6 +27,7 @@ export const rgbToHsl = (rgb: Array<number>) => {
   if (h < 0) h += 360;
 
   const l = (min + max) / 2;
+
   if (max === min) {
     s = 0;
   } else if (l <= 0.5) {
@@ -30,18 +35,31 @@ export const rgbToHsl = (rgb: Array<number>) => {
   } else {
     s = delta / (2 - max - min);
   }
-  return [h, s * 100, l * 100];
+
+  const hsl = [h, s * 100, l * 100];
+  if (typeof a === 'number') hsl.push(a);
+  return hsl;
 };
 
 export const rgbToHex = (rgb: Array<number>) => {
-  const integer =
+  const string = (
     ((Math.round(rgb[0]) & 0xff) << 16) +
     ((Math.round(rgb[1]) & 0xff) << 8) +
-    (Math.round(rgb[2]) & 0xff);
-  const string = integer.toString(16).toUpperCase();
-  return '000000'.substring(string.length) + string;
+    (Math.round(rgb[2]) & 0xff)
+  )
+    .toString(16)
+    .toUpperCase();
+
+  let hex = '000000'.substring(string.length) + string;
+  if (typeof rgb[3] === 'number') {
+    hex += Math.round(rgb[3] * 0xff).toString(16);
+  }
+  return hex;
 };
 
+/**
+ * Not supported on `alpha`
+ */
 export const rgbToAnsi256 = (rgb: Array<number>) => {
   const r = rgb[0];
   const g = rgb[1];
@@ -54,18 +72,19 @@ export const rgbToAnsi256 = (rgb: Array<number>) => {
     if (r > 248) return 231;
     return Math.round(((r - 8) / 247) * 24) + 232;
   }
-  const ansi =
+  return (
     16 +
     36 * Math.round((r / 255) * 5) +
     6 * Math.round((g / 255) * 5) +
-    Math.round((b / 255) * 5);
-  return ansi;
+    Math.round((b / 255) * 5)
+  );
 };
 
 export const hslToRgb = (hsl: Array<number>) => {
   const h = hsl[0] / 360;
   const s = hsl[1] / 100;
   const l = hsl[2] / 100;
+  const a = hsl[3];
   let t2;
   let t3;
   let val;
@@ -79,6 +98,7 @@ export const hslToRgb = (hsl: Array<number>) => {
   } else {
     t2 = l + s - l * s;
   }
+
   const t1 = 2 * l - t2;
   const rgb = [0, 0, 0];
 
@@ -97,11 +117,13 @@ export const hslToRgb = (hsl: Array<number>) => {
     }
     rgb[i] = val * 255;
   }
+
+  if (typeof a === 'number') rgb.push(a);
   return rgb;
 };
 
 export const hexToRgb = (hex: string) => {
-  const match = hex.match(/[a-f0-9]{6}|[a-f0-9]{3}/i);
+  const match = hex.match(/[a-f0-9]{8}|[a-f0-9]{6}|[a-f0-9]{3}/i);
   if (!match) return [0, 0, 0];
 
   let colorString = match[0];
@@ -111,11 +133,17 @@ export const hexToRgb = (hex: string) => {
       .map((char) => char + char)
       .join('');
   }
-  const integer = parseInt(colorString, 16);
-  const r = (integer >> 16) & 0xff;
-  const g = (integer >> 8) & 0xff;
-  const b = integer & 0xff;
-  return [r, g, b];
+
+  let a: Nullable<number>;
+  if (colorString.length === 8) {
+    a = Number(BigInt('0x' + colorString[6] + colorString[7])) / 0xff;
+    colorString = colorString.slice(0, 6);
+  }
+
+  const integer = Number(BigInt('0x' + colorString));
+  const rgb = [(integer >> 16) & 0xff, (integer >> 8) & 0xff, integer & 0xff];
+  if (a) rgb.push(a);
+  return rgb;
 };
 
 export const ansi256ToRgb = (val: number) => {
@@ -130,3 +158,18 @@ export const ansi256ToRgb = (val: number) => {
   const b = ((rem % 6) / 5) * 255;
   return [r, g, b];
 };
+
+export function randomColor(type?: 'rgb'): [number, number, number];
+export function randomColor(type?: 'hsl'): [number, number, number];
+export function randomColor(type?: 'hex'): string;
+export function randomColor(type?: 'ansi256'): number;
+export function randomColor(type?: 'rgb' | 'hex' | 'hsl' | 'ansi256') {
+  const r = random(255);
+  const g = random(255);
+  const b = random(255);
+  const color = [r, g, b];
+  if (type === 'hex') return rgbToHex(color);
+  if (type === 'hsl') return rgbToHsl(color);
+  if (type === 'ansi256') return rgbToAnsi256(color);
+  return color;
+}

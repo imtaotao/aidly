@@ -3,7 +3,7 @@ import { throttle, debounce } from '../index';
 describe('throttle.ts', () => {
   const pause = 500;
   const delay = 100;
-  function exec_many_times(each: any, complete: any) {
+  function execManyTimes(each: any, complete: any) {
     let i = 0;
     let repeated: any;
     let id: any;
@@ -44,7 +44,7 @@ describe('throttle.ts', () => {
       };
       let throttled = throttle(delay, fn);
 
-      exec_many_times(
+      execManyTimes(
         () => {
           const now = +new Date();
           start_time = start_time || now;
@@ -84,7 +84,7 @@ describe('throttle.ts', () => {
       };
       let debounced = debounce(delay, fn);
 
-      exec_many_times(
+      execManyTimes(
         () => {
           start_time = start_time || +new Date();
           i++;
