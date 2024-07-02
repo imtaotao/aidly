@@ -16,7 +16,6 @@ export type PrimitiveType =
   | string
   | boolean
   | symbol
-  | Symbol
   | null
   | undefined;
 
