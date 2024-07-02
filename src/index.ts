@@ -13,6 +13,14 @@ export {
   type QsParseOptions,
   type QsStringifyOptions,
 } from './qs';
+export {
+  rgbToHsl,
+  rgbToHex,
+  rgbToAnsi256,
+  hslToRgb,
+  hexToRgb,
+  ansi256ToRgb,
+} from './color';
 export type {
   TypedArray,
   PrimitiveType,
@@ -167,11 +175,14 @@ export const decimalPlaces = (n: number) =>
 export const random = (min = 0, max = 0) => {
   if (max === min) return max;
   if (max < min) min = [max, (max = min)][0];
-  return Number(
+  const n = Number(
     (Math.random() * (max - min) + min).toFixed(
       Math.max(decimalPlaces(min), decimalPlaces(max)),
     ),
   );
+  if (n > max) return max;
+  if (n < min) return min;
+  return n;
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
