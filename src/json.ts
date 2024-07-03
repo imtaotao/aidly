@@ -1,13 +1,10 @@
 import { isObject } from './index';
 
-// Object references are a built-in behavior of es, so `@@` is used here.
-const _flag = '@@ref*';
-
 export const jsonParse = (
   text: string,
   reviver?: (this: any, key: string, value: unknown) => any,
-  flag = _flag,
 ) => {
+  const flag = jsonParse['_ref'];
   const map = new Map();
   const refs = Object.create(null);
   const replace = [] as Array<() => void>;
@@ -53,8 +50,8 @@ export const jsonStringify = (
   value: unknown,
   replacer?: (this: any, key: string, value: unknown) => any,
   space?: string | number,
-  flag = _flag,
 ) => {
+  const flag = jsonStringify['_ref'];
   const map = new WeakMap<object, string>();
 
   function _replacer(this: object, key: string, value: unknown) {
@@ -77,3 +74,6 @@ export const jsonStringify = (
   }
   return JSON.stringify(value, _replacer, space);
 };
+
+// Object references are a built-in behavior of es, so `@@` is used here.
+jsonParse['_ref'] = jsonStringify['_ref'] = '@@ref*';
