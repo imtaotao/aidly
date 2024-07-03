@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const isObject = (v) => v !== null && typeof v === 'object';
+    const flag = '$$circular_';
+
+    const jsonParse = (text) => {
+      let i = 0;
+      const replace = []
+      const map = Object.create(null);
+      const keys = new WeakMap();
+
+      function reviver(key, val) {
+        if (isObject(this)) {
+          let child = keys.get(this);
+          if (!child) {
+            child = {[key]: {list: [], unshift(p) {
+              this.list.unshift(p)
+            }}};
+            keys.set(this, child);
+          }
+          if (!child[key]) {
+            child[key] = { list: [], unshift(p) {
+              this.list.unshift(p)
+            }};
+          }
+          child[key].unshift(key)
+        }
+        if (isObject(val)) {
+          const child = keys.get(val)
+          if (child) {
+            for (const k in child) {
+              child[k].unshift(key)
+            }
+          }
+          map[++i] = val;
+        } else if (typeof val === 'string') {
+          if (val.startsWith(flag)) {
+            const ref = val.slice(flag.length);
+            replace.push(() => {
+              const fk = keys.get(this)[key];
+              console.log(fk)
+              console.log(`obj${fk.join('.')}`, key, ref) 
+            })
+          }
+        }
+        return val;
+      }
+      const res = JSON.parse(text, reviver);
+      console.log(keys)
+      replace.forEach(f => f())
+    };
+
+    const jsonStringify = (obj, space) => {
+      let i = 0;
+      const map = new WeakMap();
+      const replacer = (_, val) => {
+        if (isObject(val)) {
+          if (map.has(val)) {
+            val = `${flag}${map.get(val)}`;
+          } else {
+            map.set(val, ++i);
+          }
+        }
+        return val;
+      };
+      return JSON.stringify(obj, replacer, space);
+    };
+
+    const obj1 = {a: 1, data: {}}
+    obj1.b = obj1.data;
+    obj1.data.data_a = obj1;
+    const json = jsonStringify(obj1, 2);
+    const obj2 = jsonParse(json);
+    // console.log(json, obj1)
+    // console.log(obj2)
+    // console.log(obj2.data.b === obj2)
+  </script>
+</body>
+</html>

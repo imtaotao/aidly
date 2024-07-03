@@ -85,7 +85,6 @@ const mergeObject = (target: O, source: O, set?: S) => {
   return res;
 };
 
-// https://github.com/TehShrike/deepmerge
 // This should not be a structure with circular references
 export const merge = <T = unknown>(
   target: unknown,
