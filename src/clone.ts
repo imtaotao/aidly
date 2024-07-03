@@ -4,6 +4,7 @@ import {
   isMap,
   isDate,
   isArray,
+  isBuffer,
   isRegExp,
   isObject,
   isWeakSet,
@@ -97,6 +98,8 @@ export function clone<T>(val: T, options?: unknown): T {
       child = Object.create(parent);
     } else if (_isRes(parent)) {
       child = parent.clone();
+    } else if (isBuffer(parent)) {
+      child = Buffer.from(parent as ArrayBuffer);
     } else if (parent instanceof Promise) {
       child = _new(
         parent,
