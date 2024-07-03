@@ -1,9 +1,9 @@
 import { isDate, isRegExp, isArray, isObject } from './index';
 
 type O = Record<PropertyKey, unknown>;
+type S = Set<object> | WeakSet<object>;
 
-const noCloneOrMerge = (val: unknown, set?: WeakSet<object>) =>
-  set && set.has(val as object);
+const noCloneOrMerge = (val: unknown, set?: S) => set && set.has(val as object);
 
 const isMergeableObject = (val: unknown) => {
   return (
@@ -14,7 +14,7 @@ const isMergeableObject = (val: unknown) => {
   );
 };
 
-const cl = (val: unknown, set?: WeakSet<object>) => {
+const cl = (val: unknown, set?: S) => {
   if (!isMergeableObject(val)) return val;
   return merge(isArray(val) ? [] : {}, val, set);
 };
@@ -22,7 +22,7 @@ const cl = (val: unknown, set?: WeakSet<object>) => {
 const mergeArray = (
   target: Array<unknown>,
   source: Array<unknown>,
-  set?: WeakSet<object>,
+  set?: S,
 ) => {
   return target.concat(source).map((val) => cl(val, set));
 };
@@ -56,7 +56,7 @@ const propertyIsUnsafe = (target: O, key: PropertyKey) => {
   );
 };
 
-const mergeObject = (target: O, source: O, set?: WeakSet<object>) => {
+const mergeObject = (target: O, source: O, set?: S) => {
   const res = {} as O;
   if (isMergeableObject(target)) {
     const keys = getKeys(target);
@@ -90,7 +90,7 @@ const mergeObject = (target: O, source: O, set?: WeakSet<object>) => {
 export const merge = <T = unknown>(
   target: unknown,
   source: unknown,
-  filterSet?: WeakSet<object>,
+  filterSet?: S,
 ): T => {
   const sourceIsArray = isArray(source);
   const targetIsArray = isArray(target);

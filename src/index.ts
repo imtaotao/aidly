@@ -7,6 +7,7 @@ export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
+export { jsonParse, jsonStringify } from './json';
 export {
   qsParse,
   qsStringify,
@@ -40,6 +41,8 @@ export function assert(condition: unknown, error?: string): asserts condition {
   if (!condition) throw new Error(error);
 }
 
+// Because there is access to the global object,
+// it is declared as a function here for better `tree-shaking`.
 export const raf = (fn: (...args: Array<any>) => any) => {
   typeof requestAnimationFrame === 'function'
     ? requestAnimationFrame(fn)
