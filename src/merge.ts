@@ -3,7 +3,7 @@ import { isDate, isRegExp, isArray, isObject } from './index';
 type O = Record<PropertyKey, unknown>;
 type S = Set<object> | WeakSet<object>;
 
-const noCloneOrMerge = (val: unknown, set?: S) => set && set.has(val as object);
+const isPrevent = (val: unknown, set?: S) => set && set.has(val as object);
 
 const isMergeableObject = (val: unknown) => {
   return (
@@ -63,22 +63,22 @@ const mergeObject = (target: O, source: O, set?: S) => {
     const keys = getKeys(target);
     for (const key of keys) {
       const val = target[key];
-      res[key] = noCloneOrMerge(val, set) ? val : cl(val, set);
+      res[key] = isPrevent(val, set) ? val : cl(val, set);
     }
   }
   const keys = getKeys(source);
   for (const key of keys) {
     if (propertyIsUnsafe(target, key)) continue;
     if (propertyIsOnObject(target, key) && isMergeableObject(source[key])) {
-      if (noCloneOrMerge(source[key], set)) {
+      if (isPrevent(source[key], set)) {
         res[key] = source[key];
-      } else if (noCloneOrMerge(target[key], set)) {
+      } else if (isPrevent(target[key], set)) {
         res[key] = target[key];
       } else {
         res[key] = merge(target[key], source[key], set);
       }
     } else {
-      res[key] = noCloneOrMerge(source[key], set)
+      res[key] = isPrevent(source[key], set)
         ? source[key]
         : cl(source[key], set);
     }
