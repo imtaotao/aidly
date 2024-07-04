@@ -1,8 +1,9 @@
 import { isObject } from './index';
+import { Nullable } from './types';
 
 export const jsonParse = (
   text: string,
-  reviver?: (this: any, key: string, value: unknown) => any,
+  reviver?: Nullable<(this: any, key: string, value: unknown) => any | null>,
 ) => {
   const flag = jsonParse['_ref'];
   const map = new Map();
@@ -48,7 +49,7 @@ export const jsonParse = (
 
 export const jsonStringify = (
   value: unknown,
-  replacer?: (this: any, key: string, value: unknown) => any,
+  replacer?: Nullable<(this: any, key: string, value: unknown) => any>,
   space?: string | number,
 ) => {
   const flag = jsonStringify['_ref'];

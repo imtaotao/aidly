@@ -1,17 +1,6 @@
-import { clone, isTypedArray } from '../index';
+import { clone, isTypedArray, jsonStringify } from '../index';
 
 describe('clone.ts', () => {
-  const inspect = (obj: unknown) => {
-    const seen = new Set<unknown>();
-    return JSON.stringify(obj, (_, val) => {
-      if (val !== null && typeof val == 'object') {
-        if (seen.has(val)) return '[cyclic]';
-        seen.add(val);
-      }
-      return val;
-    });
-  };
-
   it('clone Map', () => {
     const map = new Map();
     // simple key/value
@@ -175,7 +164,8 @@ describe('clone.ts', () => {
   });
 
   it('clone object with circular reference (2)', () => {
-    const eq = (x: unknown, y: unknown) => inspect(x) === inspect(y);
+    const eq = (x: unknown, y: unknown) =>
+      jsonStringify(x) === jsonStringify(y);
     const c = [1, 'foo', { hello: 'bar' }, function () {}, false, [2]];
     const b = [c, 2, 3, 4];
     const a = { b: b, c: c };
