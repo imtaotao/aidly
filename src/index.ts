@@ -7,7 +7,13 @@ export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
-export { jsonParse, jsonStringify } from './json';
+export {
+  jsonParse,
+  jsonStringify,
+  createJSONParse,
+  createJSONStringify,
+  type JSONOptions,
+} from './json';
 export {
   qsParse,
   qsStringify,

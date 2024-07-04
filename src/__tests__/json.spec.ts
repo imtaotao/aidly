@@ -1,10 +1,17 @@
-import { isObject, unindent, jsonParse, jsonStringify } from '../index';
+import {
+  isObject,
+  unindent,
+  jsonParse,
+  jsonStringify,
+  createJSONParse,
+  createJSONStringify,
+} from '../index';
 
 describe('json.ts', () => {
   it('nomarl stringify', () => {
     const obj = { a: 1, b: [1, 2, { num: 2 }], c: {} };
     const json = jsonStringify(obj);
-    expect(json.includes(jsonStringify._ref)).toBe(false);
+    expect(json.includes('@@ref*')).toBe(false);
   });
 
   it('simple stringify', () => {
@@ -12,7 +19,7 @@ describe('json.ts', () => {
     obj.self = obj;
     expect(obj.self === obj).toBe(true);
     const json = jsonStringify(obj);
-    expect(json.includes(jsonStringify._ref)).toBe(true);
+    expect(json.includes('@@ref*')).toBe(true);
   });
 
   it('should handle simple circular references', () => {
@@ -241,27 +248,27 @@ describe('json.ts', () => {
   it('disable resolve `ref` in jsonStringify', () => {
     const obj = {} as any;
     obj.a = obj;
-
     expect(() => jsonStringify(obj)).not.toThrowError();
-    jsonStringify._ref = '';
-    expect(() => jsonStringify(obj)).toThrowError();
-    jsonStringify._ref = '@@ref*';
+
+    let _jsonStringify = createJSONStringify({ flag: '' });
+    expect(() => _jsonStringify(obj)).toThrowError();
+
+    _jsonStringify = createJSONStringify();
     expect(() => jsonStringify(obj)).not.toThrowError();
   });
 
   it('disable resolve `ref` in jsonParse', () => {
     const obj = {} as any;
     obj.a = obj;
-
     const json = jsonStringify(obj);
 
-    jsonParse._ref = '';
-    let parsed = jsonParse(json);
+    let _jsonParse = createJSONParse({ flag: '' });
+    let parsed = _jsonParse(json);
     expect(parsed.a !== obj).toBe(true);
     expect(parsed.a === '@@ref*').toBe(true);
 
-    jsonParse._ref = '@@ref*';
-    parsed = jsonParse(json);
+    _jsonParse = createJSONParse();
+    parsed = _jsonParse(json);
     expect(parsed.a === parsed).toBe(true);
   });
 });
