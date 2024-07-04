@@ -76,4 +76,14 @@ export const jsonStringify = (
 };
 
 // Object references are a built-in behavior of es, so `@@` is used here.
-jsonParse['_ref'] = jsonStringify['_ref'] = '@@ref*';
+const flag = '@@ref*';
+
+/**
+ * Set the reference `flag` by changing `_ref`
+ */
+jsonParse['_ref'] = flag;
+
+/**
+ * Set the reference `flag` by changing `_ref`
+ */
+jsonStringify['_ref'] = flag;
