@@ -80,11 +80,11 @@ export const jsonStringify = (
 const flag = '@@ref*';
 
 /**
- * Set the reference `flag` by changing `_ref`
+ * Reference flag during json parse
  */
 jsonParse['_ref'] = flag;
 
 /**
- * Set the reference `flag` by changing `_ref`
+ * Reference flag during json stringify
  */
 jsonStringify['_ref'] = flag;

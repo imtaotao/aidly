@@ -201,13 +201,15 @@ describe('json.ts', () => {
       },
     };
 
-    const expectedOutput = `{
-  "name": "Alice",
-  "details": {
-    "age": 30,
-    "location": "Wonderland"
-  }
-}`;
+    const expectedOutput = unindent(`
+      {
+        "name": "Alice",
+        "details": {
+          "age": 30,
+          "location": "Wonderland"
+        }
+      }
+  `);
 
     const jsonString = jsonStringify(obj, null, 2);
     expect(jsonString).toBe(expectedOutput);
@@ -222,13 +224,15 @@ describe('json.ts', () => {
       },
     };
 
-    const expectedOutput = `{
---"name": "Alice",
---"details": {
-----"age": 30,
-----"location": "Wonderland"
---}
-}`;
+    const expectedOutput = unindent(`
+      {
+      --"name": "Alice",
+      --"details": {
+      ----"age": 30,
+      ----"location": "Wonderland"
+      --}
+      }
+    `);
 
     const jsonString = jsonStringify(obj, null, '--');
     expect(jsonString).toBe(expectedOutput);

@@ -14,29 +14,17 @@ const isMergeableObject = (val: unknown) => {
   );
 };
 
-const cl = (val: unknown, set?: S) => {
-  if (!isMergeableObject(val)) return val;
-  return merge(isArray(val) ? [] : {}, val, set);
-};
-
-const mergeArray = (
-  target: Array<unknown>,
-  source: Array<unknown>,
-  set?: S,
-) => {
-  return target.concat(source).map((val) => cl(val, set));
-};
-
 const getEnumerableSymbols = (target: object) => {
   return Object.getOwnPropertySymbols(target).filter((symbol) =>
     Object.propertyIsEnumerable.call(target, symbol),
   );
 };
 
-const getKeys = (target: O) =>
-  (Object.keys(target) as Array<PropertyKey>).concat(
+const getKeys = (target: O) => {
+  return (Object.keys(target) as Array<PropertyKey>).concat(
     getEnumerableSymbols(target),
   );
+};
 
 const propertyIsOnObject = (object: O, key: PropertyKey) => {
   try {
@@ -54,6 +42,19 @@ const propertyIsUnsafe = (target: O, key: PropertyKey) => {
       Object.propertyIsEnumerable.call(target, key)
     )
   );
+};
+
+const cl = (val: unknown, set?: S) => {
+  if (!isMergeableObject(val)) return val;
+  return merge(isArray(val) ? [] : {}, val, set);
+};
+
+const mergeArray = (
+  target: Array<unknown>,
+  source: Array<unknown>,
+  set?: S,
+) => {
+  return target.concat(source).map((val) => cl(val, set));
 };
 
 const mergeObject = (target: O, source: O, set?: S) => {
