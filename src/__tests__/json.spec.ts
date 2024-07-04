@@ -237,4 +237,31 @@ describe('json.ts', () => {
     const jsonString = jsonStringify(obj, null, '--');
     expect(jsonString).toBe(expectedOutput);
   });
+
+  it('disable resolve `ref` in jsonStringify', () => {
+    const obj = {} as any;
+    obj.a = obj;
+
+    expect(() => jsonStringify(obj)).not.toThrowError();
+    jsonStringify._ref = '';
+    expect(() => jsonStringify(obj)).toThrowError();
+    jsonStringify._ref = '@@ref*';
+    expect(() => jsonStringify(obj)).not.toThrowError();
+  });
+
+  it('disable resolve `ref` in jsonParse', () => {
+    const obj = {} as any;
+    obj.a = obj;
+
+    const json = jsonStringify(obj);
+
+    jsonParse._ref = '';
+    let parsed = jsonParse(json);
+    expect(parsed.a !== obj).toBe(true);
+    expect(parsed.a === '@@ref*').toBe(true);
+
+    jsonParse._ref = '@@ref*';
+    parsed = jsonParse(json);
+    expect(parsed.a === parsed).toBe(true);
+  });
 });
