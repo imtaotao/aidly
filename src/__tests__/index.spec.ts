@@ -2,8 +2,9 @@ import {
   root,
   slash,
   random,
-  unindent,
   defered,
+  unindent,
+  clearUndef,
   capitalize,
   isAbsolute,
   decimalPlaces,
@@ -110,6 +111,13 @@ describe('test', () => {
       expect(decimalPlaces(res) <= 2).toBe(true);
       expect(res <= c).toBe(true);
     }
+  });
+
+  it('clearUndef', () => {
+    const obj = { a: 1, b: undefined, c: 2 };
+    const res = clearUndef(obj);
+    expect(obj).toStrictEqual({ a: 1, c: 2 });
+    expect(Object.keys(res)).toEqual(['a', 'c']);
   });
 
   it('unindent', () => {

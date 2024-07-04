@@ -320,7 +320,7 @@ export const sortKeys = <T extends Record<PropertyKey, unknown>>(
 
 export const clearUndef = <T extends object>(val: T): T => {
   Object.keys(val).forEach((key) => {
-    if (val[key as keyof T]) {
+    if (val[key as keyof T] === undefined) {
       delete val[key as keyof T];
     }
   });
