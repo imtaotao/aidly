@@ -26,6 +26,7 @@ export {
   isPromise,
   isBase64,
   isIP,
+  isPort,
   isDomain,
   isEmail,
   isByteLength,

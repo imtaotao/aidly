@@ -69,6 +69,9 @@ export const isWeakMap: <K extends object = object, V = unknown>(
 export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> =>
   isObject(v) && typeof (v as any).then === 'function';
 
+export const isPort = (n: number) =>
+  Number.isInteger(n) && n >= 0 && n <= 65535;
+
 export const isBuffer = (v: unknown) => {
   if (!isObject(v)) return false;
   return Boolean(

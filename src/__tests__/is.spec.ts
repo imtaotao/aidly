@@ -1,4 +1,11 @@
-import { isIP, isBase64, isDomain, isEmail, isAbsolute } from '../index';
+import {
+  isIP,
+  isPort,
+  isDomain,
+  isAbsolute,
+  isEmail,
+  isBase64,
+} from '../index';
 
 describe('is.ts', () => {
   it('isAbsolute', () => {
@@ -11,6 +18,19 @@ describe('is.ts', () => {
     expect(
       isAbsolute('blob:https://a.com/832a2821-8580-4099-85c8-509bf48aee50'),
     ).toBe(true);
+  });
+
+  it('should validate ports', () => {
+    const obj = {
+      valid: [0, -0, 22, 80, 443, 3000, 8080, 65535],
+      invalid: [65536, 80.1, -1, -80.1],
+    };
+    obj.valid.forEach((p) => {
+      expect(isPort(+p)).toBe(true);
+    });
+    obj.invalid.forEach((p) => {
+      expect(isPort(+p)).toBe(false);
+    });
   });
 
   it('should validate domain names.', () => {
@@ -57,7 +77,6 @@ describe('is.ts', () => {
         '192.168.0',
       ],
     };
-
     domains.valid.forEach((domain) => {
       expect(isDomain(domain)).toBe(true);
     });
@@ -266,7 +285,6 @@ describe('is.ts', () => {
         '255.256.255.256',
       ],
     };
-
     ipv4.valid.forEach((ip) => {
       expect(isIP(ip, '4')).toBe(true);
     });
@@ -296,7 +314,6 @@ describe('is.ts', () => {
         'fe80%fe80%',
       ],
     };
-
     ipv6.valid.forEach((ip) => {
       expect(isIP(ip, '6')).toBe(true);
     });
