@@ -9,7 +9,7 @@ import {
   isObject,
   isWeakSet,
   isTypedArray,
-} from './index';
+} from './is';
 
 const _new = (val: object, ...args: Array<any>) =>
   new (val as any).constructor(...args);

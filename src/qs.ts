@@ -1,13 +1,13 @@
 import type { Prettify } from './types';
+import { hasOwn } from './index';
 import {
-  hasOwn,
   isNil,
   isDate,
   isArray,
   isObject,
   isBuffer,
   isPrimitiveValue,
-} from './index';
+} from './is';
 
 export interface QsStringifyOptions {
   encode?: boolean;

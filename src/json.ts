@@ -1,4 +1,4 @@
-import { isObject } from './index';
+import { isObject } from './is';
 import { Nullable, Prettify } from './types';
 
 // Object references are a built-in behavior of es, so `@@` is used here.

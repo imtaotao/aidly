@@ -1,4 +1,4 @@
-import { isDate, isRegExp, isArray, isObject } from './index';
+import { isDate, isRegExp, isArray, isObject } from './is';
 
 type O = Record<PropertyKey, unknown>;
 type S = Set<object> | WeakSet<object>;
