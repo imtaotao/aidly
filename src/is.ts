@@ -181,7 +181,11 @@ export const isDomain = (val: string) => {
 export const isPhone = (
   val: string,
   locale?: PhoneLocales | Array<PhoneLocales>,
+  strictMode?: boolean,
 ) => {
+  if (strictMode && !val.startsWith('+')) {
+    return false;
+  }
   if (typeof locale === 'string' && locale in phones) {
     return phones[locale].test(val);
   }
@@ -204,6 +208,9 @@ export const isPhone = (
   }
   throw new Error(`Invalid locale '${locale}'`);
 };
+
+export const isCNPhone = (val: string, strictMode?: boolean) =>
+  isPhone(val, 'zh-CN', strictMode);
 
 const emailUserUtf8Part =
   /^[a-z\d!#\$%&'\*\+\-\/=\?\^_`{\|}~\u00A1-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+$/i;

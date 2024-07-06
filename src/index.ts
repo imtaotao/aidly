@@ -30,6 +30,7 @@ export {
   isDomain,
   isEmail,
   isPhone,
+  isCNPhone,
   isByteLength,
   isWindow,
   isBrowser,
