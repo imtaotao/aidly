@@ -1,3 +1,7 @@
+import { phones } from './phoneRegExp';
+
+export type PhoneLocales = keyof typeof phones;
+
 export type Awaitable<T> = T | PromiseLike<T>;
 
 export type Nullable<T> = T | null | undefined;

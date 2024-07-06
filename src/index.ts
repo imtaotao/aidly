@@ -29,6 +29,7 @@ export {
   isPort,
   isDomain,
   isEmail,
+  isPhone,
   isByteLength,
   isWindow,
   isBrowser,
@@ -63,6 +64,7 @@ export {
 export type {
   TypedArray,
   PrimitiveType,
+  PhoneLocales,
   Prettify,
   DeepPrettify,
 } from './types';

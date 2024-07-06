@@ -1,4 +1,5 @@
-import type { TypedArray, PrimitiveType } from './types';
+import { phones } from './phoneRegExp';
+import type { TypedArray, PrimitiveType, PhoneLocales } from './types';
 
 const objectToString = Object.prototype.toString;
 
@@ -175,6 +176,33 @@ export const isDomain = (val: string) => {
     if (/_/.test(part)) return false;
     return true;
   });
+};
+
+export const isPhone = (
+  val: string,
+  locale?: PhoneLocales | Array<PhoneLocales>,
+) => {
+  if (typeof locale === 'string' && locale in phones) {
+    return phones[locale].test(val);
+  }
+  if (isArray(locale)) {
+    return locale.some((key) => {
+      if (phones.hasOwnProperty(key)) {
+        if (phones[key].test(val)) return true;
+      }
+      return false;
+    });
+  }
+  if (!locale) {
+    for (const key in phones) {
+      if (phones.hasOwnProperty(key)) {
+        const phone = phones[key as PhoneLocales];
+        if (phone.test(val)) return true;
+      }
+    }
+    return false;
+  }
+  throw new Error(`Invalid locale '${locale}'`);
 };
 
 const emailUserUtf8Part =
