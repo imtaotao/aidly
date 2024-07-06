@@ -5,7 +5,13 @@
 
 </div>
 
+<div align="center">
+
 English | [简体中文](./README.zh-CN.md)
+
+</div>
+
+<h1></h1>
 
 A collection of pure JavaScript runtime utility functions that is highly tree-shaking.
 
@@ -108,7 +114,7 @@ Api                  | Description
 `isPhone`            | Check if it is a valid `mobile number`.
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
-`merge`              | Merges two `objects` or `arrays` and returns a new object, without worrying about circular references.
 `jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
 `jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
+`merge`              | Merges two `objects` or `arrays` and returns a new object, without worrying about circular references.
 `clone`              | Clone an object that allows circular references, types include `Object`, `Array`, `TypeArray`, `Set`, `Map`, `RegExp`, `Date`, `Promise`, `Buffer`, `Response`, `setter/getter`, `Non-enumerable properties (not cloned by default)`.
