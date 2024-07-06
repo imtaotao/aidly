@@ -5,7 +5,9 @@
 
 </div>
 
-A small utility function in pure js runtime, capable of effective tree-shaking.
+English | [简体中文](./README.zh-CN.md)
+
+A collection of pure JavaScript runtime utility functions that is highly tree-shaking.
 
 
 ### Debugging platform
@@ -35,23 +37,51 @@ console.log(clone(/a/ig)); // `/a/gi`
 
 ### API
 
-The following are all the utility functions. If you have other utility functions that you need, please add a topic in [Issues](https://github.com/imtaotao/aidly/issues).
+Here are all the functions. If you need any other functions, please open a discussion in the [Issues](https://github.com/imtaotao/aidly/issues) section.
 
 > https://unpkg.com/browse/aidly/dist/index.d.ts
 
 Api                  | Description
 -------------------- | --------------------------------------
-`jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
-`jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
-`root`               | Alias ​​for global objects, compatible with different environments.
-`clone`              | Clone an object that allows circular references, types include `Object`, `Array`, `TypeArray`, `Set`, `Map`, `RegExp`, `Date`, `Promise`, `Buffer`, `Response`, `setter/getter`, `Non-enumerable properties (not cloned by default)`.
-`merge`              | Merge two `Objects` or `Arrays` and return a new object without handling circular references.
-`loopSlice`          | Slice the specified number of loops, the default slicing time is `17ms`.
 `throttle`           | Throttle function, the first time it triggers the function call immediately.
 `debounce`           | Debounce function, the first time it is called, it will trigger the function call immediately.
-`uuid`               | Generate a uuid.
+`loopSlice`          | Slice the specified number of loops, the default slicing time is `17ms`.
+`uuid`               | Generate a `uuid`.
 `noop`               | Empty arrow function.
-`supportWasm`        | Check if the current environment supports WebAssembly.
+`qsParse`            | Query string parsing.
+`qsStringify`        | Query string formatted as a string.
+`rgbToHsl`           | `RGB` to `Hsl`.
+`rgbToHex`           | `RGB` to `Hexadecimal`.
+`rgbToAnsi256`       | `RGB` to `Ansi256`.
+`hslToRgb`           | `Hsl` to `RGB`.
+`hexToRgb`           | `Hexadecimal` to `RGB`.
+`ansi256ToRgb`       | `Ansi256` to `RGB`.
+`randomColor`        | Generate a random color value, the default format is `RGB`.
+`assert`             | Assert a condition.
+`raf`                | Compatibility handling for `requestAnimationFrame`.
+`now`                | Compatibility handling for `Date.now` and `performance.now`.
+`idleCallback`       | Compatibility handling for `requestIdleCallback`.
+`isAbsolute`         | Determines whether a path is an absolute path in the browser.
+`last`               | Returns the nth to last element in an array (default is the last element).
+`uniq`               | Array deduplication.
+`hasOwn`             | `Object.hasOwnProperty.call` alias.
+`slash`              | Replace `\` with `/`.
+`makeMap`            | Convert an `Array<string>` to a `Record<string, (key) => boolean>`.
+`decimalPlaces`      | Return the number of decimal places in a number.
+`random`             | Return a random number in a specified range. If only one parameter `T` is specified, the range defaults to `0 ~ T`.
+`once`               | Generates a higher-order function that will be executed only once.
+`sleep`              | Pause for `n` ms, return a promise.
+`remove`             | Remove the specified element from a `Array` or `Set`.
+`map`                | Perform a map operation on `Object`, `Array`, `Set` and return a brand new copy.
+`toCamelCase`        | Convert a string to `camelCase` or `pascalCase` naming, processing `_` and `-` by default.
+`getExtname`         | Get the `extname` of a url.
+`getIteratorFn`      | Get an object's iterator function.
+`sortKeys`           | Sort the keys of an `Object` and return a new copy.
+`clearUndef`         | Clearing `undefined` values ​​from an object.
+`pick`               | Select the required attribute values ​​from an object and return a new copy.
+`unindent`           | Formatting template strings `(unindet(`string`))`.
+`defered`            | Returns a `defered` object.
+`supportWasm`        | Check if the current environment supports `WebAssembly`.
 `isBrowser`          | Check if you are in the browser environment.
 `isNil`              | Check if a value is `null` or `undefined`.
 `isNumber`           | Check if a value is a `Number`.
@@ -61,52 +91,24 @@ Api                  | Description
 `isPlainObject`      | Check if a value is a `plainObject`.
 `isDate`             | Check if a value is a `Date`.
 `isRegExp`           | Check if a value is a `RegExp`.
-`isSet`              | Check if a value is `Set`.
-`isWeakSet`          | Check if a value is `WeakSet`.
+`isSet`              | Check if a value is a `Set`.
+`isWeakSet`          | Check if a value is a `WeakSet`.
 `isMap`              | Check if a value is a `Map`.
 `isWeakMap`          | Check if a value is a `WeakMap`.
 `isPromise`          | Check if a value is a `PromiseLike`.
-`isWindow`           | Check if an object is a `window` object.
-`isBase64`           | Check if it is a valid base64 string.
-`isInBounds`         | Check if a number is within a specified range (isInBounds([1, 5], 2)).
-`isIP`               | Check if it is a valid IP address.
-`isDomain`           | Check if it is a valid domain name.
-`isPort`             | Check if it is a valid port.
-`isEmail`            | Check if it is a valid email.
-`isPhone`            | Check if it is a valid mobile number.
-`isCNPhone`          | Check if it is a valid mobile phone number in mainland China.
-`isEmptyObject`      | Check if an object is empty object.
 `isPrimitiveValue`   | Check if a value is a primitive value.
-`qsParse`            | Query string parsing.
-`qsStringify`        | Query string formatted as a string.
-`rgbToHsl`           | RGB to Hsl.
-`rgbToHex`           | RGB to Hexadecimal.
-`rgbToAnsi256`       | RGB to Ansi256.
-`hslToRgb`           | Hsl to RGB.
-`hexToRgb`           | Hexadecimal to RGB.
-`ansi256ToRgb`       | Ansi256 to RGB.
-`randomColor`        | Generate a random color value, the default format is RGB.
-`assert`             | Assert a condition.
-`raf`                | Compatibility handling for `requestAnimationFrame`.
-`now`                | Compatibility handling for `Date.now` and `performance.now`.
-`idleCallback`       | Compatibility handling for `requestIdleCallback`.
-`isAbsolute`         | Determine if a path is an absolute path in the browser.
-`last`               | Returns the nth to last element in an array (default is the last element).
-`uniq`               | Array deduplication.
-`hasOwn`             | `Object.hasOwnProperty.call` alias.
-`slash`              | Replace `\` with `/`.
-`makeMap`            | Convert an `Array<string>` to a `Record<string, (key) => boolean>`.
-`decimalPlaces`      | Return the number of decimal places in a number.
-`random`             | Return a random number in a specified range. If only one parameter `T` is specified, the range defaults to `0 ~ T`.
-`once`               | Return a higher-order function that will only ever be executed once.
-`sleep`              | Pause for `n` ms, return a promise.
-`remove`             | RRemove the specified element from a `Array` or `Set`.
-`map`                | Perform a map operation on `Object`, `Array`, `Set` and return a brand new copy.
-`toCamelCase`        | Convert a string to `camelCase` or `pascalCase` naming, processing `_` and `-` by default.
-`getExtname`         | Get the `extname` of a url.
-`getIteratorFn`      | Get an object's iterator function.
-`sortKeys`           | Sort the keys of an object and return a new copy.
-`clearUndef`         | Clearing `undefined` values ​​from an object.
-`pick`               | Select the required attribute values ​​from an object and return a new copy.
-`unindent`           | Formatting template strings (unindet(`string`)).
-`defered`            | Returns a `defered` object.
+`isEmptyObject`      | Check if an object is empty object.
+`isWindow`           | Check if an object is a `window` object.
+`isBase64`           | Check if a string is a valid base64 string.
+`isInBounds`         | Check if a number is within a specified range `(isInBounds([1, 5], 2))`.
+`isIP`               | Check if it is a valid `IP` address.
+`isDomain`           | Check if it is a valid `domain` name.
+`isPort`             | Check if it is a valid `port`.
+`isEmail`            | Check if it is a valid `email`.
+`isPhone`            | Check if it is a valid `mobile number`.
+`isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
+`root`               | Alias ​​for global objects, compatible with different environments.
+`merge`              | Merges two `objects` or `arrays` and returns a new object, without worrying about circular references.
+`jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
+`jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
+`clone`              | Clone an object that allows circular references, types include `Object`, `Array`, `TypeArray`, `Set`, `Map`, `RegExp`, `Date`, `Promise`, `Buffer`, `Response`, `setter/getter`, `Non-enumerable properties (not cloned by default)`.
