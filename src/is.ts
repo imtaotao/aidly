@@ -105,15 +105,12 @@ export const isPrimitiveValue = (v: unknown): v is PrimitiveType => {
   );
 };
 
-export const isByteLength = (val: string, a: number, b = 0) => {
-  let min: number;
-  let max: number;
-  if (a === b) {
-    min = max = a;
-  } else {
-    min = Math.min(a, b);
-    max = min === a ? b : a;
-  }
+export const isByteLength = (
+  val: string,
+  options: { max?: number; min?: number } = {},
+) => {
+  const min = options.min || 0;
+  const max = options.max;
   const len = encodeURI(val).split(/%..|./).length - 1;
   return len >= min && (typeof max === 'undefined' || len <= max);
 };
@@ -199,7 +196,7 @@ export const isEmail = (
   if (!domain) return false;
   let user = parts.join('@');
 
-  if (!isByteLength(user, 64) || !isByteLength(domain, 254)) {
+  if (!isByteLength(user, { max: 64 }) || !isByteLength(domain, { max: 254 })) {
     return false;
   }
   if (!isDomain(domain)) {

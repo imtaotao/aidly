@@ -5,6 +5,7 @@ import {
   isAbsolute,
   isEmail,
   isBase64,
+  isByteLength,
 } from '../index';
 
 describe('is.ts', () => {
@@ -392,5 +393,51 @@ describe('is.ts', () => {
       encoded = Buffer.from(str).toString('base64');
       expect(isBase64(encoded)).toBe(true);
     }
+  });
+
+  it('should validate strings by byte length', () => {
+    const obj1 = {
+      valid: ['abc', 'de', 'abcd', 'ｇｍａｉｌ'],
+      invalid: ['', 'a'],
+    };
+    obj1.valid.forEach((v) => {
+      expect(isByteLength(v, { min: 2 })).toBe(true);
+    });
+    obj1.invalid.forEach((v) => {
+      expect(isByteLength(v, { min: 2 })).toBe(false);
+    });
+
+    const obj2 = {
+      valid: ['abc', 'de', 'ｇ'],
+      invalid: ['', 'a', 'abcd', 'ｇｍ'],
+    };
+    obj2.valid.forEach((v) => {
+      expect(isByteLength(v, { min: 2, max: 3 })).toBe(true);
+    });
+    obj2.invalid.forEach((v) => {
+      expect(isByteLength(v, { min: 2, max: 3 })).toBe(false);
+    });
+
+    const obj3 = {
+      valid: ['abc', 'de', 'ｇ', 'a', ''],
+      invalid: ['abcd', 'ｇｍ'],
+    };
+    obj3.valid.forEach((v) => {
+      expect(isByteLength(v, { max: 3 })).toBe(true);
+    });
+    obj3.invalid.forEach((v) => {
+      expect(isByteLength(v, { max: 3 })).toBe(false);
+    });
+
+    const obj4 = {
+      valid: [''],
+      invalid: ['ｇ', 'a'],
+    };
+    obj4.valid.forEach((v) => {
+      expect(isByteLength(v, { max: 0 })).toBe(true);
+    });
+    obj4.invalid.forEach((v) => {
+      expect(isByteLength(v, { max: 0 })).toBe(false);
+    });
   });
 });
