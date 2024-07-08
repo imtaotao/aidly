@@ -326,3 +326,34 @@ export const defered = <T = void>() => {
   });
   return { promise, resolve, reject };
 };
+
+export const batchProcess = <T = unknown>({
+  ms,
+  processor,
+}: {
+  ms?: number;
+  processor: (queue: Array<T>) => void;
+}) => {
+  const queue = [] as Array<{ value: T; resolve: () => void }>;
+  const flush = () => {
+    setTimeout(() => {
+      const ls = [];
+      const fns = [];
+      for (const { value, resolve } of queue) {
+        ls.push(value);
+        fns.push(resolve);
+      }
+      queue.length = 0;
+      processor(ls);
+      for (const fn of fns) {
+        fn();
+      }
+    }, ms || 0);
+  };
+  return (value: T) => {
+    const defer = defered();
+    if (queue.length === 0) flush();
+    queue.push({ value, resolve: defer.resolve });
+    return defer.promise;
+  };
+};

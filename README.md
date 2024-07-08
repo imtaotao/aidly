@@ -114,6 +114,7 @@ Api                  | Description
 `isPhone`            | Check if it is a valid `mobile number`.
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
+`batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`
 `jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
 `jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
 `merge`              | Merges two `objects` or `arrays` and returns a new object, without worrying about circular references.

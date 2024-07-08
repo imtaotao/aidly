@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Tool library.",
   "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
@@ -14,7 +14,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "README.zh-CN.md"],
+  "files": ["dist"],
   "scripts": {
     "test": "jest",
     "prepare": "husky",

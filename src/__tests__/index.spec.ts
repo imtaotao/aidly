@@ -6,6 +6,7 @@ import {
   unindent,
   clearUndef,
   capitalize,
+  batchProcess,
   decimalPlaces,
   getIteratorFn,
 } from '../index';
@@ -105,6 +106,75 @@ describe('test', () => {
     const res = clearUndef(obj);
     expect(obj).toStrictEqual({ a: 1, c: 2 });
     expect(Object.keys(res)).toEqual(['a', 'c']);
+  });
+
+  it('batchProcess(1)', async () => {
+    let p: Promise<void>;
+    const list = [] as Array<number>;
+    const set = batchProcess<() => void>({
+      processor(ls) {
+        ls.forEach((fn) => fn());
+      },
+    });
+
+    p = set(() => list.push(1));
+    expect(list).toEqual([]);
+    await p;
+    expect(list).toEqual([1]);
+
+    p = set(() => list.push(2));
+    expect(list).toEqual([1]);
+    await p;
+    expect(list).toEqual([1, 2]);
+
+    p = set(() => list.push(3));
+    expect(list).toEqual([1, 2]);
+    await p;
+    expect(list).toEqual([1, 2, 3]);
+  });
+
+  it('batchProcess(2)', async () => {
+    let p: Promise<void>;
+    const list = [] as Array<number>;
+    const set = batchProcess<() => void>({
+      processor(ls) {
+        ls.forEach((fn) => fn());
+      },
+    });
+
+    p = set(() => list.push(1));
+    expect(list).toEqual([]);
+    p = set(() => list.push(2));
+    expect(list).toEqual([]);
+    p = set(() => list.push(3));
+    expect(list).toEqual([]);
+    await p;
+    expect(list).toEqual([1, 2, 3]);
+  });
+
+  it('batchProcess(3)', async () => {
+    const list = [] as Array<number>;
+    const set = batchProcess<() => void>({
+      ms: 100,
+      processor(ls) {
+        ls.forEach((fn) => fn());
+      },
+    });
+
+    const ps = new Array(100).fill(1).map((v, i) => {
+      const p = defered();
+      setTimeout(() => {
+        set(() => list.push(1)).then(p.resolve);
+        if (i < 10) {
+          expect(list.length === 0).toBe(true);
+        } else if (i > 90) {
+          expect(list.length > 80).toBe(true);
+        }
+      }, 10 * i);
+      return p.promise;
+    });
+    await Promise.all(ps);
+    expect(list.length === 100).toBe(true);
   });
 
   it('unindent', () => {

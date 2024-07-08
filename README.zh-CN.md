@@ -114,6 +114,7 @@ Api                  | 描述
 `isPhone`            | 检查是否是一个有效的 `手机号码`。
 `isCNPhone`          | 检查是否是一个 `中国大陆` 有效的 `手机号码`。
 `root`               | 为全局对象提供的别名，兼容不同环境。
+`batchProcess`       | 用于事务的批量处理，例如: `const set = batchProcess({ ms: 50, process(ls) { ... } });`。
 `jsonParse`          | 将 `json` 字符串解析为对象，能够处理引用关系（包括循环引用）。
 `jsonStringify`      | 将对象格式化为 `json` 字符串，能够处理引用关系（包括循环引用）。
 `merge`              | 合并两个 `Object` 或 `Array` 并返回一个新对象或数组，而不处理循环引用。
