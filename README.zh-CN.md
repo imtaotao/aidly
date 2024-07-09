@@ -85,6 +85,7 @@ Api                  | 描述
 `sortKeys`           | 对 `Object` 的键进行排序并返回一个新的副本。
 `clearUndef`         | 从对象中清除 `undefined` 的值。
 `pick`               | 从一个对象中选择所需的属性值并返回一个新的副本。
+`omit`               | 从一个对象中过滤传入的属性值并返回一个新的副本。
 `unindent`           | 格式化模板字符串 `(unindet(string))`。
 `defered`            | 返回一个 `defered` 对象。
 `supportWasm`        | 检查当前环境是否支持 `WebAssembly`。

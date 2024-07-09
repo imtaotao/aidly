@@ -1,3 +1,4 @@
+import type { Prettify } from './types';
 import { toRawType, isSet, isArray, isPlainObject } from './is';
 
 export { Queue } from 'small-queue';
@@ -284,7 +285,19 @@ export const pick = <O extends object, T extends keyof O>(
       }
     }
     return n;
-  }, {} as Pick<O, T>);
+  }, {} as Prettify<Pick<O, T>>);
+};
+
+export const omit = <O extends object, T extends keyof O>(
+  val: O,
+  keys: Array<T>,
+) => {
+  return Object.keys(val).reduce((n, k) => {
+    if (!keys.includes(k as T)) {
+      (n as any)[k] = val[k as T];
+    }
+    return n;
+  }, {} as Prettify<Omit<O, T>>);
 };
 
 const _reFullWs = /^\s*$/;

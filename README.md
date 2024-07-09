@@ -85,6 +85,7 @@ Api                  | Description
 `sortKeys`           | Sort the keys of an `Object` and return a new copy.
 `clearUndef`         | Clearing `undefined` values ​​from an object.
 `pick`               | Select the required attribute values ​​from an object and return a new copy.
+`omit`               | Filters attributes entered from an object and returns a new copy.
 `unindent`           | Formatting template strings `(unindet(`string`))`.
 `defered`            | Returns a `defered` object.
 `supportWasm`        | Check if the current environment supports `WebAssembly`.
