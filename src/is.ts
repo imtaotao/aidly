@@ -22,7 +22,9 @@ export const isNumber = (v: any): v is number => typeof v === 'number';
 
 export const isString = (v: unknown): v is string => typeof v === 'string';
 
-export const isFunction = <T extends Function>(v: T): v is T =>
+export const isFunction = <T extends unknown>(
+  v: T,
+): v is T extends Function ? T : Extract<T, Function> =>
   typeof v === 'function';
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
