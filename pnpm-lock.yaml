@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       small-queue:
-        specifier: ^1.1.1
-        version: 1.1.1
+        specifier: ^1.1.2
+        version: 1.1.2
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^26.0.1
@@ -1486,8 +1486,8 @@ packages:
     resolution: {integrity: sha512-bSiSngZ/jWeX93BqeIAbImyTbEihizcwNjFoRUIY/T1wWQsfsm2Vw1agPKylXvQTU7iASGdHhyqRlqQzfz+Htg==}
     engines: {node: '>=18'}
 
-  small-queue@1.1.1:
-    resolution: {integrity: sha512-+29gk0aVAE5UHaXK4u90MiC2LMcLrRr6UajYw5VPrrJ5vdTHM7e7zlSa0kZgZrJO5QWd/Y363kb/0Wcvrvw6/Q==}
+  small-queue@1.1.2:
+    resolution: {integrity: sha512-K6zQPh7cRjkzv+upcwrOTbR4kU3neY3KZR2F1nc8Fuez8uJyh4BguOUs4KGKHcuzU1LJmK8yfCkMUZbconLe8Q==}
 
   source-map-support@0.5.13:
     resolution: {integrity: sha512-SHSKFHadjVA5oR4PPqhtAVdcBWwRYVd6g6cAXnIbRiIwc2EhPrTuKUBdSLvlEKyIP3GCf89fltvcZiP9MMFA1w==}
@@ -3400,7 +3400,7 @@ snapshots:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 5.0.0
 
-  small-queue@1.1.1: {}
+  small-queue@1.1.2: {}
 
   source-map-support@0.5.13:
     dependencies:

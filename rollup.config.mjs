@@ -18,9 +18,13 @@ const outputConfigs = {
     format: 'cjs',
     file: path.resolve(__dirname, 'dist/aidly.cjs.js'),
   },
-  'esm-bundler': {
+  'esm-bundler-js': {
     format: 'es',
     file: path.resolve(__dirname, 'dist/aidly.esm-bundler.js'),
+  },
+  'esm-bundler-mjs': {
+    format: 'es',
+    file: path.resolve(__dirname, 'dist/aidly.esm-bundler.mjs'),
   },
 };
 

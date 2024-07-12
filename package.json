@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Tool library.",
   "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
@@ -11,7 +11,8 @@
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./index.mjs"
+        "node": "./dist/aidly.esm-bundler.mjs",
+        "default": "./dist/aidly.esm-bundler.js"
       },
       "require": {
         "types": "./dist/index.d.ts",
@@ -19,13 +20,13 @@
       }
     }
   },
-  "files": ["index.mjs", "dist"],
+  "files": ["dist"],
   "scripts": {
     "test": "jest",
     "prepare": "husky",
     "dev": "ts-node ./test.ts",
     "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
-    "format": "prettier --write --parser typescript \"(src|dist)/**/*.(js|ts?(x))\""
+    "format": "prettier --write --parser typescript \"(src|dist)/**/*.((m)?js|ts?(x))\""
   },
   "lint-staged": {
     "*.js": [
@@ -73,6 +74,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "small-queue": "^1.1.1"
+    "small-queue": "^1.1.2"
   }
 }
