@@ -5,7 +5,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "resolveJsonModule": true,
-    "lib": ["es6", "dom"],
+    "lib": ["es2018", "dom"],
     "moduleResolution": "node",
     "strict": true,
     "allowJs": true,
