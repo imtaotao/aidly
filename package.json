@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Tool library.",
   "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
@@ -9,12 +9,17 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/aidly.esm-bundler.js",
-      "require": "./dist/aidly.cjs.js",
-      "types": "./dist/index.d.ts"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/aidly.cjs.js"
+      }
     }
   },
-  "files": ["dist"],
+  "files": ["index.mjs", "dist"],
   "scripts": {
     "test": "jest",
     "prepare": "husky",
