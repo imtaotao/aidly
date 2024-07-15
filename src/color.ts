@@ -1,6 +1,26 @@
 import { random } from './index';
 import type { Nullable } from './types';
 
+export const colors = {
+  red: '#FF4136',
+  navy: '#001F3F',
+  blue: '#0074D9',
+  aqua: '#7FDBFF',
+  teal: '#39CCCC',
+  lime: '#01FF70',
+  gray: '#AAAAAA',
+  black: '#111111',
+  olive: '#3D9970',
+  white: '#FFFFFF',
+  green: '#2ECC40',
+  yellow: '#FFDC00',
+  orange: '#FF851B',
+  purple: '#B10DC9',
+  maroon: '#85144B',
+  silver: '#DDDDDD',
+  fuchsia: '#F012BE',
+};
+
 // https://github.com/Qix-/color-convert/blob/master/conversions.js
 export const rgbToHsl = (rgb: Array<number>) => {
   let h: number;

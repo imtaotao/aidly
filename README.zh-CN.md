@@ -52,6 +52,7 @@ Api                  | 描述
 `throttle`           | Throttle 函数, 第一次调用时，将立即触发函数调用。
 `debounce`           | Debounce 函数, 第一次调用时，将立即触发函数调用。
 `loopSlice`          | 切片指定次数的循环，默认切片时间为 `17ms`。
+`colors`             | 一些默认的颜色值。
 `uuid`               | 生成一个 `uuid`。
 `noop`               | 一个空箭头函数。
 `qsParse`            | Query string 解析。

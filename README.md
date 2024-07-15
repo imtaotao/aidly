@@ -52,6 +52,7 @@ Api                  | Description
 `throttle`           | Throttle function, the first time it triggers the function call immediately.
 `debounce`           | Debounce function, the first time it is called, it will trigger the function call immediately.
 `loopSlice`          | Slice the specified number of loops, the default slicing time is `17ms`.
+`colors`             | Some default color values.
 `uuid`               | Generate a `uuid`.
 `noop`               | Empty arrow function.
 `qsParse`            | Query string parsing.

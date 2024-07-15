@@ -61,6 +61,7 @@ export {
   hslToRgb,
   hexToRgb,
   ansi256ToRgb,
+  colors,
   randomColor,
 } from './color';
 export type {
