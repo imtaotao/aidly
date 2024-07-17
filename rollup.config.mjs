@@ -3,7 +3,7 @@ import ts from "typescript";
 import json from '@rollup/plugin-json';
 import cleanup from 'rollup-plugin-cleanup';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from 'rollup-plugin-typescript2';
+import typescript from 'rollup-plugin-typescript2'
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import pkg from "./package.json" with { type: "json" };
 

@@ -100,5 +100,5 @@ export const createJSONStringify = (options?: Prettify<JSONOptions>) => {
   };
 };
 
-export const jsonParse = createJSONParse();
-export const jsonStringify = createJSONStringify();
+export const jsonParse = /*#__PURE__*/ createJSONParse();
+export const jsonStringify = /*#__PURE__*/ createJSONStringify();

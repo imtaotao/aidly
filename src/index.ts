@@ -89,8 +89,8 @@ export const raf = (fn: (...args: Array<any>) => any) => {
     : setTimeout(fn, 17);
 };
 
-export const now =
-  typeof performance.now === 'function' ? () => performance.now() : Date.now;
+export const now = () =>
+  typeof performance.now === 'function' ? performance.now() : Date.now();
 
 export const idleCallback =
   typeof requestIdleCallback !== 'undefined' ? requestIdleCallback : raf;

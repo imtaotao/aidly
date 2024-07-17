@@ -1,22 +1,26 @@
-const freeSelf =
-  typeof self === 'object' && self !== null && self.Object === Object && self;
+const freeSelf = /*#__PURE__*/ (() =>
+  typeof self === 'object' &&
+  self !== null &&
+  self.Object === Object &&
+  self)();
 
-const freeGlobal =
+const freeGlobal = /*#__PURE__*/ (() =>
   typeof global === 'object' &&
   global !== null &&
   global.Object === Object &&
-  global;
+  global)();
 
-const freeGlobalThis =
+const freeGlobalThis = /*#__PURE__*/ (() =>
   typeof globalThis === 'object' &&
   globalThis !== null &&
   globalThis.Object === Object &&
-  globalThis;
+  globalThis)();
 
 export const root =
   freeGlobalThis ||
   freeGlobal ||
   freeSelf ||
+  /*#__PURE__*/
   (function (this: unknown) {
     return this as Window & typeof globalThis;
   })();

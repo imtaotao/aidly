@@ -8,7 +8,7 @@ export const supportWasm = typeof WebAssembly === 'object';
 export const toRawType = (v: unknown) =>
   objectToString.call(v).slice(8, -1).toLowerCase();
 
-export const isArray = Array.isArray;
+export const isArray = /*#__PURE__*/ (() => Array.isArray)();
 
 export const isBrowser = typeof window !== 'undefined';
 
@@ -46,26 +46,28 @@ export const isTypedArray = (val: unknown): val is TypedArray =>
   typeArrTag.test(objectToString.call(val));
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
-  typeof Set !== 'function' || !Set.prototype.has
+  typeof Set !== 'function' || !(/*#__PURE__*/ (() => Set.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof Set;
 
 export const isWeakSet: <T extends object = object>(
   v: unknown,
 ) => v is WeakSet<T> =
-  typeof WeakSet !== 'function' || !WeakSet.prototype.has
+  typeof WeakSet !== 'function' ||
+  !(/*#__PURE__*/ (() => WeakSet.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof WeakSet;
 
 export const isMap: <K = unknown, V = unknown>(v: unknown) => v is Map<K, V> =
-  typeof Map !== 'function' || !Map.prototype.has
+  typeof Map !== 'function' || !(/*#__PURE__*/ (() => Map.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof Map;
 
 export const isWeakMap: <K extends object = object, V = unknown>(
   v: unknown,
 ) => v is WeakMap<K, V> =
-  typeof WeakMap !== 'function' || !WeakMap.prototype.has
+  typeof WeakMap !== 'function' ||
+  !(/*#__PURE__*/ (() => WeakMap.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof WeakMap;
 
@@ -135,22 +137,25 @@ export const isBase64 = (val: string, urlSafe = false) => {
 
 const IPv4SegmentFormat =
   '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
-const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
-const IPv4AddressRegExp = new RegExp(`^${IPv4AddressFormat}$`);
+const IPv4AddressFormat = /*#__PURE__*/ (() =>
+  `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`)();
+const IPv4AddressRegExp = /*#__PURE__*/ (() =>
+  new RegExp(`^${IPv4AddressFormat}$`))();
 
 const IPv6SegmentFormat = '(?:[0-9a-fA-F]{1,4})';
-const IPv6AddressRegExp = new RegExp(
-  '^(' +
-    `(?:${IPv6SegmentFormat}:){7}(?:${IPv6SegmentFormat}|:)|` +
-    `(?:${IPv6SegmentFormat}:){6}(?:${IPv4AddressFormat}|:${IPv6SegmentFormat}|:)|` +
-    `(?:${IPv6SegmentFormat}:){5}(?::${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,2}|:)|` +
-    `(?:${IPv6SegmentFormat}:){4}(?:(:${IPv6SegmentFormat}){0,1}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,3}|:)|` +
-    `(?:${IPv6SegmentFormat}:){3}(?:(:${IPv6SegmentFormat}){0,2}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,4}|:)|` +
-    `(?:${IPv6SegmentFormat}:){2}(?:(:${IPv6SegmentFormat}){0,3}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,5}|:)|` +
-    `(?:${IPv6SegmentFormat}:){1}(?:(:${IPv6SegmentFormat}){0,4}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,6}|:)|` +
-    `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
-    ')(%[0-9a-zA-Z-.:]{1,})?$',
-);
+const IPv6AddressRegExp = /*#__PURE__*/ (() =>
+  new RegExp(
+    '^(' +
+      `(?:${IPv6SegmentFormat}:){7}(?:${IPv6SegmentFormat}|:)|` +
+      `(?:${IPv6SegmentFormat}:){6}(?:${IPv4AddressFormat}|:${IPv6SegmentFormat}|:)|` +
+      `(?:${IPv6SegmentFormat}:){5}(?::${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,2}|:)|` +
+      `(?:${IPv6SegmentFormat}:){4}(?:(:${IPv6SegmentFormat}){0,1}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,3}|:)|` +
+      `(?:${IPv6SegmentFormat}:){3}(?:(:${IPv6SegmentFormat}){0,2}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,4}|:)|` +
+      `(?:${IPv6SegmentFormat}:){2}(?:(:${IPv6SegmentFormat}){0,3}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,5}|:)|` +
+      `(?:${IPv6SegmentFormat}:){1}(?:(:${IPv6SegmentFormat}){0,4}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,6}|:)|` +
+      `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
+      ')(%[0-9a-zA-Z-.:]{1,})?$',
+  ))();
 
 // https://github.com/validatorjs/validator.js/blob/master/src/lib/isIP.js
 export const isIP = (val: string, version?: '4' | '6'): boolean => {
