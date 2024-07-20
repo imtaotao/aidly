@@ -144,7 +144,7 @@ export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
     called = true;
     return fn.apply(this, args);
   }
-  return wrap;
+  return wrap as T;
 };
 
 export const sleep = (t: number) => {
