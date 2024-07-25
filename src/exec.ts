@@ -1,38 +1,51 @@
-export interface ExecOptions<T> {
-  type?: T;
-  strict?: boolean;
+export interface ExecOptions {
+  useStrict?: boolean;
+  require?: (id: string, ...args: Array<unknown>) => unknown;
 }
 
-export const internFunc = (code: string) => {
+export const inline = (code: string) => {
   const obj: Record<string, boolean> = {};
   obj[code] = true;
   return Object.keys(obj)[0];
 };
 
-export const exec = <T, K extends 'cjs' | 'esm' | never = never>(
+export function exec<T = unknown, U extends never = never>(
   code: string,
-  type?: K,
-  strict?: boolean,
-): K extends 'cjs' ? T : K extends 'esm' ? Promise<T> : never => {
+  type?: U,
+  options?: ExecOptions,
+): void;
+export function exec<T = unknown, U extends null = null>(
+  code: string,
+  type?: U,
+  options?: ExecOptions,
+): void;
+export function exec<T = unknown, U extends 'cjs' = 'cjs'>(
+  code: string,
+  type?: U,
+  options?: ExecOptions,
+): T;
+export function exec<T = unknown, U extends 'esm' = 'esm'>(
+  code: string,
+  type?: U,
+  options?: ExecOptions,
+): Promise<T>;
+export function exec(code: string, type?: string, options?: ExecOptions) {
   if (type === 'esm') {
-    code = encodeURIComponent(code);
-    const id = `data:text/javascript;charset=utf-8,${code}`;
-    return (0, eval)(`import(${id})`);
+    const id = `data:text/javascript;charset=utf-8,${encodeURIComponent(code)}`;
+    return (0, eval)(inline(`import("${id}")`));
   }
+  const { require, useStrict } = options || {};
   const codes = [
-    'function _wrapper(module,exports){',
-    strict ? '"use strict";' : '',
+    'function _$wr_(module,exports,require){',
+    useStrict ? '"use strict";' : '',
     code,
     '\n}',
   ];
   const ms = { exports: Object.create(null) };
-  const fn = (0, eval)(codes.join(''));
+  const fn = (0, eval)(inline(`(()=>${codes.join('')})()`));
   if (type === 'cjs') {
-    fn(ms, ms.exports);
+    fn(ms, ms.exports, require);
     return ms.exports;
   }
   fn();
-  return undefined as never;
-};
-
-const a = exec<number>('', 'cjs');
+}

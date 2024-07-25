@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.4.9",
+  "version": "1.5.0",
   "description": "Tool library.",
   "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
@@ -24,10 +24,10 @@
     "dist"
   ],
   "scripts": {
-    "test": "jest",
     "prepare": "husky",
     "dev": "ts-node ./test.ts",
     "build": "rimraf ./dist && rollup --config && rimraf ./dist/__tests__",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "format": "prettier --write --parser typescript \"(src|dist)/**/*.((m)?js|ts?(x))\""
   },
   "lint-staged": {

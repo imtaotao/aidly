@@ -116,6 +116,7 @@ Api                  | Description
 `isPhone`            | Check if it is a valid `mobile number`.
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
+`exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
 `batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`
 `jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
 `jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
