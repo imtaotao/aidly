@@ -8,6 +8,7 @@ export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
+export { exec, type ExecOptions } from './exec';
 export {
   isNil,
   isNumber,
