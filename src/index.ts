@@ -91,7 +91,9 @@ export const raf = (fn: (...args: Array<any>) => any) => {
 };
 
 export const now = () =>
-  typeof performance.now === 'function' ? performance.now() : Date.now();
+  typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
 
 export const idleCallback =
   typeof requestIdleCallback !== 'undefined' ? requestIdleCallback : raf;
