@@ -66,6 +66,10 @@ export {
   randomColor,
 } from './color';
 export type {
+  Nullable,
+  Awaitable,
+  Arrayable,
+  ElementOf,
   TypedArray,
   PrimitiveType,
   PhoneLocales,
