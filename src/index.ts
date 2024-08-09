@@ -7,7 +7,7 @@ export { uuid } from './uuid';
 export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
-export { createCacheSystem } from './cache';
+export { createCacheObject } from './cache';
 export { throttle, debounce } from './throttle';
 export { exec, type ExecOptions } from './exec';
 export {

@@ -118,7 +118,8 @@ Api                  | Description
 `root`               | Alias ​​for global objects, compatible with different environments.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
 `batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`
-`jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
+`createCacheObject`  | Creating an in-memory cache system.
 `jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).
+`jsonStringify`      | Format objects as json strings, able to handle reference relationships (including circular references).
 `merge`              | Merges two `objects` or `arrays` and returns a new object, without worrying about circular references.
 `clone`              | Clone an object that allows circular references, types include `Object`, `Array`, `TypeArray`, `Set`, `Map`, `RegExp`, `Date`, `Promise`, `Buffer`, `Response`, `setter/getter`, `Non-enumerable properties (not cloned by default)`.
