@@ -75,7 +75,8 @@ export function createCacheObject<T>(
         const keys = Object.keys(data);
         keys.sort((a, b) => data[a].count - data[b].count);
         for (let i = 0; i < keys.length; i++) {
-          if (keys[i] !== key && !canSet() && !isPermanent(keys[i])) {
+          if (canSet()) break;
+          if (keys[i] !== key && !isPermanent(keys[i])) {
             remove(keys[i]);
           }
         }
