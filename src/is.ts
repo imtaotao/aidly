@@ -5,45 +5,68 @@ const objectToString = Object.prototype.toString;
 
 export const supportWasm = typeof WebAssembly === 'object';
 
-export const toRawType = (v: unknown) =>
-  objectToString.call(v).slice(8, -1).toLowerCase();
+export const toRawType = (v: unknown) => {
+  return objectToString.call(v).slice(8, -1).toLowerCase();
+};
 
 export const isArray = /*#__PURE__*/ (() => Array.isArray)();
 
 export const isBrowser = typeof window !== 'undefined';
 
-export const isNil = (v: unknown): v is null | undefined =>
-  v === undefined || v === null;
+export const isNil = (v: unknown): v is null | undefined => {
+  return v === undefined || v === null;
+};
 
-export const isObject = (v: unknown): v is object =>
-  v !== null && typeof v === 'object';
+export const isObject = (v: unknown): v is object => {
+  return v !== null && typeof v === 'object';
+};
 
-export const isNumber = (v: any): v is number => typeof v === 'number';
+export const isNumber = (v: any): v is number => {
+  return typeof v === 'number';
+};
 
-export const isString = (v: unknown): v is string => typeof v === 'string';
+export const isString = (v: unknown): v is string => {
+  return typeof v === 'string';
+};
+
+export const isPort = (n: number) => {
+  return Number.isInteger(n) && n >= 0 && n <= 65535;
+};
+
+export const isDate = (v: unknown): v is Date => {
+  return objectToString.call(v) === '[object Date]';
+};
+
+export const isRegExp = (v: unknown): v is RegExp => {
+  return objectToString.call(v) === '[object RegExp]';
+};
+
+export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> => {
+  return isObject(v) && typeof (v as any).then === 'function';
+};
+
+export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> => {
+  return objectToString.call(v) === '[object Object]';
+};
 
 export const isFunction = <T extends unknown>(
   v: T,
-): v is T extends Function ? T : Extract<T, Function> =>
-  typeof v === 'function';
+): v is T extends Function ? T : Extract<T, Function> => {
+  return typeof v === 'function';
+};
 
-export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> =>
-  objectToString.call(v) === '[object Object]';
-
-export const isDate = (v: unknown): v is Date =>
-  objectToString.call(v) === '[object Date]';
-
-export const isRegExp = (v: unknown): v is RegExp =>
-  objectToString.call(v) === '[object RegExp]';
-
-export const isWindow = (val: any): boolean =>
-  typeof window !== 'undefined' &&
-  objectToString.call(val) === '[object Window]';
+export const isWindow = (val: any): boolean => {
+  return (
+    typeof window !== 'undefined' &&
+    objectToString.call(val) === '[object Window]'
+  );
+};
 
 const typeArrTag =
   /^\[object (?:Float(?:32|64)|(?:Int|Uint)(?:8|16|32)|Uint8Clamped)Array\]$/;
-export const isTypedArray = (val: unknown): val is TypedArray =>
-  typeArrTag.test(objectToString.call(val));
+export const isTypedArray = (val: unknown): val is TypedArray => {
+  return typeArrTag.test(objectToString.call(val));
+};
 
 export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
   typeof Set !== 'function' || !(/*#__PURE__*/ (() => Set.prototype.has)())
@@ -70,12 +93,6 @@ export const isWeakMap: <K extends object = object, V = unknown>(
   !(/*#__PURE__*/ (() => WeakMap.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof WeakMap;
-
-export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> =>
-  isObject(v) && typeof (v as any).then === 'function';
-
-export const isPort = (n: number) =>
-  Number.isInteger(n) && n >= 0 && n <= 65535;
 
 export const isBuffer = (v: unknown) => {
   if (!isObject(v)) return false;

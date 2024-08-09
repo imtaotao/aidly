@@ -7,6 +7,7 @@ export { uuid } from './uuid';
 export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
+export { createCacheSystem } from './cache';
 export { throttle, debounce } from './throttle';
 export { exec, type ExecOptions } from './exec';
 export {
@@ -104,19 +105,29 @@ export const idleCallback =
 
 const unc = /^[a-zA-Z]:\\/;
 const uri = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
-export const isAbsolute = (p: string) => !unc.test(p) && uri.test(p);
+export const isAbsolute = (p: string) => {
+  return !unc.test(p) && uri.test(p);
+};
 
-export const last = <T>(arr: Array<T>, i = 0) => arr[arr.length + i - 1];
+export const last = <T>(arr: Array<T>, i = 0) => {
+  return arr[arr.length + i - 1];
+};
 
-export const uniq = <T>(arr: Array<T>): Array<T> => Array.from(new Set(arr));
+export const uniq = <T>(arr: Array<T>): Array<T> => {
+  return Array.from(new Set(arr));
+};
 
-export const hasOwn = <T extends unknown>(obj: T, key: PropertyKey) =>
-  Object.hasOwnProperty.call(obj, key) as boolean;
+export const hasOwn = <T extends unknown>(obj: T, key: PropertyKey) => {
+  return Object.hasOwnProperty.call(obj, key);
+};
 
-export const capitalize = ([v, ...args]: string) =>
-  v.toUpperCase() + args.join('').toLowerCase();
+export const capitalize = ([v, ...args]: string) => {
+  return v.toUpperCase() + args.join('').toLowerCase();
+};
 
-export const slash = (val: string) => val.replace(/\\/g, '/');
+export const slash = (val: string) => {
+  return val.replace(/\\/g, '/');
+};
 
 export const makeMap = <T extends string>(arr: Array<T>) => {
   const map: { [key in T]: true } = Object.create(null);

@@ -36,7 +36,7 @@ export function exec(code: string, type?: string, options?: ExecOptions) {
   }
   const { require, useStrict } = options || {};
   const codes = [
-    'function _$wr_(module,exports,require){',
+    'function _$c_(module,exports,require){',
     useStrict ? '"use strict";' : '',
     code,
     '\n}',

@@ -11,8 +11,9 @@ import {
   isTypedArray,
 } from './is';
 
-const _new = (val: object, ...args: Array<any>) =>
-  new (val as any).constructor(...args);
+const _new = (val: object, ...args: Array<any>) => {
+  return new (val as any).constructor(...args);
+};
 
 const _isRes =
   typeof Response === 'undefined'
