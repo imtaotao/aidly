@@ -173,7 +173,8 @@ describe('cache.ts', () => {
     cache.set('c', 'ccccccc', 7);
 
     expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
-    expect(cache.has('a')).toBe(false);
+    expect(cache.size).toBe(10);
+    expect(cache.has('a')).toBe(true);
     expect(cache.has('b')).toBe(false);
   });
 
@@ -208,6 +209,7 @@ describe('cache.ts', () => {
     cache.set('c', 'cc', 2);
 
     expect(cache.set('c', 'ccccccc', 7)).toBe(false);
+    expect(cache.size).toBe(10);
     expect(cache.has('a')).toBe(true);
     expect(cache.has('b')).toBe(true);
 
@@ -217,7 +219,8 @@ describe('cache.ts', () => {
     cache2.set('c', 'cc', 2);
 
     expect(cache2.set('c', 'cccccccc', 8)).toBe(true);
-    expect(cache2.has('a')).toBe(false);
+    expect(cache2.size).toBe(9);
+    expect(cache2.has('a')).toBe(true);
     expect(cache2.has('b')).toBe(false);
   });
 

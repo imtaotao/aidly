@@ -58,7 +58,6 @@ export function createCacheObject<T>(
   const set = (key: string, value: T, size: number) => {
     let isInit = false;
     let unit = data[key];
-    const canSet = (s: number) => s - unit.size + size <= max;
 
     if (!unit) {
       isInit = true;
@@ -73,30 +72,40 @@ export function createCacheObject<T>(
       value = ref.value;
     }
 
+    const diff = size - unit.size;
+    const canSet = (s: number) => s + diff <= max;
+
     if (size <= max) {
       if (!canSet(allSize)) {
         let tempSize = allSize;
         const keys = Object.keys(data);
-        const removeKeys: Array<string> = [];
+        const queue: Array<[string, number]> = [];
         keys.sort((a, b) => data[a].count - data[b].count);
 
         for (let i = 0; i < keys.length; i++) {
+          const u = data[keys[i]];
           if (canSet(tempSize)) {
-            for (const k of removeKeys) {
-              remove(k);
+            let extra = max - tempSize - diff;
+            for (const [k, s] of queue) {
+              if (extra > 0 && extra >= s) {
+                extra -= s;
+              } else {
+                remove(k);
+              }
             }
             break;
           }
-          const u = data[keys[i]];
-          if (keys[i] === key || u.count > unit.count || isPermanent(keys[i])) {
-            continue;
-          }
-          if (u.count === unit.count && u.size >= size) {
+          if (
+            keys[i] === key ||
+            isPermanent(keys[i]) ||
+            u.count > unit.count ||
+            (u.count === unit.count && u.size >= size)
+          ) {
             continue;
           }
           tempSize -= u.size;
           if (tempSize < 0) tempSize = 0;
-          removeKeys.push(keys[i]);
+          queue.push([keys[i], u.size]);
         }
       }
 
