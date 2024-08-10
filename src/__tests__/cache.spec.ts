@@ -108,61 +108,6 @@ describe('cache.ts', () => {
     expect(cache.size).toBe(10);
   });
 
-  it('check priority (1)', () => {
-    const cache = createCacheObject(10);
-    cache.set('a', 'a', 1);
-    cache.set('b', 'bb', 2);
-    cache.set('c', 'ccccccc', 7);
-
-    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
-    expect(cache.has('a')).toBe(false);
-    expect(cache.has('b')).toBe(false);
-  });
-
-  it('check priority (2)', () => {
-    const cache = createCacheObject(10);
-    cache.set('a', 'a', 1);
-    cache.set('b', 'bb', 2);
-    cache.set('c', 'ccccccc', 7);
-
-    cache.get('a');
-    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
-    expect(cache.has('a')).toBe(true);
-    expect(cache.has('b')).toBe(false);
-  });
-
-  it('check priority (3)', () => {
-    const cache = createCacheObject(10);
-    cache.set('a', 'a', 1);
-    cache.set('b', 'bb', 2);
-    cache.set('c', 'ccccccc', 7);
-
-    cache.get('b');
-    expect(cache.set('c', 'ccccccccc', 9)).toBe(false);
-    expect(cache.has('a')).toBe(true);
-    expect(cache.has('b')).toBe(true);
-  });
-
-  it('check priority (4)', () => {
-    const cache = createCacheObject(10);
-    cache.set('a', 'a', 1);
-    cache.set('b', 'bbbbbbb', 7);
-    cache.set('c', 'cc', 2);
-
-    expect(cache.set('c', 'ccccccc', 7)).toBe(false);
-    expect(cache.has('a')).toBe(true);
-    expect(cache.has('b')).toBe(true);
-
-    const cache2 = createCacheObject(10);
-    cache2.set('a', 'a', 1);
-    cache2.set('b', 'bbbbbbb', 7);
-    cache2.set('c', 'cc', 2);
-
-    expect(cache2.set('c', 'cccccccc', 8)).toBe(true);
-    expect(cache2.has('a')).toBe(false);
-    expect(cache2.has('b')).toBe(false);
-  });
-
   it('onGet', () => {
     let lock = false;
     const cache = createCacheObject(10, {
@@ -219,5 +164,66 @@ describe('cache.ts', () => {
 
     cache.remove('a');
     expect(i).toBe(1);
+  });
+
+  it('check priority (1)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+  });
+
+  it('check priority (2)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    cache.get('a');
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(false);
+  });
+
+  it('check priority (3)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    cache.get('b');
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(false);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(true);
+  });
+
+  it('check priority (4)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bbbbbbb', 7);
+    cache.set('c', 'cc', 2);
+
+    expect(cache.set('c', 'ccccccc', 7)).toBe(false);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(true);
+
+    const cache2 = createCacheObject(10);
+    cache2.set('a', 'a', 1);
+    cache2.set('b', 'bbbbbbb', 7);
+    cache2.set('c', 'cc', 2);
+
+    expect(cache2.set('c', 'cccccccc', 8)).toBe(true);
+    expect(cache2.has('a')).toBe(false);
+    expect(cache2.has('b')).toBe(false);
+  });
+
+  it('init key', () => {
+    const cache = createCacheObject(0);
+    expect(cache.set('a', 'a', 1)).toBe(false);
+    expect(cache.has('a')).toBe(false);
   });
 });

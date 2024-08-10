@@ -56,10 +56,12 @@ export function createCacheObject<T>(
   };
 
   const set = (key: string, value: T, size: number) => {
+    let isInit = false;
     let unit = data[key];
     const canSet = (s: number) => s - unit.size + size <= max;
 
     if (!unit) {
+      isInit = true;
       unit = data[key] = Object.create(null);
       unit.size = 0;
       unit.count = 0;
@@ -104,6 +106,10 @@ export function createCacheObject<T>(
         unit.value = value;
         return true;
       }
+    }
+
+    if (isInit) {
+      delete data[key];
     }
     return false;
   };
