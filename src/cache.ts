@@ -22,16 +22,17 @@ export function createCacheObject<T>(
   } = {},
 ) {
   if (max < 0) max = 0;
-  let cur = 0;
+  let allSize = 0;
   const data: Record<string, Unit<T>> = Object.create(null);
   const isPermanent = permanents ? makeMap(permanents) : () => false;
 
   const remove = (key: string) => {
     if (data[key]) {
       const unit = data[key];
-
-      cur -= unit.size;
-      if (cur < 0) cur = 0;
+      allSize -= unit.size;
+      if (allSize < 0) {
+        allSize = 0;
+      }
       delete data[key];
       if (typeof onRemove === 'function') {
         onRemove(key, { ...unit });
@@ -43,8 +44,8 @@ export function createCacheObject<T>(
   // Should use `has` to check first.
   const get = <U extends T>(key: string) => {
     assert(data[key], `"${key}" does not exist`);
-    data[key].count++;
 
+    data[key].count++;
     if (typeof onGet === 'function') {
       const ref = { ...data[key] };
       onGet(key, ref);
@@ -56,7 +57,7 @@ export function createCacheObject<T>(
 
   const set = (key: string, value: T, size: number) => {
     let unit = data[key];
-    const canSet = () => cur - unit.size + size <= max;
+    const canSet = (s: number) => s - unit.size + size <= max;
 
     if (!unit) {
       unit = data[key] = Object.create(null);
@@ -71,18 +72,34 @@ export function createCacheObject<T>(
     }
 
     if (size <= max) {
-      if (!canSet()) {
+      if (!canSet(allSize)) {
+        let tempSize = allSize;
         const keys = Object.keys(data);
+        const removeKeys: Array<string> = [];
         keys.sort((a, b) => data[a].count - data[b].count);
+
         for (let i = 0; i < keys.length; i++) {
-          if (canSet()) break;
-          if (keys[i] !== key && !isPermanent(keys[i])) {
-            remove(keys[i]);
+          if (canSet(tempSize)) {
+            for (const k of removeKeys) {
+              remove(k);
+            }
+            break;
           }
+          const u = data[keys[i]];
+          if (keys[i] === key || u.count > unit.count || isPermanent(keys[i])) {
+            continue;
+          }
+          if (u.count === unit.count && u.size >= size) {
+            continue;
+          }
+          tempSize -= u.size;
+          if (tempSize < 0) tempSize = 0;
+          removeKeys.push(keys[i]);
         }
       }
-      if (canSet()) {
-        cur += size - unit.size;
+
+      if (canSet(allSize)) {
+        allSize += size - unit.size;
         unit.size = size;
         unit.value = value;
         return true;
@@ -96,8 +113,8 @@ export function createCacheObject<T>(
     set,
     remove,
     has: (key: string) => !isNil(data[key]),
-    get cur() {
-      return cur;
+    get size() {
+      return allSize;
     },
   };
 }

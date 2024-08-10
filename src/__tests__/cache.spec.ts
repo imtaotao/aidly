@@ -1,27 +1,27 @@
 import { createCacheObject } from '../index';
 
 describe('cache.ts', () => {
-  it('cur', () => {
+  it('allSize', () => {
     const cache = createCacheObject(10);
-    expect(cache.cur).toBe(0);
+    expect(cache.size).toBe(0);
 
     cache.set('a', '', 0);
-    expect(cache.cur).toBe(0);
+    expect(cache.size).toBe(0);
 
     cache.remove('a');
-    expect(cache.cur).toBe(0);
+    expect(cache.size).toBe(0);
 
     cache.set('a', 'tao', 3);
-    expect(cache.cur).toBe(3);
+    expect(cache.size).toBe(3);
 
     cache.set('b', 'tao', 3);
-    expect(cache.cur).toBe(6);
+    expect(cache.size).toBe(6);
 
     cache.set('a', 'ta', 2);
-    expect(cache.cur).toBe(5);
+    expect(cache.size).toBe(5);
 
     cache.remove('b');
-    expect(cache.cur).toBe(2);
+    expect(cache.size).toBe(2);
   });
 
   it('has', () => {
@@ -65,24 +65,27 @@ describe('cache.ts', () => {
 
     // The least used `a` will be deleted to facilitate the update of `c`
     cache.get('b');
+    cache.get('c');
+    cache.get('c');
+    cache.get('c');
     expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
     expect(cache.get('b')).toBe('b');
     expect(cache.get('c')).toBe('ccccccccc');
     expect(cache.has('a')).toBe(false);
-    expect(cache.cur).toBe(10);
+    expect(cache.size).toBe(10);
 
     // Delete all and you won't be able to update
     expect(cache.set('c', '01234567891', 11)).toBe(false);
     expect(cache.get('c')).toBe('ccccccccc');
     expect(cache.has('a')).toBe(false);
     expect(cache.has('b')).toBe(true);
-    expect(cache.cur).toBe(10);
+    expect(cache.size).toBe(10);
 
     expect(cache.set('c', 'cccccccccc', 10)).toBe(true);
     expect(cache.get('c')).toBe('cccccccccc');
     expect(cache.has('a')).toBe(false);
     expect(cache.has('b')).toBe(false);
-    expect(cache.cur).toBe(10);
+    expect(cache.size).toBe(10);
   });
 
   it('permanents', () => {
@@ -92,9 +95,9 @@ describe('cache.ts', () => {
     cache.set('c', 'cccccccc', 8);
 
     cache.get('c');
+    cache.get('c');
+    cache.get('c');
     cache.get('a');
-    cache.get('a');
-    cache.get('b');
     cache.get('b');
     cache.get('b');
 
@@ -102,7 +105,62 @@ describe('cache.ts', () => {
     expect(cache.get('a')).toBe('a');
     expect(cache.get('c')).toBe('ccccccccc');
     expect(cache.has('b')).toBe(false);
-    expect(cache.cur).toBe(10);
+    expect(cache.size).toBe(10);
+  });
+
+  it('check priority (1)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+  });
+
+  it('check priority (2)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    cache.get('a');
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(true);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(false);
+  });
+
+  it('check priority (3)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bb', 2);
+    cache.set('c', 'ccccccc', 7);
+
+    cache.get('b');
+    expect(cache.set('c', 'ccccccccc', 9)).toBe(false);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(true);
+  });
+
+  it('check priority (4)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'bbbbbbb', 7);
+    cache.set('c', 'cc', 2);
+
+    expect(cache.set('c', 'ccccccc', 7)).toBe(false);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('b')).toBe(true);
+
+    const cache2 = createCacheObject(10);
+    cache2.set('a', 'a', 1);
+    cache2.set('b', 'bbbbbbb', 7);
+    cache2.set('c', 'cc', 2);
+
+    expect(cache2.set('c', 'cccccccc', 8)).toBe(true);
+    expect(cache2.has('a')).toBe(false);
+    expect(cache2.has('b')).toBe(false);
   });
 
   it('onGet', () => {
@@ -140,7 +198,7 @@ describe('cache.ts', () => {
 
     cache.set('a', 'a', 1);
     expect(cache.get('a')).toBe('aa');
-    expect(cache.cur).toBe(2);
+    expect(cache.size).toBe(2);
   });
 
   it('onRemove', () => {
