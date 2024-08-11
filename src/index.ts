@@ -12,6 +12,7 @@ export { throttle, debounce } from './throttle';
 export {
   exec,
   execMathExpression,
+  inlineString,
   type ExecOptions,
   type ExecMathExpressionOptions,
 } from './exec';

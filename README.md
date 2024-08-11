@@ -116,6 +116,7 @@ Api                  | Description
 `isPhone`            | Check if it is a valid `mobile number`.
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
+`inlineString`       | Quantify the string constant.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
 `execMathExpression` | Execute mathematical expressions.
 `batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`

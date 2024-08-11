@@ -116,6 +116,7 @@ Api                  | 描述
 `isPhone`            | 检查是否是一个有效的 `手机号码`。
 `isCNPhone`          | 检查是否是一个 `中国大陆` 有效的 `手机号码`。
 `root`               | 为全局对象提供的别名，兼容不同环境。
+`inlineString`       | 将字符串常量化。
 `exec`               | 执行一段 js 代码，可以以 `cjs`，`esm` 和普通模式来执行代码，默认为普通模式。
 `execMathExpression` | 执行数学计算表达式。
 `batchProcess`       | 用于事务的批量处理，例如: `const set = batchProcess({ ms: 50, process(ls) { ... } });`。
