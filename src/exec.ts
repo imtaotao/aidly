@@ -49,3 +49,29 @@ export function exec(code: string, type?: string, options?: ExecOptions) {
   }
   fn();
 }
+
+export interface ExecMathExpressionOptions {
+  units?: Record<string, (num: number, unit: string, input: string) => number>;
+}
+
+// If need to filter keywords such as `function`,
+// need to process them at the upper level.
+export const execMathExpression = (
+  input: string,
+  { units }: ExecMathExpressionOptions = {},
+) => {
+  input = input.replace(
+    /(-?\d+(\.\d+)?|NaN|Infinity)([^\d\s\+\-\*\/\.\(\)]+)?/g,
+    ($1, n, $3, u, $4) => {
+      if (!u) return n;
+      const parser = units && units[u];
+      if (!parser) throw new Error(`Invalid unit: "${u}"`);
+      return String(parser(Number(n), u, input));
+    },
+  );
+  try {
+    return exec<number>(`module.exports=(${input});`, 'cjs');
+  } catch (e) {
+    throw new Error(`Invalid expression: "${input}", error: "${e}"`);
+  }
+};

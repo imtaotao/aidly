@@ -1,4 +1,8 @@
-import { exec } from '../index';
+import {
+  exec,
+  execMathExpression,
+  type ExecMathExpressionOptions,
+} from '../index';
 
 describe('exec.ts', () => {
   it('cjs', () => {
@@ -98,5 +102,28 @@ describe('exec.ts', () => {
       },
     });
     expect(i).toBe(1);
+  });
+
+  it('execExpression', () => {
+    expect(execMathExpression('10+-20')).toBe(-10);
+    expect(execMathExpression('10 + -20')).toBe(-10);
+    expect(execMathExpression('10+20+(10*5 %10)')).toBe(30);
+    expect(execMathExpression('10 + 20 + (10 * 5 % 10)')).toBe(30);
+
+    const units: ExecMathExpressionOptions['units'] = {
+      '%': (n) => {
+        return (Number(n) / 100) * 10;
+      },
+      px: (n) => {
+        return n;
+      },
+    };
+    expect(execMathExpression('10%+-20%', { units })).toBe(-1);
+    expect(execMathExpression('10% + -20%', { units })).toBe(-1);
+    expect(execMathExpression('10%+20%+(10*5 %10)', { units })).toBe(3);
+    expect(execMathExpression('10% + 20% + (10 * 5 % 10)', { units })).toBe(3);
+
+    expect(execMathExpression('Infinity - 1')).toBe(Infinity);
+    expect(execMathExpression('Infinitypx - 1px', { units })).toBe(Infinity);
   });
 });

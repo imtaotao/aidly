@@ -9,7 +9,12 @@ export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { createCacheObject } from './cache';
 export { throttle, debounce } from './throttle';
-export { exec, type ExecOptions } from './exec';
+export {
+  exec,
+  execMathExpression,
+  type ExecOptions,
+  type ExecMathExpressionOptions,
+} from './exec';
 export {
   isNil,
   isNumber,
