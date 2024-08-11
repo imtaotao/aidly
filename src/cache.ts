@@ -88,11 +88,10 @@ export function createCacheObject<T>(
             let l = queue.length;
             let extra = max - tempSize - diff;
             while (~--l) {
-              const val = queue[l];
-              if (extra > 0 && extra >= val[1]) {
-                extra -= val[1];
+              if (extra > 0 && extra >= queue[l][1]) {
+                extra -= queue[l][1];
               } else {
-                remove(val[0]);
+                remove(queue[l][0]);
               }
             }
             break;
