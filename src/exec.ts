@@ -48,22 +48,38 @@ export function exec(code: string, type?: string, options?: ExecOptions) {
   }
 }
 
+const isLegalExpressions = (input: string) => {
+  // prettier-ignore
+  const keywords = ["'", '"', '`', ';', '[', '=', 'var', 'let', 'const', 'return'];
+  for (const word of keywords) {
+    if (input.includes(word)) {
+      return false;
+    }
+  }
+  if (/[^\+\-\*\/\%\s]+\(/.test(input)) {
+    return false;
+  }
+  return true;
+};
+
 export interface ExecMathExpressionOptions {
-  actuator?: (expr: string, exec: boolean) => number | string;
   exec?: boolean;
+  verify?: boolean;
   units?: Record<
     string,
     (num: string, unit: string, input: string) => number | string
   >;
+  actuator?: (expr: string, exec: boolean) => number | string;
 }
 
-// If need to filter keywords such as `function`, need to process them at the upper level.
 export const execMathExpression = <T extends ExecMathExpressionOptions>(
   input: string,
   options?: T,
 ): T['exec'] extends false ? string : number => {
-  const { units, actuator, exec: _exec = true } = options || {};
-
+  const { units, verify, actuator, exec: _exec = true } = options || {};
+  if (verify && !isLegalExpressions(input)) {
+    throw new Error(`Invalid expression: "${input}"`);
+  }
   input = input.replace(
     /(-?\d+(\.\d+)?|NaN|Infinity)([^\d\s\+\-\*\/\.\(\)]+)?/g,
     ($1, n, $3, u, $4) => {
@@ -74,11 +90,11 @@ export const execMathExpression = <T extends ExecMathExpressionOptions>(
     },
   );
   try {
-    return actuator
-      ? actuator(input, Boolean(_exec))
-      : _exec
-      ? exec<any>(`module.exports=(${input});`, 'cjs')
-      : input;
+    if (actuator) {
+      return actuator(input, Boolean(_exec)) as any;
+    } else {
+      return _exec ? (0, eval)(`(${input})`) : input;
+    }
   } catch (e) {
     throw new Error(`Invalid expression: "${input}", error: "${e}"`);
   }
