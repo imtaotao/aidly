@@ -255,6 +255,29 @@ describe('cache.ts', () => {
     expect(cache.has('c')).toBe(true);
   });
 
+  // When the number of visits is the same,
+  // the one with a larger size has a higher priority.
+  it('check priority (7)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'aaaa', 4);
+    cache.set('b', 'bbb', 3);
+    cache.set('c', 'cc', 2);
+    cache.set('d', 'd', 1);
+
+    cache.get('d');
+    cache.get('d');
+    cache.get('d');
+    cache.get('a');
+    cache.get('a');
+    cache.get('b');
+    cache.get('c');
+    expect(cache.set('d', 'dddddd', 7)).toBe(true);
+    expect(cache.size).toBe(10);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(true);
+    expect(cache.has('c')).toBe(false);
+  });
+
   it('init key', () => {
     const cache = createCacheObject(0);
     expect(cache.set('a', 'a', 1)).toBe(false);

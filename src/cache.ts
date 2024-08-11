@@ -1,5 +1,5 @@
 import { isNil } from './is';
-import { assert, makeMap } from './index';
+import { once, assert, makeMap } from './index';
 
 interface Unit<T> {
   value: T;
@@ -80,20 +80,28 @@ export function createCacheObject<T>(
         let tempSize = allSize;
         const keys = Object.keys(data);
         const queue: Array<[string, number]> = [];
-        keys.sort((a, b) => data[a].count - data[b].count);
+
+        const tryRemove = once(() => {
+          let l = queue.length;
+          let extra = max - tempSize - diff;
+          while (~--l) {
+            if (extra > 0 && extra >= queue[l][1]) {
+              extra -= queue[l][1];
+            } else {
+              remove(queue[l][0]);
+            }
+          }
+        });
+
+        keys.sort((a, b) => {
+          const d = data[a].count - data[b].count;
+          return d === 0 ? data[a].size - data[b].size : d;
+        });
 
         for (let i = 0; i < keys.length; i++) {
           const u = data[keys[i]];
           if (canSet(tempSize)) {
-            let l = queue.length;
-            let extra = max - tempSize - diff;
-            while (~--l) {
-              if (extra > 0 && extra >= queue[l][1]) {
-                extra -= queue[l][1];
-              } else {
-                remove(queue[l][0]);
-              }
-            }
+            tryRemove();
             break;
           }
           if (
@@ -107,6 +115,10 @@ export function createCacheObject<T>(
           tempSize -= u.size;
           if (tempSize < 0) tempSize = 0;
           queue.push([keys[i], u.size]);
+        }
+
+        if (canSet(tempSize)) {
+          tryRemove();
         }
       }
 
