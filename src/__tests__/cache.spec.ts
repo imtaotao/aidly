@@ -204,6 +204,17 @@ describe('cache.ts', () => {
 
   it('check priority (4)', () => {
     const cache = createCacheObject(10);
+    cache.set('a', 'aaaaa', 5);
+    cache.set('b', 'bbbbb', 5);
+
+    expect(cache.set('c', 'cccccc', 6)).toBe(true);
+    expect(cache.size).toBe(6);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+  });
+
+  it('check priority (5)', () => {
+    const cache = createCacheObject(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'bbbbbbb', 7);
     cache.set('c', 'cc', 2);
@@ -222,6 +233,26 @@ describe('cache.ts', () => {
     expect(cache2.size).toBe(9);
     expect(cache2.has('a')).toBe(true);
     expect(cache2.has('b')).toBe(false);
+  });
+
+  it('check priority (6)', () => {
+    const cache = createCacheObject(10);
+    cache.set('a', 'aaaa', 4);
+    cache.set('b', 'bbb', 3);
+    cache.set('c', 'cc', 2);
+    cache.set('d', 'd', 1);
+
+    cache.get('d');
+    cache.get('d');
+    cache.get('d');
+    cache.get('a');
+    cache.get('a');
+    cache.get('c');
+    expect(cache.set('d', 'dddddd', 7)).toBe(true);
+    expect(cache.size).toBe(9);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+    expect(cache.has('c')).toBe(true);
   });
 
   it('init key', () => {

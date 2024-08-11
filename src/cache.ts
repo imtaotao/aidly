@@ -85,12 +85,14 @@ export function createCacheObject<T>(
         for (let i = 0; i < keys.length; i++) {
           const u = data[keys[i]];
           if (canSet(tempSize)) {
+            let l = queue.length;
             let extra = max - tempSize - diff;
-            for (const [k, s] of queue) {
-              if (extra > 0 && extra >= s) {
-                extra -= s;
+            while (~--l) {
+              const val = queue[l];
+              if (extra > 0 && extra >= val[1]) {
+                extra -= val[1];
               } else {
-                remove(k);
+                remove(val[0]);
               }
             }
             break;
