@@ -164,6 +164,15 @@ describe('cache.ts', () => {
 
     cache.remove('a');
     expect(i).toBe(1);
+
+    cache.set('a', 'a', 1);
+    expect(cache.get('a')).toBe('a');
+
+    i = 0;
+    cache.removeAll();
+    expect(i).toBe(1);
+    expect(cache.size).toBe(0);
+    expect(cache.keys).toMatchObject([]);
   });
 
   it('check priority (1)', () => {
@@ -253,6 +262,14 @@ describe('cache.ts', () => {
     expect(cache.has('a')).toBe(false);
     expect(cache.has('b')).toBe(false);
     expect(cache.has('c')).toBe(true);
+
+    // test remove all
+    cache.removeAll();
+    expect(cache.size).toBe(0);
+    expect(cache.keys).toMatchObject([]);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+    expect(cache.has('c')).toBe(false);
   });
 
   // When the number of visits is the same,

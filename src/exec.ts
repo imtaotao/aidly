@@ -50,7 +50,7 @@ export function exec(code: string, type?: string, options?: ExecOptions) {
 
 const isLegalExpressions = (input: string) => {
   // prettier-ignore
-  const keywords = ["'", '"', '`', ';', '[', '=', 'var', 'let', 'const', 'return'];
+  const keywords = ["'", '"', '`', ':', ';', '[', '{', '=', 'var', 'let', 'const', 'return'];
   for (const word of keywords) {
     if (input.includes(word)) {
       return false;

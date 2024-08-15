@@ -26,6 +26,8 @@ export function createCacheObject<T>(
   const data: Record<string, Unit<T>> = Object.create(null);
   const isPermanent = permanents ? makeMap(permanents) : () => false;
 
+  const has = (key: string) => !isNil(data[key]);
+
   const remove = (key: string) => {
     if (data[key]) {
       const unit = data[key];
@@ -37,6 +39,12 @@ export function createCacheObject<T>(
       if (typeof onRemove === 'function') {
         onRemove(key, { ...unit });
       }
+    }
+  };
+
+  const removeAll = () => {
+    for (const key in data) {
+      remove(key);
     }
   };
 
@@ -137,12 +145,16 @@ export function createCacheObject<T>(
   };
 
   return {
+    has,
     get,
     set,
     remove,
-    has: (key: string) => !isNil(data[key]),
+    removeAll,
     get size() {
       return allSize;
+    },
+    get keys() {
+      return Object.keys(data);
     },
   };
 }
