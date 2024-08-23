@@ -23,30 +23,39 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
     const map = new Map();
     const refs = Object.create(null);
     const replace = [] as Array<() => void>;
+    const isRefString = (val: unknown) =>
+      typeof val === 'string' && val.startsWith(flag);
 
     function _reviver(this: any, key: string, value: unknown) {
       let isRef = false;
       if (flag) {
-        if (isObject(value)) {
-          if (!map.has(this)) map.set(this, {});
-          const parent = map.get(this);
-          parent[key] = {
-            set: [],
-            add(p: string) {
-              if (!p) return;
-              this.set.unshift(p);
-              const children = map.get(value);
-              for (const prop in children) {
-                children[prop].add(p);
-              }
-            },
-          };
-          parent[key].add(key);
-        } else if (typeof value === 'string' && value.startsWith(flag)) {
+        if (isRefString(value)) {
           isRef = true;
-          const ref = value.slice(flag.length);
-          replace.unshift(() => (this[key] = refs[ref]));
+          let ref = (value as string).slice(flag.length);
+          replace.unshift(() => {
+            let refValue = refs[ref];
+            while (isRefString(refValue)) {
+              refValue = refs[refValue.slice(flag.length)];
+            }
+            this[key] = refValue;
+          });
         }
+        if (!map.has(this)) {
+          map.set(this, {});
+        }
+        const parent = map.get(this);
+        parent[key] = {
+          set: [],
+          add(p: string) {
+            if (!p) return;
+            this.set.unshift(p);
+            const children = map.get(value);
+            for (const prop in children) {
+              children[prop].add(p);
+            }
+          },
+        };
+        parent[key].add(key);
       }
       return !isRef && typeof reviver === 'function'
         ? reviver.call(this, key, value)

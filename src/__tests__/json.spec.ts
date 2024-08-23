@@ -271,4 +271,88 @@ describe('json.ts', () => {
     parsed = _jsonParse(json);
     expect(parsed.a === parsed).toBe(true);
   });
+
+  it('ref string', () => {
+    const str = `{
+      "name": "taotao",
+      "refName": "@@ref*name"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      name: 'taotao',
+      refName: 'taotao',
+    });
+  });
+
+  it('ref number', () => {
+    const str = `{
+      "num": { "val": 1 },
+      "refNum": "@@ref*num.val"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      num: { val: 1 },
+      refNum: 1,
+    });
+  });
+
+  it('ref `ref string` (1)', () => {
+    const str = `{
+      "num": { "val": 1 },
+      "refNum": "@@ref*num.val",
+      "refStr": "@@ref*refNum"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      num: { val: 1 },
+      refNum: 1,
+      refStr: 1,
+    });
+  });
+
+  it('ref `ref string` (2)', () => {
+    const str = `{
+      "num": { "val": 1 },
+      "refNum": "@@ref*num.val",
+      "refStr1": "@@ref*refNum",
+      "refStr2": "@@ref*refStr1"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      num: { val: 1 },
+      refNum: 1,
+      refStr1: 1,
+      refStr2: 1,
+    });
+  });
+
+  it('ref `ref string` (3)', () => {
+    const str = `{
+      "num": { "val": 1 },
+      "refNum": "@@ref*num.val",
+      "refStr2": "@@ref*refStr1",
+      "refStr1": "@@ref*refNum"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      num: { val: 1 },
+      refStr1: 1,
+      refStr2: 1,
+    });
+  });
+
+  it('ref `ref string` (4)', () => {
+    const str = `{
+      "num": { "val": 1 },
+      "refNum": "@@ref*refStr2",
+      "refStr2": "@@ref*num.val",
+      "refStr1": "@@ref*refNum"
+    }`;
+    const obj = jsonParse(str);
+    expect(obj).toMatchObject({
+      num: { val: 1 },
+      refStr1: 1,
+      refStr2: 1,
+    });
+  });
 });
