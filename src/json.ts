@@ -24,7 +24,7 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
     const refs = Object.create(null);
     const replace = [] as Array<() => void>;
 
-    const slice = (v: string) => v.slice(flag.length);
+    const refKey = (v: string) => v.slice(flag.length);
 
     const isRefStr = (v: unknown): v is string =>
       typeof v === 'string' && v.startsWith(flag);
@@ -49,11 +49,11 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
 
         if (isRefStr(value)) {
           isRef = true;
-          let ref = slice(value);
+          let ref = refKey(value);
           replace.unshift(() => {
             let refValue = refs[ref];
             while (isRefStr(refValue)) {
-              refValue = refs[slice(refValue)];
+              refValue = refs[refKey(refValue)];
             }
             this[key] = refValue;
           });
