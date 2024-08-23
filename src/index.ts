@@ -200,16 +200,13 @@ export const remove = <T>(arr: Array<T> | Set<T>, el: T) => {
   }
 };
 
-export function map<T>(data: Set<T>, fn?: (val: T) => T): Set<T>;
-export function map<T>(data: Array<T>, fn?: (val: T, i: number) => T): Array<T>;
-export function map<T extends Record<PropertyKey, any>>(
-  data: T,
-  fn?: (val: T[keyof T], key: keyof T) => T[keyof T],
-): T;
-export function map(
-  data: unknown,
-  fn?: (val: any, i?: any) => unknown,
-): unknown {
+export function map<T, U>(data: Set<T>, fn?: (val: T) => U): Set<U>;
+// prettier-ignore
+export function map<T, U>(data: Array<T>, fn?: (val: T, i: number) => U): Array<U>;
+// prettier-ignore
+export function map<T, U>(data: T, fn?: (val: T[keyof T], key: keyof T) => U): Prettify<Record<keyof T, U>>;
+// prettier-ignore
+export function map(data: unknown, fn?: (val: any, i?: any) => unknown): unknown {
   fn = fn || ((val) => val);
   if (isArray(data)) {
     return data.map((val, i) => fn!(val, i));
