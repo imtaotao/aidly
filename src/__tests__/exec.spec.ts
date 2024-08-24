@@ -12,10 +12,13 @@ describe('exec.ts', () => {
     expect(obj).toMatchObject({ a: 1 });
   });
 
-  it('esm', async () => {
-    const value = await exec<{ default: number }>('export default 1;', 'esm');
+  it('esm:data', async () => {
+    const value = await exec<{ default: number }>(
+      'export default 1;',
+      'esm:data',
+    );
     expect(value.default).toBe(1);
-    const obj = await exec<{ a: number }>('export const a = 1;', 'esm');
+    const obj = await exec<{ a: number }>('export const a = 1;', 'esm:data');
     expect(obj).toMatchObject({ a: 1 });
   });
 
@@ -43,7 +46,7 @@ describe('exec.ts', () => {
     }).toThrow('normal error');
 
     let i = 0;
-    await exec('throw new Error("esm error")', 'esm').catch((e) => {
+    await exec('throw new Error("esm error")', 'esm:data').catch((e) => {
       i++;
       expect(e.message).toBe('esm error');
     });

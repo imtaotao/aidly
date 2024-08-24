@@ -24,16 +24,27 @@ export function exec<T = unknown, U extends 'cjs' = 'cjs'>(
   type?: U,
   options?: ExecOptions,
 ): T;
-export function exec<T = unknown, U extends 'esm' = 'esm'>(
+export function exec<T = unknown, U extends 'esm:data' = 'esm:data'>(
+  code: string,
+  type?: U,
+  options?: ExecOptions,
+): Promise<T>;
+export function exec<T = unknown, U extends 'esm:blob' = 'esm:blob'>(
   code: string,
   type?: U,
   options?: ExecOptions,
 ): Promise<T>;
 export function exec(code: string, type?: string, options?: ExecOptions) {
-  if (type === 'esm') {
+  if (type === 'esm:data') {
     const id = `data:text/javascript;charset=utf-8,${encodeURIComponent(code)}`;
     return (0, eval)(inlineString(`import("${id}")`));
+  } else if (type === 'esm:blob') {
+    const id = URL.createObjectURL(
+      new Blob([code], { type: 'text/javascript' }),
+    );
+    return (0, eval)(inlineString(`import("${id}")`));
   }
+
   const { require, useStrict } = options || {};
   const strictCode = useStrict ? '"use strict";' : '';
   code = `function _$c_(module,exports,require){${strictCode}${code}\n}`;
