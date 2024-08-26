@@ -76,10 +76,12 @@ describe('exec.ts', () => {
         'if (typeof require === "undefined") throw new Error("error")',
         null,
         {
-          require() {},
+          env: {
+            require() {},
+          },
         },
       );
-    }).toThrow();
+    }).not.toThrow();
 
     expect(() => {
       exec(
@@ -92,19 +94,78 @@ describe('exec.ts', () => {
         'if (typeof require === "undefined") throw new Error("error")',
         'cjs',
         {
-          require() {},
+          env: {
+            require() {},
+          },
         },
       );
     }).not.toThrow();
 
     let i = 0;
     exec('require("react")', 'cjs', {
-      require(id) {
-        i++;
-        expect(id).toBe('react');
+      env: {
+        require(id: string) {
+          i++;
+          expect(id).toBe('react');
+        },
       },
     });
     expect(i).toBe(1);
+  });
+
+  it('cjs env', () => {
+    const res = exec('module.exports = 1 + num', 'cjs', {
+      env: { num: 2 },
+    });
+    expect(res).toBe(3);
+  });
+
+  it('esm env', async () => {
+    const res = await exec<{ default: number }>(
+      'export default (1 + num)',
+      'esm:data',
+      {
+        env: { num: 2 },
+      },
+    );
+    expect(res.default).toBe(3);
+  });
+
+  it('normal mode env', () => {
+    let i = 0;
+    try {
+      exec('throw (1 + num)', null, {
+        env: { num: 2 },
+      });
+    } catch (e) {
+      i++;
+      expect(e).toBe(3);
+    }
+    expect(i).toBe(1);
+  });
+
+  it('check normal mode return value', () => {
+    expect(exec('return { a: 1 }')).toMatchObject({ a: 1 });
+  });
+
+  it('check sourceUrl', async () => {
+    try {
+      await exec('throw new Error("Test Error")', 'esm:data', {
+        sourceUrl: 'test.js',
+      });
+    } catch (e: any) {
+      expect(e.stack).toContain('test.js');
+    }
+    try {
+      exec('throw new Error("Test Error")', null, { sourceUrl: 'test.js' });
+    } catch (e: any) {
+      expect(e.stack).toContain('test.js');
+    }
+    try {
+      exec('throw new Error("Test Error")', 'cjs', { sourceUrl: 'test.js' });
+    } catch (e: any) {
+      expect(e.stack).toContain('test.js');
+    }
   });
 
   it('execExpression', () => {

@@ -1,6 +1,6 @@
 {
   "name": "aidly",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "Tool library.",
   "sideEffects": false,
   "main": "./dist/aidly.cjs.js",
