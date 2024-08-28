@@ -81,6 +81,7 @@ Api                  | 描述
 `remove`             | 从 `Array` 或 `Set` 中删除指定元素。
 `map`                | 对 `Object`，`Array`，`Set` 执行 map 操作并返回一个全新的副本。
 `toCamelCase`        | 将字符串转换为 `camelCase` 或 `pascalCase` 命名，默认处理 `_` 和 `-`。
+`capitalize`         | 将字符串的首字母转换为大写。
 `getExtname`         | 获取 url 的 `extname`。
 `getIteratorFn`      | 获取一个对象的迭代器函数。
 `sortKeys`           | 对 `Object` 的键进行排序并返回一个新的副本。

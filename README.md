@@ -81,6 +81,7 @@ Api                  | Description
 `remove`             | Remove the specified element from a `Array` or `Set`.
 `map`                | Perform a map operation on `Object`, `Array`, `Set` and return a brand new copy.
 `toCamelCase`        | Convert a string to `camelCase` or `pascalCase` naming, processing `_` and `-` by default.
+`capitalize`         | Converts the first letter of a string to uppercase.
 `getExtname`         | Get the `extname` of a url.
 `getIteratorFn`      | Get an object's iterator function.
 `sortKeys`           | Sort the keys of an `Object` and return a new copy.
