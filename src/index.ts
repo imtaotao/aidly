@@ -1,5 +1,5 @@
 import type { Prettify } from './types';
-import { toRawType, isSet, isArray, isPlainObject } from './is';
+import { toRawType, isSet, isArray, isAbsolute, isPlainObject } from './is';
 
 export { Queue } from 'small-queue';
 export { root } from './root';
@@ -24,6 +24,7 @@ export {
   isObject,
   isPlainObject,
   isFunction,
+  isAbsolute,
   isMap,
   isWeakMap,
   isSet,
@@ -108,12 +109,6 @@ export const now = () =>
 
 export const idleCallback =
   typeof requestIdleCallback !== 'undefined' ? requestIdleCallback : raf;
-
-const unc = /^[a-zA-Z]:\\/;
-const uri = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
-export const isAbsolute = (p: string) => {
-  return !unc.test(p) && uri.test(p);
-};
 
 export const last = <T>(arr: Array<T>, i = 0) => {
   return arr[arr.length + i - 1];

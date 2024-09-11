@@ -55,6 +55,12 @@ export const isFunction = <T extends unknown>(
   return typeof v === 'function';
 };
 
+const unc = /^[a-zA-Z]:\\/;
+const uri = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
+export const isAbsolute = (p: string) => {
+  return !unc.test(p) && uri.test(p);
+};
+
 export const isWindow = (val: any): boolean => {
   return (
     typeof window !== 'undefined' &&
