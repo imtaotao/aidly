@@ -1,8 +1,9 @@
 import {
   root,
+  once,
   slash,
   random,
-  defered,
+  deferred,
   unindent,
   clearUndef,
   capitalize,
@@ -15,6 +16,32 @@ describe('test', () => {
   it('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
+  });
+
+  it('should invoke `func` once', () => {
+    let count = 0;
+    const resultFunc = once(() => ++count);
+    expect(resultFunc()).toBe(1);
+    expect(count).toBe(1);
+  });
+
+  it('should ignore recursive calls', () => {
+    let count = 0;
+    const resultFunc = once(() => {
+      resultFunc();
+      return ++count;
+    });
+    expect(resultFunc()).toBe(1);
+    expect(count).toBe(1);
+    expect(resultFunc()).toBe(1);
+  });
+
+  it('should not throw more than once', () => {
+    const resultFunc = once(() => {
+      throw new Error();
+    });
+    expect(resultFunc).toThrow();
+    expect(resultFunc).not.toThrow();
   });
 
   it('getIteratorFn', () => {
@@ -34,8 +61,8 @@ describe('test', () => {
     ).toBe(true);
   });
 
-  it('defered', async () => {
-    const d = defered<number>();
+  it('deferred', async () => {
+    const d = deferred<number>();
     setTimeout(() => {
       d.resolve(1);
     });
@@ -162,7 +189,7 @@ describe('test', () => {
     });
 
     const ps = new Array(100).fill(1).map((v, i) => {
-      const p = defered();
+      const p = deferred();
       setTimeout(() => {
         set(() => list.push(1)).then(p.resolve);
         if (i < 10) {

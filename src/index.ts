@@ -157,11 +157,13 @@ export const random = (min = 0, max = 0) => {
 };
 
 export const once = <T extends (...args: Array<any>) => any>(fn: T) => {
+  let result: T;
   let called = false;
   function wrap(this: unknown, ...args: Array<unknown>) {
-    if (called) return;
+    if (called) return result;
     called = true;
-    return fn.apply(this, args);
+    result = fn.apply(this, args);
+    return result;
   }
   return wrap as T;
 };
@@ -347,7 +349,7 @@ export const unindent = (str: TemplateStringsArray | string) => {
     .join('\n');
 };
 
-export const defered = <T = void>() => {
+export const deferred = <T = void>() => {
   let reject!: (reason?: any) => void;
   let resolve!: (value: T | PromiseLike<T>) => void;
   const promise = new Promise<T>((rs, rj) => {
@@ -381,7 +383,7 @@ export const batchProcess = <T = unknown>({
     }, ms || 0);
   };
   return (value: T) => {
-    const defer = defered();
+    const defer = deferred();
     if (queue.length === 0) flush();
     queue.push({ value, resolve: defer.resolve });
     return defer.promise;
