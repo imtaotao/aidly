@@ -18,8 +18,8 @@ export interface QsStringifyOptions {
 
 const defaultStringifyOptions = {
   encode: true,
-  addQueryPrefix: true,
   commaRoundTrip: true,
+  addQueryPrefix: false,
   arrayFormat: 'indices',
 };
 
