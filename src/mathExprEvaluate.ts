@@ -112,7 +112,7 @@ const isLegalExpression = (expr: string) => {
   return !/[^\+\-\*\/\%\s]+\(/.test(expr);
 };
 
-export interface MathExpreEvaluateOptions {
+export interface MathExprEvaluateOptions {
   actuator?: (expr: string, exec: boolean) => number | string;
   exec?: boolean;
   verify?: boolean;
@@ -122,8 +122,8 @@ export interface MathExpreEvaluateOptions {
   >;
 }
 
-export const mathExpreEvaluate = <
-  T extends MathExpreEvaluateOptions,
+export const mathExprEvaluate = <
+  T extends MathExprEvaluateOptions,
   R = T['exec'] extends false ? string : number,
 >(
   expr: string,

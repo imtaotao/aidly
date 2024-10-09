@@ -11,9 +11,9 @@ export { createCacheObject } from './cache';
 export { throttle, debounce } from './throttle';
 export { exec, inlineString, type ExecOptions } from './exec';
 export {
-  mathExpreEvaluate,
-  type MathExpreEvaluateOptions,
-} from './mathExpreEvaluate';
+  mathExprEvaluate,
+  type MathExprEvaluateOptions,
+} from './mathExprEvaluate';
 export {
   isNil,
   isNumber,
