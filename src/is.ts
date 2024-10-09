@@ -133,6 +133,17 @@ export const isPrimitiveValue = (v: unknown): v is PrimitiveType => {
   );
 };
 
+export const isWhitespace = (char: string) => {
+  return (
+    char === ' ' ||
+    char === '\t' ||
+    char === '\n' ||
+    char === '\r' ||
+    char === '\f' ||
+    char === '\v'
+  );
+};
+
 export const isByteLength = (
   val: string,
   options: { max?: number; min?: number } = {},

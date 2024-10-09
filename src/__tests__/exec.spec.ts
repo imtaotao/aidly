@@ -1,8 +1,4 @@
-import {
-  exec,
-  execMathExpression,
-  type ExecMathExpressionOptions,
-} from '../index';
+import { exec } from '../index';
 
 describe('exec.ts', () => {
   it('cjs', () => {
@@ -166,59 +162,5 @@ describe('exec.ts', () => {
     } catch (e: any) {
       expect(e.stack).toContain('test.js');
     }
-  });
-
-  it('execExpression', () => {
-    expect(execMathExpression('10+-20', { verify: true })).toBe(-10);
-    expect(execMathExpression('10 + -20', { verify: true })).toBe(-10);
-    expect(execMathExpression('10+20+(10*5 %10)', { verify: true })).toBe(30);
-    expect(
-      execMathExpression('10 + 20 + (10 * 5 % 10)', { verify: true }),
-    ).toBe(30);
-
-    const units: ExecMathExpressionOptions['units'] = {
-      '%': (n) => {
-        return (Number(n) / 100) * 10;
-      },
-      px: (n) => {
-        return n;
-      },
-    };
-    expect(execMathExpression('10%+-20%', { units, verify: true })).toBe(-1);
-    expect(execMathExpression('10% + -20%', { units, verify: true })).toBe(-1);
-    expect(
-      execMathExpression('10%+20%+(10*5 %10)', { units, verify: true }),
-    ).toBe(3);
-    expect(
-      execMathExpression('10% + 20% + (10 * 5 % 10)', { units, verify: true }),
-    ).toBe(3);
-
-    expect(execMathExpression('Infinity - 1', { verify: true })).toBe(Infinity);
-    expect(
-      execMathExpression('Infinitypx - 1px', { units, verify: true }),
-    ).toBe(Infinity);
-  });
-
-  it('verify execExpression', () => {
-    const exps = [
-      "'1'",
-      '`1`',
-      '"1"',
-      'var a',
-      'let a',
-      'const a',
-      '1 + 1;',
-      'return 1',
-      'console = a',
-      'fetch()',
-      'console[0]',
-      'console.log(1)',
-      'import("https://unpkg.com/aidly@1.6.0/dist/aidly.umd.js")',
-    ];
-    exps.forEach((e) => {
-      expect(() => execMathExpression(e, { verify: true })).toThrow(
-        /Invalid expression/,
-      );
-    });
   });
 });

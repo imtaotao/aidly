@@ -89,7 +89,7 @@ Api                  | Description
 `pick`               | Select the required attribute values ​​from an object and return a new copy.
 `omit`               | Filters attributes entered from an object and returns a new copy.
 `unindent`           | Formatting template strings `(unindet(`string`))`.
-`defered`            | Returns a `defered` object.
+`deferred`           | Returns a `deferred` object.
 `supportWasm`        | Check if the current environment supports `WebAssembly`.
 `isBrowser`          | Check if you are in the browser environment.
 `isNil`              | Check if a value is `null` or `undefined`.
@@ -107,6 +107,7 @@ Api                  | Description
 `isPromise`          | Check if a value is a `PromiseLike`.
 `isPrimitiveValue`   | Check if a value is a primitive value.
 `isEmptyObject`      | Check if an object is empty object.
+`isWhitespace`       | Checks if a character is the whitespace character.
 `isWindow`           | Check if an object is a `window` object.
 `isBase64`           | Check if a string is a valid base64 string.
 `isInBounds`         | Check if a number is within a specified range `(isInBounds([1, 5], 2))`.
@@ -119,7 +120,7 @@ Api                  | Description
 `root`               | Alias ​​for global objects, compatible with different environments.
 `inlineString`       | Quantify the string constant.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
-`execMathExpression` | Execute mathematical expressions.
+`mathExpreEvaluate`  | Execute mathematical expressions.
 `batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`
 `createCacheObject`  | Creating an in-memory cache system.
 `jsonParse`          | Parse the json string into an object, able to handle reference relationships (including circular references).

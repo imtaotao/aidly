@@ -9,13 +9,11 @@ export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { createCacheObject } from './cache';
 export { throttle, debounce } from './throttle';
+export { exec, inlineString, type ExecOptions } from './exec';
 export {
-  exec,
-  execMathExpression,
-  inlineString,
-  type ExecOptions,
-  type ExecMathExpressionOptions,
-} from './exec';
+  mathExpreEvaluate,
+  type MathExpreEvaluateOptions,
+} from './mathExpreEvaluate';
 export {
   isNil,
   isNumber,
@@ -45,6 +43,7 @@ export {
   isWindow,
   isBrowser,
   isInBounds,
+  isWhitespace,
   isEmptyObject,
   isPrimitiveValue,
   toRawType,

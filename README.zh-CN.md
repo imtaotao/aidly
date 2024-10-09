@@ -89,7 +89,7 @@ Api                  | 描述
 `pick`               | 从一个对象中选择所需的属性值并返回一个新的副本。
 `omit`               | 从一个对象中过滤传入的属性值并返回一个新的副本。
 `unindent`           | 格式化模板字符串 `(unindet(string))`。
-`defered`            | 返回一个 `defered` 对象。
+`deferred`           | 返回一个 `deferred` 对象。
 `supportWasm`        | 检查当前环境是否支持 `WebAssembly`。
 `isBrowser`          | 检查是否处于浏览器环境中。
 `isNil`              | 检查一个值是否是 `null` 或 `undefined`。
@@ -107,6 +107,7 @@ Api                  | 描述
 `isPromise`          | 检查一个值是否是 `PromiseLike`。
 `isPrimitiveValue`   | 检查一个值是否是原始类型的值。
 `isEmptyObject`      | 检查一个对象是否是一个空对象。
+`isWhitespace`       | 检查一个字符是否为空白字符。
 `isWindow`           | 检查一个对象是否是 `window` 对象。
 `isBase64`           | 检查一个字符串是否是有效的 base64 字符串。
 `isInBounds`         | 检查数字是否在指定范围内 `(isInBounds([1, 5], 2))`。
@@ -119,7 +120,7 @@ Api                  | 描述
 `root`               | 为全局对象提供的别名，兼容不同环境。
 `inlineString`       | 将字符串常量化。
 `exec`               | 执行一段 js 代码，可以以 `cjs`，`esm` 和普通模式来执行代码，默认为普通模式。
-`execMathExpression` | 执行数学计算表达式。
+`mathExpreEvaluate`  | 数学计算表达式求值。
 `batchProcess`       | 用于事务的批量处理，例如: `const set = batchProcess({ ms: 50, process(ls) { ... } });`。
 `createCacheObject`  | 创建一个在内存中的缓存系统。
 `jsonParse`          | 将 `json` 字符串解析为对象，能够处理引用关系（包括循环引用）。
