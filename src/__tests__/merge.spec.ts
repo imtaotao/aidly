@@ -461,7 +461,7 @@ describe('merge.ts', () => {
     expect(res[mySymbol]).toBe('value1');
   });
 
-  it('filter set', () => {
+  it('exclude set', () => {
     const source = {
       a: { key: 1 },
       b: { key: 2 },
@@ -481,7 +481,7 @@ describe('merge.ts', () => {
     expect(res.b === source.b).toBe(false);
     expect(res.b === src.b).toBe(false);
 
-    res = merge<any>(source, src, new WeakSet([source.b]));
+    res = merge<any>(source, src, { excludeSet: new WeakSet([source.b]) });
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 2 },
@@ -491,7 +491,7 @@ describe('merge.ts', () => {
     expect(res.b === src.b).toBe(false);
     expect(res.c === src.c).toBe(false);
 
-    res = merge<any>(source, src, new WeakSet([src.b]));
+    res = merge<any>(source, src, { excludeSet: new WeakSet([src.b]) });
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -501,7 +501,9 @@ describe('merge.ts', () => {
     expect(res.b === src.b).toBe(true);
     expect(res.c === src.c).toBe(false);
 
-    res = merge<any>(source, src, new WeakSet([source.b, src.b]));
+    res = merge<any>(source, src, {
+      excludeSet: new WeakSet([source.b, src.b]),
+    });
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -511,7 +513,7 @@ describe('merge.ts', () => {
     expect(res.b === src.b).toBe(true);
     expect(res.c === src.c).toBe(false);
 
-    res = merge<any>(source, src, new WeakSet([src.c]));
+    res = merge<any>(source, src, { excludeSet: new WeakSet([src.c]) });
     expect(res).toStrictEqual({
       a: { key: 1 },
       b: { key: 3 },
@@ -520,5 +522,71 @@ describe('merge.ts', () => {
     expect(res.b === source.b).toBe(false);
     expect(res.b === src.b).toBe(false);
     expect(res.c === src.c).toBe(true);
+  });
+
+  it('filter undefined (1)', () => {
+    const source = {
+      a: 1,
+      b: 2,
+      c: 3,
+      arr: [1, undefined, 3],
+    };
+    const src = {
+      a: 11,
+      b: 22,
+      c: undefined,
+      arr: [4, undefined, 6],
+    };
+    const res = merge<any>(source, src);
+    expect(res).toStrictEqual({
+      a: 11,
+      b: 22,
+      c: undefined,
+      arr: [1, undefined, 3, 4, undefined, 6],
+    });
+    // filter undefined
+    const res2 = merge<any>(source, src, { ignoreUndef: true });
+    expect(res2).toStrictEqual({
+      a: 11,
+      b: 22,
+      c: 3,
+      arr: [1, 3, 4, 6],
+    });
+  });
+
+  it('filter undefined (2)', () => {
+    const res = merge(
+      {
+        a: 'a',
+        b: undefined,
+        c: 'c',
+        d: {
+          env: undefined,
+          name: 'tt',
+        },
+        arr: [1, 2, 3, undefined, null],
+      },
+      {
+        a: 'aa',
+        b: undefined,
+        c: undefined,
+        d: {
+          env: null,
+          name: 'hh',
+        },
+        arr: [5, null, undefined, 7],
+      },
+      { ignoreUndef: true },
+    );
+
+    expect(res).toStrictEqual({
+      a: 'aa',
+      c: 'c',
+      d: {
+        env: null,
+        name: 'hh',
+      },
+      arr: [1, 2, 3, null, 5, null, 7],
+    });
   });
 });

@@ -1,9 +1,15 @@
-import { isDate, isRegExp, isArray, isObject } from './is';
+import { isDate, isRegExp, isObject } from './is';
 
-type O = Record<PropertyKey, unknown>;
-type S = Set<object> | WeakSet<object>;
+type Target = Record<PropertyKey, unknown>;
 
-const isPrevent = (val: unknown, set?: S) => set && set.has(val as object);
+interface MergeOptions {
+  ignoreUndef?: boolean;
+  excludeSet?: Set<object> | WeakSet<object>;
+}
+
+const prevent = (val: unknown, { excludeSet }: MergeOptions) => {
+  return isObject(val) && excludeSet && excludeSet.has(val);
+};
 
 const isMergeableObject = (val: unknown) => {
   return (
@@ -20,13 +26,13 @@ const getEnumerableSymbols = (target: object) => {
   );
 };
 
-const getKeys = (target: O) => {
+const getKeys = (target: Target) => {
   return (Object.keys(target) as Array<PropertyKey>).concat(
     getEnumerableSymbols(target),
   );
 };
 
-const propertyIsOnObject = (object: O, key: PropertyKey) => {
+const propertyIsOnObject = (object: Target, key: PropertyKey) => {
   try {
     return key in object;
   } catch (e) {
@@ -34,7 +40,7 @@ const propertyIsOnObject = (object: O, key: PropertyKey) => {
   }
 };
 
-const propertyIsUnsafe = (target: O, key: PropertyKey) => {
+const propertyIsUnsafe = (target: Target, key: PropertyKey) => {
   return (
     propertyIsOnObject(target, key) &&
     !(
@@ -44,62 +50,69 @@ const propertyIsUnsafe = (target: O, key: PropertyKey) => {
   );
 };
 
-const cl = (val: unknown, set?: S) => {
+const clone = (val: unknown, option: MergeOptions) => {
   if (!isMergeableObject(val)) return val;
-  return merge(isArray(val) ? [] : {}, val, set);
+  return merge(Array.isArray(val) ? [] : {}, val, option);
 };
 
 const mergeArray = (
   target: Array<unknown>,
   source: Array<unknown>,
-  set?: S,
+  option: MergeOptions,
 ) => {
-  return target.concat(source).map((val) => cl(val, set));
+  const arr = target.concat(source).map((val) => clone(val, option));
+  return option.ignoreUndef ? arr.filter((val) => val !== undefined) : arr;
 };
 
-const mergeObject = (target: O, source: O, set?: S) => {
-  const res = {} as O;
+const mergeObject = (target: Target, source: Target, option: MergeOptions) => {
+  const res = {} as Target;
+  const isUndef = (val: unknown) => option.ignoreUndef && val === undefined;
+
   if (isMergeableObject(target)) {
     const keys = getKeys(target);
     for (const key of keys) {
       const val = target[key];
-      res[key] = isPrevent(val, set) ? val : cl(val, set);
+      if (isUndef(val)) continue;
+      res[key] = prevent(val, option) ? val : clone(val, option);
     }
   }
+
   const keys = getKeys(source);
+
   for (const key of keys) {
     if (propertyIsUnsafe(target, key)) continue;
     if (propertyIsOnObject(target, key) && isMergeableObject(source[key])) {
-      if (isPrevent(source[key], set)) {
+      if (prevent(source[key], option)) {
         res[key] = source[key];
-      } else if (isPrevent(target[key], set)) {
-        res[key] = target[key];
+      } else if (prevent(target[key], option)) {
+        if (!isUndef(target[key])) {
+          res[key] = target[key];
+        }
       } else {
-        res[key] = merge(target[key], source[key], set);
+        res[key] = merge(target[key], source[key], option);
       }
-    } else {
-      res[key] = isPrevent(source[key], set)
+    } else if (!isUndef(source[key])) {
+      res[key] = prevent(source[key], option)
         ? source[key]
-        : cl(source[key], set);
+        : clone(source[key], option);
     }
   }
   return res;
 };
 
 // This should not be a structure with circular references
-export const merge = <T = unknown>(
+export const merge = <T>(
   target: unknown,
   source: unknown,
-  filterSet?: S,
+  option: MergeOptions = {},
 ): T => {
-  const sourceIsArray = isArray(source);
-  const targetIsArray = isArray(target);
-
+  const sourceIsArray = Array.isArray(source);
+  const targetIsArray = Array.isArray(target);
   if (sourceIsArray !== targetIsArray) {
-    return cl(source, filterSet) as T;
+    return clone(source, option) as T;
   } else if (sourceIsArray) {
-    return mergeArray(target as Array<unknown>, source, filterSet) as T;
+    return mergeArray(target as Array<unknown>, source, option) as T;
   } else {
-    return mergeObject(target as O, source as O, filterSet) as T;
+    return mergeObject(target as Target, source as Target, option) as T;
   }
 };
