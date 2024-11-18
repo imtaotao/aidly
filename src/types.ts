@@ -35,3 +35,13 @@ export type TypedArray =
   | BigInt64Array
   | Float32Array
   | Float64Array;
+
+export type ExtractRouteParams<S extends string> = string extends S
+  ? Record<string, string>
+  : S extends `${infer P}?${infer _Q}`
+  ? ExtractRouteParams<P>
+  : S extends `${infer _S}:${infer P}/${infer Rest}`
+  ? { [K in P | keyof ExtractRouteParams<Rest>]: string }
+  : S extends `${infer _Start}:${infer P}`
+  ? { [K in P]: string }
+  : {};

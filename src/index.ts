@@ -82,6 +82,7 @@ export type {
   PhoneLocales,
   Prettify,
   DeepPrettify,
+  ExtractRouteParams,
 } from './types';
 
 export const noop = () => {};
