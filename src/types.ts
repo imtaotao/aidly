@@ -36,8 +36,25 @@ export type TypedArray =
   | Float32Array
   | Float64Array;
 
+export type Protocols =
+  | 'http'
+  | 'https'
+  | 'ws'
+  | 'wss'
+  | 'ftp'
+  | 'ftps'
+  | 'sftp'
+  | 'file'
+  | 'data'
+  | 'telnet'
+  | 'mailto'
+  | 'ssh'
+  | 'git';
+
 export type ExtractRouteParams<S extends string> = string extends S
   ? Record<string, string>
+  : S extends `${Protocols}://${infer P}`
+  ? ExtractRouteParams<P>
   : S extends `${infer P}?${infer _Q}`
   ? ExtractRouteParams<P>
   : S extends `${infer _S}:${infer P}/${infer Rest}`

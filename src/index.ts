@@ -82,6 +82,7 @@ export type {
   PhoneLocales,
   Prettify,
   DeepPrettify,
+  Protocols,
   ExtractRouteParams,
 } from './types';
 
