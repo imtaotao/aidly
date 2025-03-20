@@ -80,6 +80,7 @@ Api                  | Description
 `sleep`              | Pause for `n` ms, return a promise.
 `remove`             | Remove the specified element from a `Array` or `Set`.
 `map`                | Perform a map operation on `Object`, `Array`, `Set` and return a brand new copy.
+`retry`              | Retry the function until it succeeds or reaches the maximum number of retries.
 `toCamelCase`        | Convert a string to `camelCase` or `pascalCase` naming, processing `_` and `-` by default.
 `capitalize`         | Converts the first letter of a string to uppercase.
 `getExtname`         | Get the `extname` of a url.

@@ -390,3 +390,32 @@ export const batchProcess = <T = unknown>({
     return defer.promise;
   };
 };
+
+export const retry = <T>(
+  fn: () => T,
+  callback:
+    | number
+    | ((e: unknown | null, n: number, next: () => Promise<T>) => Promise<T>),
+) => {
+  let attempts = 0;
+
+  if (typeof callback === 'number') {
+    const max = callback;
+    callback = (e, attempts, next) => {
+      if (attempts > max) throw e;
+      return next();
+    };
+  }
+  const next = () => {
+    try {
+      attempts++;
+      const res = fn();
+      return Promise.resolve(res).catch((e: unknown) => {
+        return (callback as Function)(e, attempts, next);
+      });
+    } catch (e) {
+      return (callback as Function)(e, attempts, next);
+    }
+  };
+  return next();
+};

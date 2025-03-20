@@ -80,6 +80,7 @@ Api                  | 描述
 `sleep`              | 暂停 `n` 毫秒，返回一个 promise。
 `remove`             | 从 `Array` 或 `Set` 中删除指定元素。
 `map`                | 对 `Object`，`Array`，`Set` 执行 map 操作并返回一个全新的副本。
+`retry`              | 重试函数，直到成功或达到最大重试次数。
 `toCamelCase`        | 将字符串转换为 `camelCase` 或 `pascalCase` 命名，默认处理 `_` 和 `-`。
 `capitalize`         | 将字符串的首字母转换为大写。
 `getExtname`         | 获取 url 的 `extname`。
