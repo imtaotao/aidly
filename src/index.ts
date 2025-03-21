@@ -395,7 +395,11 @@ export const retry = <T>(
   fn: () => T,
   callback:
     | number
-    | ((e: unknown | null, n: number, next: () => Promise<T>) => Promise<T>),
+    | ((
+        e: unknown | null,
+        n: number,
+        next: () => Promise<Awaited<T>>,
+      ) => Promise<Awaited<T>>),
 ) => {
   let n = 0;
   if (typeof callback === 'number') {
