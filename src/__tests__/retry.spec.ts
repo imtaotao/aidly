@@ -27,7 +27,7 @@ describe('retry function tests', () => {
     const mockFn = jest.fn(() => {
       throw new Error('fail');
     });
-    await expect(() => retry(mockFn, 2)).toThrow();
+    await expect(retry(mockFn, 2)).rejects.toThrow('fail');
     expect(mockFn).toHaveBeenCalledTimes(3);
   });
 
@@ -97,5 +97,18 @@ describe('retry function tests', () => {
     );
     expect(asyncFunction).toHaveBeenCalledTimes(3); // Initial + two retries
     expect(customRetryLogic).toHaveBeenCalledTimes(3);
+  });
+
+  test('should handle the error after maximum retries', async () => {
+    const errorFunction = jest.fn(() => {
+      throw 11;
+    });
+
+    await expect(retry(errorFunction, 2)).rejects.toEqual(11);
+    expect(errorFunction).toHaveBeenCalledTimes(3);
+
+    await retry(errorFunction, 2).catch((e: unknown) => {
+      expect(e).toEqual(11);
+    });
   });
 });

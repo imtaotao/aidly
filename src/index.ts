@@ -397,24 +397,18 @@ export const retry = <T>(
     | number
     | ((e: unknown | null, n: number, next: () => Promise<T>) => Promise<T>),
 ) => {
-  let attempts = 0;
-
+  let n = 0;
   if (typeof callback === 'number') {
     const max = callback;
-    callback = (e, attempts, next) => {
-      if (attempts > max) throw e;
-      return next();
-    };
+    callback = (e, n, next) => (n > max ? Promise.reject(e) : next());
   }
   const next = () => {
     try {
-      attempts++;
+      n++;
       const res = fn();
-      return Promise.resolve(res).catch((e: unknown) => {
-        return (callback as Function)(e, attempts, next);
-      });
+      return Promise.resolve(res).catch((e) => callback(e, n, next));
     } catch (e) {
-      return (callback as Function)(e, attempts, next);
+      return callback(e, n, next);
     }
   };
   return next();
