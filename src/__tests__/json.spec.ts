@@ -1,3 +1,4 @@
+import { parse, stringify } from 'json5';
 import {
   isObject,
   unindent,
@@ -8,7 +9,7 @@ import {
 } from '../index';
 
 describe('json.ts', () => {
-  it('nomarl stringify', () => {
+  it('normal stringify', () => {
     const obj = { a: 1, b: [1, 2, { num: 2 }], c: {} };
     const json = jsonStringify(obj);
     expect(json.includes('@@ref*')).toBe(false);
@@ -248,13 +249,13 @@ describe('json.ts', () => {
   it('disable resolve `ref` in jsonStringify', () => {
     const obj = {} as any;
     obj.a = obj;
-    expect(() => jsonStringify(obj)).not.toThrowError();
+    expect(() => jsonStringify(obj)).not.toThrow();
 
     let _jsonStringify = createJSONStringify({ flag: '' });
-    expect(() => _jsonStringify(obj)).toThrowError();
+    expect(() => _jsonStringify(obj)).toThrow();
 
     _jsonStringify = createJSONStringify();
-    expect(() => jsonStringify(obj)).not.toThrowError();
+    expect(() => jsonStringify(obj)).not.toThrow();
   });
 
   it('disable resolve `ref` in jsonParse', () => {
@@ -354,5 +355,38 @@ describe('json.ts', () => {
       refStr1: 1,
       refStr2: 1,
     });
+  });
+
+  it('json5 parse', () => {
+    const _parse = createJSONParse({
+      parse,
+      flag: '',
+    });
+    const jsonString = `
+      {
+          // 这是一条注释
+          firstName: 'John', // 使用单引号和没有引号的键
+          lastName: 'Doe',
+          hobbies: ['Reading', 'Photography', 'Traveling'], // 尾随逗号
+          age: 30,
+      }
+    `;
+    const obj = _parse(jsonString);
+    expect(obj).toMatchObject({
+      firstName: 'John',
+      lastName: 'Doe',
+      hobbies: ['Reading', 'Photography', 'Traveling'],
+      age: 30,
+    });
+  });
+
+  it('json5 stringify', () => {
+    const _stringify = createJSONStringify({
+      stringify,
+      flag: '',
+    });
+    const obj = { a: 1, b: [1, 2, { num: 2 }], c: {} };
+    const json = _stringify(obj);
+    expect(json.includes('@@ref*')).toBe(false);
   });
 });

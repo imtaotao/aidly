@@ -36,6 +36,9 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.14.9)(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.8.2))
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       lint-staged:
         specifier: ^15.2.5
         version: 15.2.7

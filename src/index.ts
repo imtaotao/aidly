@@ -54,7 +54,6 @@ export {
   jsonStringify,
   createJSONParse,
   createJSONStringify,
-  type JSONOptions,
 } from './json';
 export {
   qsParse,

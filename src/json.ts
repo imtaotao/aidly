@@ -1,21 +1,19 @@
 import { isObject } from './is';
-import { Nullable, Prettify } from './types';
+import { type Nullable } from './types';
 
 // Object references are a built-in behavior of es, so `@@` is used here.
 const defaultFlag = '@@ref*';
 
-export interface JSONOptions {
-  /**
-   * Reference flag during json parse or json stringify
-   */
+export const createJSONParse = ({
+  flag,
+  parse,
+}: {
   flag?: string;
-}
+  parse?: JSON['parse'];
+} = {}) => {
+  if (typeof flag !== 'string') flag = defaultFlag;
+  if (typeof parse !== 'function') parse = JSON.parse;
 
-export const createJSONParse = (options?: Prettify<JSONOptions>) => {
-  let flag = defaultFlag;
-  if (options && typeof options.flag === 'string') {
-    flag = options.flag;
-  }
   return (
     text: string,
     reviver?: Nullable<(this: any, key: string, value: unknown) => any | null>,
@@ -25,15 +23,18 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
     const replace = [] as Array<() => void>;
 
     const refKey = (v: string) => v.slice(flag.length);
-
-    const isRefStr = (v: unknown): v is string =>
-      typeof v === 'string' && v.startsWith(flag);
+    const isRefStr = (v: unknown): v is string => {
+      return typeof v === 'string' && v.startsWith(flag);
+    };
 
     function _reviver(this: any, key: string, value: unknown) {
       let isRef = false;
       if (flag) {
-        if (!map.has(this)) map.set(this, {});
+        if (!map.has(this)) {
+          map.set(this, {});
+        }
         const parent = map.get(this);
+
         parent[key] = {
           set: [],
           add(p: string) {
@@ -45,6 +46,7 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
             }
           },
         };
+
         parent[key].add(key);
 
         if (isRefStr(value)) {
@@ -64,22 +66,30 @@ export const createJSONParse = (options?: Prettify<JSONOptions>) => {
         : value;
     }
 
-    const res = JSON.parse(text, _reviver);
+    const res = parse(text, _reviver);
+
     map.forEach((value, key) => {
       for (const prop in value) {
         refs[value[prop].set.join('.')] = key[prop];
       }
     });
-    replace.forEach((fn) => fn());
+    for (const fn of replace) {
+      fn();
+    }
     return res;
   };
 };
 
-export const createJSONStringify = (options?: Prettify<JSONOptions>) => {
-  let flag = defaultFlag;
-  if (options && typeof options.flag === 'string') {
-    flag = options.flag;
-  }
+export const createJSONStringify = ({
+  flag,
+  stringify,
+}: {
+  flag?: string;
+  stringify?: JSON['stringify'];
+} = {}) => {
+  if (typeof flag !== 'string') flag = defaultFlag;
+  if (typeof stringify !== 'function') stringify = JSON.stringify;
+
   return (
     value: unknown,
     replacer?: Nullable<(this: any, key: string, value: unknown) => any>,
@@ -107,7 +117,7 @@ export const createJSONStringify = (options?: Prettify<JSONOptions>) => {
       }
       return value;
     }
-    return JSON.stringify(value, _replacer, space);
+    return stringify(value, _replacer, space);
   };
 };
 
