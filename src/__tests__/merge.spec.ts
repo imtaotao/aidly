@@ -589,4 +589,14 @@ describe('merge.ts', () => {
       arr: [1, 2, 3, null, 5, null, 7],
     });
   });
+
+  it('array strategy', () => {
+    const target = { arr: [1, 2, 3] };
+    const src = { arr: [4, 5, 6] };
+    const res = merge(target, src, { arrayStrategy: 'replace' });
+    expect(res).toStrictEqual({ arr: [4, 5, 6] });
+
+    const res2 = merge(target, src, { arrayStrategy: 'concat' });
+    expect(res2).toStrictEqual({ arr: [1, 2, 3, 4, 5, 6] });
+  });
 });

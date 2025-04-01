@@ -4,6 +4,7 @@ type Target = Record<PropertyKey, unknown>;
 
 interface MergeOptions {
   ignoreUndef?: boolean;
+  arrayStrategy?: 'replace' | 'concat';
   excludeSet?: Set<object> | WeakSet<object>;
 }
 
@@ -60,8 +61,11 @@ const mergeArray = (
   source: Array<unknown>,
   option: MergeOptions,
 ) => {
-  const arr = target.concat(source).map((val) => clone(val, option));
-  return option.ignoreUndef ? arr.filter((val) => val !== undefined) : arr;
+  let arr = option.arrayStrategy === 'replace' ? source : target.concat(source);
+  if (option.ignoreUndef) {
+    arr = arr.filter((val) => val !== undefined);
+  }
+  return arr.map((val) => clone(val, option));
 };
 
 const mergeObject = (target: Target, source: Target, option: MergeOptions) => {
