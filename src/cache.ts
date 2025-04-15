@@ -1,7 +1,7 @@
 import { isNil } from './is';
 import { once, assert, makeMap } from './index';
 
-interface Unit<T> {
+export interface Unit<T> {
   value: T;
   size: number;
   count: number;
@@ -155,6 +155,9 @@ export function createCacheObject<T>(
     },
     get keys() {
       return Object.keys(data);
+    },
+    get bucket() {
+      return data;
     },
   };
 }
