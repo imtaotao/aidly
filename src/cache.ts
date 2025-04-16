@@ -1,7 +1,7 @@
 import { isNil } from './is';
 import { once, assert, makeMap } from './index';
 
-export interface Unit<T> {
+export interface CacheUnit<T = unknown> {
   value: T;
   size: number;
   count: number;
@@ -16,14 +16,14 @@ export function createCacheObject<T>(
     permanents,
   }: {
     permanents?: Array<string>;
-    onGet?: (key: string, unit: Unit<T>) => void;
-    onSet?: (key: string, unit: Unit<T>) => void;
-    onRemove?: (key: string, unit: Unit<T>) => void;
+    onGet?: (key: string, unit: CacheUnit<T>) => void;
+    onSet?: (key: string, unit: CacheUnit<T>) => void;
+    onRemove?: (key: string, unit: CacheUnit<T>) => void;
   } = {},
 ) {
   if (max < 0) max = 0;
   let allSize = 0;
-  const data: Record<string, Unit<T>> = Object.create(null);
+  const data: Record<string, CacheUnit<T>> = Object.create(null);
   const isPermanent = permanents ? makeMap(permanents) : () => false;
 
   const has = (key: string) => !isNil(data[key]);

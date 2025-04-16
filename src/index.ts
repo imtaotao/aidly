@@ -8,7 +8,7 @@ export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
-export { createCacheObject, type Unit } from './cache';
+export { createCacheObject, type CacheUnit } from './cache';
 export { exec, inlineString, type ExecOptions } from './exec';
 export {
   mathExprEvaluate,
