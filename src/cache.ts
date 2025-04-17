@@ -63,7 +63,7 @@ export function createCacheObject<T>(
     }
   };
 
-  const set = (key: string, value: T, size: number) => {
+  const set = (key: string, value: T, size: number, force?: boolean) => {
     let isInit = false;
     let unit = data[key];
 
@@ -112,17 +112,17 @@ export function createCacheObject<T>(
             tryRemove();
             break;
           }
-          if (
-            keys[i] === key ||
-            isPermanent(keys[i]) ||
-            u.count > unit.count ||
-            (u.count === unit.count && u.size >= size)
-          ) {
-            continue;
+          if (keys[i] !== key && !isPermanent(keys[i])) {
+            if (
+              force ||
+              u.count < unit.count ||
+              (u.count === unit.count && u.size < size)
+            ) {
+              tempSize -= u.size;
+              if (tempSize < 0) tempSize = 0;
+              queue.push([keys[i], u.size]);
+            }
           }
-          tempSize -= u.size;
-          if (tempSize < 0) tempSize = 0;
-          queue.push([keys[i], u.size]);
         }
 
         if (canSet(tempSize)) {

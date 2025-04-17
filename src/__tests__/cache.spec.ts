@@ -108,6 +108,71 @@ describe('cache.ts', () => {
     expect(cache.size).toBe(10);
   });
 
+  it('force', () => {
+    // normal
+    let cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'b', 1);
+    cache.set('c', 'cccccccc', 8);
+    cache.get('c');
+    cache.get('c');
+    cache.get('a');
+    cache.get('b');
+    expect(cache.set('d', 'ddddddddd', 9)).toBe(false);
+    expect(cache.get('a')).toBe('a');
+    expect(cache.get('c')).toBe('cccccccc');
+    expect(cache.has('b')).toBe(true);
+    expect(cache.size).toBe(10);
+
+    // force1
+    cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'b', 1);
+    cache.set('c', 'cccccccc', 8);
+    cache.get('c');
+    cache.get('c');
+    cache.get('a');
+    cache.get('b');
+    expect(cache.set('d', 'ddddddddd', 9, true)).toBe(true);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('c')).toBe(false);
+    expect(cache.has('b')).toBe(true);
+    expect(cache.get('d')).toBe('ddddddddd');
+    expect(cache.size).toBe(10);
+
+    // force2
+    cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'b', 1);
+    cache.set('c', 'cccccccc', 8);
+    cache.get('c');
+    cache.get('c');
+    cache.get('a');
+    cache.get('b');
+    expect(cache.set('d', 'dddddddddd', 10, true)).toBe(true);
+    expect(cache.has('a')).toBe(false);
+    expect(cache.has('c')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+    expect(cache.get('d')).toBe('dddddddddd');
+    expect(cache.size).toBe(10);
+
+    // force3
+    cache = createCacheObject(10);
+    cache.set('a', 'a', 1);
+    cache.set('b', 'b', 1);
+    cache.set('c', 'cccccccc', 8);
+    cache.get('a');
+    cache.get('a');
+    cache.get('b');
+    cache.get('c');
+    expect(cache.set('d', 'ddddddddd', 9, true)).toBe(true);
+    expect(cache.has('a')).toBe(true);
+    expect(cache.has('c')).toBe(false);
+    expect(cache.has('b')).toBe(false);
+    expect(cache.get('d')).toBe('ddddddddd');
+    expect(cache.size).toBe(10);
+  });
+
   it('onGet', () => {
     let lock = false;
     const cache = createCacheObject(10, {
