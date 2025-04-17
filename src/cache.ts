@@ -1,5 +1,5 @@
 import { isNil } from './is';
-import { once, assert, makeMap } from './index';
+import { once, assert, makeMap, type Nullable } from './index';
 
 export interface CacheUnit<T = unknown> {
   value: T;
@@ -63,7 +63,12 @@ export function createCacheObject<T>(
     }
   };
 
-  const set = (key: string, value: T, size: number, force?: boolean) => {
+  const set = (
+    key: string,
+    value: T,
+    size: number,
+    force?: Nullable<boolean>,
+  ) => {
     let isInit = false;
     let unit = data[key];
 
