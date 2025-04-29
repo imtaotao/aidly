@@ -153,6 +153,7 @@ export function createCacheObject<T>(
     has,
     get,
     set,
+    max,
     remove,
     removeAll,
     get size() {

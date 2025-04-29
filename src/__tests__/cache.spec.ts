@@ -3,6 +3,7 @@ import { createCacheObject } from '../index';
 describe('cache.ts', () => {
   it('allSize', () => {
     const cache = createCacheObject(10);
+    expect(cache.max).toBe(10);
     expect(cache.size).toBe(0);
 
     cache.set('a', '', 0);
@@ -22,6 +23,7 @@ describe('cache.ts', () => {
 
     cache.remove('b');
     expect(cache.size).toBe(2);
+    expect(cache.max).toBe(10);
   });
 
   it('has', () => {
@@ -111,6 +113,7 @@ describe('cache.ts', () => {
   it('force', () => {
     // normal
     let cache = createCacheObject(10);
+    expect(cache.max).toBe(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'b', 1);
     cache.set('c', 'cccccccc', 8);
@@ -123,9 +126,11 @@ describe('cache.ts', () => {
     expect(cache.get('c')).toBe('cccccccc');
     expect(cache.has('b')).toBe(true);
     expect(cache.size).toBe(10);
+    expect(cache.max).toBe(10);
 
     // force1
     cache = createCacheObject(10);
+    expect(cache.max).toBe(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'b', 1);
     cache.set('c', 'cccccccc', 8);
@@ -139,9 +144,11 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(true);
     expect(cache.get('d')).toBe('ddddddddd');
     expect(cache.size).toBe(10);
+    expect(cache.max).toBe(10);
 
     // force2
     cache = createCacheObject(10);
+    expect(cache.max).toBe(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'b', 1);
     cache.set('c', 'cccccccc', 8);
@@ -155,9 +162,11 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(false);
     expect(cache.get('d')).toBe('dddddddddd');
     expect(cache.size).toBe(10);
+    expect(cache.max).toBe(10);
 
     // force3
     cache = createCacheObject(10);
+    expect(cache.max).toBe(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'b', 1);
     cache.set('c', 'cccccccc', 8);
@@ -171,6 +180,7 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(false);
     expect(cache.get('d')).toBe('ddddddddd');
     expect(cache.size).toBe(10);
+    expect(cache.max).toBe(10);
   });
 
   it('onGet', () => {
@@ -182,6 +192,7 @@ describe('cache.ts', () => {
         }
       },
     });
+    expect(cache.max).toBe(10);
     expect(() => cache.get('a')).toThrow();
 
     cache.set('a', '', 0);
@@ -195,6 +206,7 @@ describe('cache.ts', () => {
 
     lock = true;
     expect(cache.get('a')).toBe('tao');
+    expect(cache.max).toBe(10);
   });
 
   it('onSet', () => {
