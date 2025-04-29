@@ -32,6 +32,7 @@ export {
   isBuffer,
   isTypedArray,
   isPromise,
+  isPromiseLike,
   isBase64,
   isIP,
   isPort,

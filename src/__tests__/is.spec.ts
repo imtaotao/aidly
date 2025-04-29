@@ -5,6 +5,8 @@ import {
   isAbsolute,
   isEmail,
   isBase64,
+  isPromise,
+  isPromiseLike,
   isByteLength,
 } from '../index';
 
@@ -19,6 +21,17 @@ describe('is.ts', () => {
     expect(
       isAbsolute('blob:https://a.com/832a2821-8580-4099-85c8-509bf48aee50'),
     ).toBe(true);
+  });
+
+  it('isPromiseLike', () => {
+    expect(isPromiseLike({ then() {} })).toBe(true);
+    expect(isPromiseLike({ then1() {} })).toBe(false);
+    expect(isPromiseLike(Promise.resolve())).toBe(true);
+  });
+
+  it('isPromise', () => {
+    expect(isPromise(Promise.resolve())).toBe(true);
+    expect(isPromise({ then() {} })).toBe(false);
   });
 
   it('should validate ports', () => {

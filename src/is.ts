@@ -41,8 +41,14 @@ export const isRegExp = (v: unknown): v is RegExp => {
   return objectToString.call(v) === '[object RegExp]';
 };
 
-export const isPromise = <T, S>(v: PromiseLike<T> | S): v is PromiseLike<T> => {
-  return isObject(v) && typeof (v as any).then === 'function';
+export const isPromise = <T, S>(v: Promise<T> | S): v is Promise<T> => {
+  return v instanceof Promise;
+};
+
+export const isPromiseLike = <T, S>(
+  v: PromiseLike<T> | S,
+): v is PromiseLike<T> => {
+  return isObject(v) && typeof (v as PromiseLike<T>).then === 'function';
 };
 
 export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> => {
