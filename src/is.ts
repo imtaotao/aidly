@@ -5,60 +5,62 @@ const objectToString = Object.prototype.toString;
 
 export const supportWasm = typeof WebAssembly === 'object';
 
-export const toRawType = (v: unknown) => {
-  return objectToString.call(v).slice(8, -1).toLowerCase();
+export const toRawType = (val: unknown) => {
+  return objectToString.call(val).slice(8, -1).toLowerCase();
 };
 
 export const isArray = /*#__PURE__*/ (() => Array.isArray)();
 
 export const isBrowser = typeof window !== 'undefined';
 
-export const isNil = (v: unknown): v is null | undefined => {
-  return v === undefined || v === null;
+export const isNil = (val: unknown): val is null | undefined => {
+  return val === undefined || val === null;
 };
 
-export const isObject = (v: unknown): v is object => {
-  return v !== null && typeof v === 'object';
+export const isObject = (val: unknown): val is object => {
+  return val !== null && typeof val === 'object';
 };
 
-export const isNumber = (v: any): v is number => {
-  return typeof v === 'number';
+export const isNumber = (val: unknown): val is number => {
+  return typeof val === 'number';
 };
 
-export const isString = (v: unknown): v is string => {
-  return typeof v === 'string';
+export const isString = (val: unknown): val is string => {
+  return typeof val === 'string';
 };
 
 export const isPort = (n: number) => {
   return Number.isInteger(n) && n >= 0 && n <= 65535;
 };
 
-export const isDate = (v: unknown): v is Date => {
-  return objectToString.call(v) === '[object Date]';
+export const isDate = (val: unknown): val is Date => {
+  return objectToString.call(val) === '[object Date]';
 };
 
-export const isRegExp = (v: unknown): v is RegExp => {
-  return objectToString.call(v) === '[object RegExp]';
+export const isRegExp = (val: unknown): val is RegExp => {
+  return objectToString.call(val) === '[object RegExp]';
 };
 
-export const isPromise = <T, S>(v: Promise<T> | S): v is Promise<T> => {
-  return v instanceof Promise;
+export const isPromise = <T, S>(val: Promise<T> | S): val is Promise<T> => {
+  return val instanceof Promise;
 };
 
 export const isPromiseLike = <T, S>(
-  v: PromiseLike<T> | S,
-): v is PromiseLike<T> => {
-  return isObject(v) && typeof (v as PromiseLike<T>).then === 'function';
+  val: PromiseLike<T> | S,
+): val is PromiseLike<T> => {
+  return isObject(val) && typeof (val as PromiseLike<T>).then === 'function';
 };
 
-export const isPlainObject = <T>(v: unknown): v is Record<PropertyKey, T> => {
-  return objectToString.call(v) === '[object Object]';
+export const isPlainObject = <T>(
+  val: unknown,
+): val is Record<PropertyKey, T> => {
+  return objectToString.call(val) === '[object Object]';
 };
 
 export const isFunction = <T extends unknown>(
-  v: T,
-): v is T extends Function ? T : Extract<T, Function> => {
-  return typeof v === 'function';
+  val: T,
+): val is T extends Function ? T : Extract<T, Function> => {
+  return typeof val === 'function';
 };
 
 const unc = /^[a-zA-Z]:\\/;
@@ -86,40 +88,42 @@ export const isSet: <T = unknown>(val: unknown) => val is Set<T> =
     : (v) => isObject(v) && v instanceof Set;
 
 export const isWeakSet: <T extends object = object>(
-  v: unknown,
-) => v is WeakSet<T> =
+  val: unknown,
+) => val is WeakSet<T> =
   typeof WeakSet !== 'function' ||
   !(/*#__PURE__*/ (() => WeakSet.prototype.has)())
     ? ((() => false) as any)
-    : (v) => isObject(v) && v instanceof WeakSet;
+    : (val) => isObject(val) && val instanceof WeakSet;
 
-export const isMap: <K = unknown, V = unknown>(v: unknown) => v is Map<K, V> =
+export const isMap: <K = unknown, V = unknown>(
+  val: unknown,
+) => val is Map<K, V> =
   typeof Map !== 'function' || !(/*#__PURE__*/ (() => Map.prototype.has)())
     ? ((() => false) as any)
-    : (v) => isObject(v) && v instanceof Map;
+    : (val) => isObject(val) && val instanceof Map;
 
 export const isWeakMap: <K extends object = object, V = unknown>(
-  v: unknown,
-) => v is WeakMap<K, V> =
+  val: unknown,
+) => val is WeakMap<K, V> =
   typeof WeakMap !== 'function' ||
   !(/*#__PURE__*/ (() => WeakMap.prototype.has)())
     ? ((() => false) as any)
-    : (v) => isObject(v) && v instanceof WeakMap;
+    : (val) => isObject(val) && val instanceof WeakMap;
 
-export const isBuffer = (v: unknown) => {
-  if (!isObject(v)) return false;
+export const isBuffer = (val: unknown) => {
+  if (!isObject(val)) return false;
   return Boolean(
-    v.constructor &&
-      (v.constructor as any).isBuffer &&
-      (v.constructor as any).isBuffer(v),
+    val.constructor &&
+      (val.constructor as any).isBuffer &&
+      (val.constructor as any).isBuffer(val),
   );
 };
 
-export const isInBounds = ([a, b]: Array<number>, v: number) => {
-  if (v === a || v === b) return true;
+export const isInBounds = ([a, b]: Array<number>, val: number) => {
+  if (val === a || val === b) return true;
   const min = Math.min(a, b);
   const max = min === a ? b : a;
-  return min < v && v < max;
+  return min < val && val < max;
 };
 
 export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
@@ -127,15 +131,15 @@ export const isEmptyObject = <T extends Record<PropertyKey, any>>(val: T) => {
   return true;
 };
 
-export const isPrimitiveValue = (v: unknown): v is PrimitiveType => {
+export const isPrimitiveValue = (val: unknown): val is PrimitiveType => {
   return (
-    typeof v === 'number' ||
-    typeof v === 'bigint' ||
-    typeof v === 'string' ||
-    typeof v === 'symbol' ||
-    typeof v === 'boolean' ||
-    v === undefined ||
-    v === null
+    typeof val === 'number' ||
+    typeof val === 'bigint' ||
+    typeof val === 'string' ||
+    typeof val === 'symbol' ||
+    typeof val === 'boolean' ||
+    val === undefined ||
+    val === null
   );
 };
 
