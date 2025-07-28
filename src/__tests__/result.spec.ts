@@ -18,8 +18,8 @@ describe('result.ts', () => {
     const err = new Error('test error');
     const res = result.error(err);
     expect(res.ok).toBe(false);
-    expect(res.error).toBe(err);
-    expect(res.originalError).toBe(err);
+    expect(res.value).toBe(err);
+    expect(res.originalValue).toBe(err);
     expect(res.orElse('default')).toBe('default');
     expect(res.orElse()).toBeUndefined();
   });
@@ -29,7 +29,7 @@ describe('result.ts', () => {
     const err = new Error('wrapped error');
     (err as any)._original = original;
     const res = result.error(err);
-    expect(res.originalError).toBe(original);
+    expect(res.originalValue).toBe(original);
   });
 
   it('should return ok result for successful sync function', () => {
@@ -52,9 +52,9 @@ describe('result.ts', () => {
     expect(fn).toHaveBeenCalled();
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.error).toBeInstanceOf(Error);
-      expect(res.error.message).toBe('fail');
-      expect(res.originalError).toBe(error);
+      expect(res.value).toBeInstanceOf(Error);
+      expect(res.value.message).toBe('fail');
+      expect(res.originalValue).toBe(error);
     }
   });
 
@@ -66,15 +66,15 @@ describe('result.ts', () => {
     const res = result.run(fn);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.error).toBeInstanceOf(Error);
-      expect(res.error.message).toBe(thrown);
-      expect(res.originalError).toBe(thrown);
+      expect(res.value).toBeInstanceOf(Error);
+      expect(res.value.message).toBe(thrown);
+      expect(res.originalValue).toBe(thrown);
     }
   });
 
   it('should return ok result for resolved promise', async () => {
     const promise = Promise.resolve('success');
-    const res = await result.p(promise);
+    const res = await result.promise(promise);
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.value).toBe('success');
@@ -85,23 +85,23 @@ describe('result.ts', () => {
   it('should return error result for rejected promise with Error', async () => {
     const error = new Error('fail');
     const promise = Promise.reject(error);
-    const res = await result.p(promise);
+    const res = await result.promise(promise);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.error).toBe(error);
-      expect(res.originalError).toBe(error);
+      expect(res.value).toBe(error);
+      expect(res.originalValue).toBe(error);
     }
   });
 
   it('should wrap non-Error rejection values', async () => {
     const thrown = 12345;
     const promise = Promise.reject(thrown);
-    const res = await result.p(promise);
+    const res = await result.promise(promise);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.error).toBeInstanceOf(Error);
-      expect(res.error.message).toBe(String(thrown));
-      expect(res.originalError).toBe(thrown);
+      expect(res.value).toBeInstanceOf(Error);
+      expect(res.value.message).toBe(String(thrown));
+      expect(res.originalValue).toBe(thrown);
     }
   });
 
@@ -111,7 +111,7 @@ describe('result.ts', () => {
       Promise.resolve(2),
       Promise.resolve(3),
     ];
-    const res = await result.pAll(promises);
+    const res = await result.promiseAll(promises);
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.value).toEqual([1, 2, 3]);
@@ -125,11 +125,11 @@ describe('result.ts', () => {
       Promise.reject(error),
       Promise.resolve(3),
     ];
-    const res = await result.pAll(promises);
+    const res = await result.promiseAll(promises);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.error).toBe(error);
-      expect(res.originalError).toBe(error);
+      expect(res.value).toBe(error);
+      expect(res.originalValue).toBe(error);
     }
   });
 
@@ -156,5 +156,25 @@ describe('result.ts', () => {
   it('should create a new Result instance', () => {
     const result = Result.create();
     expect(result).toBeInstanceOf(Result);
+  });
+
+  it('should return the value when unwrap is called on OkResult', () => {
+    const val = 123;
+    const okResult = result.ok(val);
+    expect(okResult.ok).toBe(true);
+    expect(okResult.unwrap()).toBe(val);
+  });
+
+  it('should throw the original error when unwrap is called on ErrorResult', () => {
+    const error = new Error('test error');
+    const errorResult = result.error(error);
+    expect(errorResult.ok).toBe(false);
+    expect(() => errorResult.unwrap()).toThrowError(error);
+  });
+
+  it('should throw a normalized error when unwrap is called on ErrorResult created from non-Error', () => {
+    const thrown = 'string error';
+    const errorResult = result.error(new Error(String(thrown)));
+    expect(() => errorResult.unwrap()).toThrow('string error');
   });
 });

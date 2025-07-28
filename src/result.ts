@@ -3,13 +3,15 @@ import { isObject } from './is';
 export interface OkResult<T> {
   ok: true;
   value: T;
+  unwrap: () => T;
   orElse: () => T;
 }
 
 export interface ErrorResult {
+  originalValue: unknown;
   ok: false;
-  error: Error;
-  originalError: unknown;
+  value: Error;
+  unwrap: () => never;
   orElse: <T>(val?: T) => T | undefined;
 }
 
@@ -25,26 +27,28 @@ export class Result {
     return e as Error;
   }
 
-  private _originalError(error: unknown) {
-    return isObject(error)
-      ? (error as { _original?: unknown })._original || error
-      : error;
+  private _original(e: unknown) {
+    return isObject(e) ? (e as { _original?: unknown })._original || e : e;
   }
 
   public ok<T>(value: T): OkResult<T> {
     return {
-      ok: true,
       value,
+      ok: true,
       orElse: () => value,
+      unwrap: () => value,
     };
   }
 
-  public error(error: Error): ErrorResult {
+  public error(value: Error): ErrorResult {
     return {
+      value,
       ok: false,
-      error,
-      originalError: this._originalError(error),
+      originalValue: this._original(value),
       orElse: <T>(val?: T) => val,
+      unwrap: () => {
+        throw value;
+      },
     };
   }
 
@@ -56,7 +60,7 @@ export class Result {
     }
   }
 
-  public async p<T>(
+  public async promise<T>(
     promise: PromiseLike<T> | Promise<T>,
   ): Promise<ResultType<T>> {
     try {
@@ -66,7 +70,7 @@ export class Result {
     }
   }
 
-  public async pAll<T>(
+  public async promiseAll<T>(
     promises: Array<PromiseLike<T> | Promise<T>>,
   ): Promise<ResultType<Array<T>>> {
     try {
@@ -76,8 +80,11 @@ export class Result {
     }
   }
 
-  public async orElse<T>(p: Promise<T>, val?: T): Promise<T | undefined> {
-    return (await this.p(p)).orElse(val);
+  public async orElse<T, R>(
+    p: Promise<T>,
+    val?: R,
+  ): Promise<R | T | undefined> {
+    return (await this.promise(p)).orElse(val);
   }
 
   public static create(): Result {
