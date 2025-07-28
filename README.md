@@ -119,6 +119,8 @@ Api                  | Description
 `isPhone`            | Check if it is a valid `mobile number`.
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
+`Result`             | Result class, used to process the results of asynchronous operations.
+`KV`                 | Key-value pair type.
 `inlineString`       | Quantify the string constant.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
 `mathExprEvaluate`   | Execute mathematical expressions.

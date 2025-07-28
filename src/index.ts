@@ -2,6 +2,7 @@ import type { Prettify } from './types';
 import { toRawType, isSet, isArray, isAbsolute, isPlainObject } from './is';
 
 export { Queue } from 'small-queue';
+export { KV } from './kv';
 export { root } from './root';
 export { uuid } from './uuid';
 export { clone } from './clone';
@@ -10,6 +11,12 @@ export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
 export { createCacheObject, type CacheUnit } from './cache';
 export { exec, inlineString, type ExecOptions } from './exec';
+export {
+  Result,
+  type OkResult,
+  type ErrorResult,
+  type ResultType,
+} from './result';
 export {
   mathExprEvaluate,
   type MathExprEvaluateOptions,

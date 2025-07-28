@@ -80,7 +80,7 @@ export const isTypedArray = (val: unknown): val is TypedArray => {
   return typeArrTag.test(objectToString.call(val));
 };
 
-export const isSet: <T = unknown>(v: unknown) => v is Set<T> =
+export const isSet: <T = unknown>(val: unknown) => val is Set<T> =
   typeof Set !== 'function' || !(/*#__PURE__*/ (() => Set.prototype.has)())
     ? ((() => false) as any)
     : (v) => isObject(v) && v instanceof Set;
