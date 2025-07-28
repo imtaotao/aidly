@@ -79,4 +79,8 @@ export class Result {
   public async orElse<T>(p: Promise<T>, val?: T): Promise<T | undefined> {
     return (await this.p(p)).orElse(val);
   }
+
+  public static create(): Result {
+    return new Result();
+  }
 }

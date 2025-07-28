@@ -152,4 +152,9 @@ describe('result.ts', () => {
     const res = await result.orElse(promise);
     expect(res).toBeUndefined();
   });
+
+  it('should create a new Result instance', () => {
+    const result = Result.create();
+    expect(result).toBeInstanceOf(Result);
+  });
 });
