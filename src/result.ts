@@ -8,7 +8,7 @@ export interface OkResult<T> {
 }
 
 export interface ErrorResult {
-  originalValue: unknown;
+  cause: unknown;
   ok: false;
   value: Error;
   unwrap: () => never;
@@ -20,15 +20,22 @@ export type ResultType<T> = OkResult<T> | ErrorResult;
 export class Result {
   private _normalize(e: unknown) {
     if (!(e instanceof Error)) {
-      let original = e;
+      let cause = e;
       e = new Error(String(e));
-      (e as { _original: unknown })._original = original;
+      (e as { _cause: unknown })._cause = cause;
     }
     return e as Error;
   }
 
-  private _original(e: unknown) {
-    return isObject(e) ? (e as { _original?: unknown })._original || e : e;
+  private _errorCause(e: unknown) {
+    if (e instanceof Error) {
+      return (
+        (e as { cause?: unknown }).cause ||
+        (e as unknown as { _cause: unknown })._cause ||
+        e
+      );
+    }
+    return e;
   }
 
   public ok<T>(value: T): OkResult<T> {
@@ -44,7 +51,7 @@ export class Result {
     return {
       value,
       ok: false,
-      originalValue: this._original(value),
+      cause: this._errorCause(value),
       orElse: <T>(val?: T) => val,
       unwrap: () => {
         throw value;

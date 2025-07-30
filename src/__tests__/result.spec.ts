@@ -19,17 +19,9 @@ describe('result.ts', () => {
     const res = result.error(err);
     expect(res.ok).toBe(false);
     expect(res.value).toBe(err);
-    expect(res.originalValue).toBe(err);
+    expect(res.cause).toBe(err);
     expect(res.orElse('default')).toBe('default');
     expect(res.orElse()).toBeUndefined();
-  });
-
-  it('should return originalError if error has _original property', () => {
-    const original = { message: 'original error' };
-    const err = new Error('wrapped error');
-    (err as any)._original = original;
-    const res = result.error(err);
-    expect(res.originalValue).toBe(original);
   });
 
   it('should return ok result for successful sync function', () => {
@@ -54,7 +46,7 @@ describe('result.ts', () => {
     if (!res.ok) {
       expect(res.value).toBeInstanceOf(Error);
       expect(res.value.message).toBe('fail');
-      expect(res.originalValue).toBe(error);
+      expect(res.cause).toBe(error);
     }
   });
 
@@ -68,7 +60,7 @@ describe('result.ts', () => {
     if (!res.ok) {
       expect(res.value).toBeInstanceOf(Error);
       expect(res.value.message).toBe(thrown);
-      expect(res.originalValue).toBe(thrown);
+      expect(res.cause).toBe(thrown);
     }
   });
 
@@ -89,7 +81,7 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.value).toBe(error);
-      expect(res.originalValue).toBe(error);
+      expect(res.cause).toBe(error);
     }
   });
 
@@ -101,7 +93,7 @@ describe('result.ts', () => {
     if (!res.ok) {
       expect(res.value).toBeInstanceOf(Error);
       expect(res.value.message).toBe(String(thrown));
-      expect(res.originalValue).toBe(thrown);
+      expect(res.cause).toBe(thrown);
     }
   });
 
@@ -129,7 +121,7 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.value).toBe(error);
-      expect(res.originalValue).toBe(error);
+      expect(res.cause).toBe(error);
     }
   });
 
