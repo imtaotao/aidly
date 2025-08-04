@@ -19,7 +19,6 @@ describe('result.ts', () => {
     const res = result.error(err);
     expect(res.ok).toBe(false);
     expect(res.value).toBe(err);
-    expect(res.cause).toBe(err);
     expect(res.orElse('default')).toBe('default');
     expect(res.orElse()).toBeUndefined();
   });
@@ -45,8 +44,6 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.value).toBeInstanceOf(Error);
-      expect(res.value.message).toBe('fail');
-      expect(res.cause).toBe(error);
     }
   });
 
@@ -58,9 +55,7 @@ describe('result.ts', () => {
     const res = result.run(fn);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.value).toBeInstanceOf(Error);
-      expect(res.value.message).toBe(thrown);
-      expect(res.cause).toBe(thrown);
+      expect(res.value).toBe(thrown);
     }
   });
 
@@ -81,7 +76,6 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.value).toBe(error);
-      expect(res.cause).toBe(error);
     }
   });
 
@@ -91,9 +85,7 @@ describe('result.ts', () => {
     const res = await result.promise(promise);
     expect(res.ok).toBe(false);
     if (!res.ok) {
-      expect(res.value).toBeInstanceOf(Error);
-      expect(res.value.message).toBe(String(thrown));
-      expect(res.cause).toBe(thrown);
+      expect(res.value).toBe(thrown);
     }
   });
 
@@ -121,7 +113,6 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.value).toBe(error);
-      expect(res.cause).toBe(error);
     }
   });
 

@@ -1,5 +1,3 @@
-import { isObject } from './is';
-
 export interface OkResult<T> {
   ok: true;
   value: T;
@@ -8,9 +6,8 @@ export interface OkResult<T> {
 }
 
 export interface ErrorResult {
-  cause: unknown;
   ok: false;
-  value: Error;
+  value: unknown;
   unwrap: () => never;
   orElse: <T>(val?: T) => T | undefined;
 }
@@ -18,26 +15,6 @@ export interface ErrorResult {
 export type ResultType<T> = OkResult<T> | ErrorResult;
 
 export class Result {
-  private _normalize(e: unknown) {
-    if (!(e instanceof Error)) {
-      let cause = e;
-      e = new Error(String(e));
-      (e as { _cause: unknown })._cause = cause;
-    }
-    return e as Error;
-  }
-
-  private _errorCause(e: unknown) {
-    if (e instanceof Error) {
-      return (
-        (e as { cause?: unknown }).cause ||
-        (e as unknown as { _cause: unknown })._cause ||
-        e
-      );
-    }
-    return e;
-  }
-
   public ok<T>(value: T): OkResult<T> {
     return {
       value,
@@ -47,11 +24,10 @@ export class Result {
     };
   }
 
-  public error(value: Error): ErrorResult {
+  public error(value: unknown): ErrorResult {
     return {
       value,
       ok: false,
-      cause: this._errorCause(value),
       orElse: <T>(val?: T) => val,
       unwrap: () => {
         throw value;
@@ -63,7 +39,7 @@ export class Result {
     try {
       return this.ok(fn());
     } catch (e: unknown) {
-      return this.error(this._normalize(e));
+      return this.error(e);
     }
   }
 
@@ -73,7 +49,7 @@ export class Result {
     try {
       return this.ok((await promise) as T);
     } catch (e: unknown) {
-      return this.error(this._normalize(e));
+      return this.error(e);
     }
   }
 
@@ -83,7 +59,7 @@ export class Result {
     try {
       return this.ok((await Promise.all(promises)) as T[]);
     } catch (e: unknown) {
-      return this.error(this._normalize(e));
+      return this.error(e);
     }
   }
 
