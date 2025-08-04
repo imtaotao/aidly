@@ -14,7 +14,13 @@ export interface ErrorResult {
 
 export type ResultType<T> = OkResult<T> | ErrorResult;
 
-export class Result {
+export class Result<N extends number | bigint = number> {
+  private _now: () => N;
+
+  public constructor(now?: () => N) {
+    this._now = now || (Date.now as () => N);
+  }
+
   public ok<T>(value: T): OkResult<T> {
     return {
       value,
@@ -53,6 +59,17 @@ export class Result {
     }
   }
 
+  public async timedPromise<T>(
+    promise: PromiseLike<T> | Promise<T>,
+  ): Promise<ResultType<T> & { duration: N }> {
+    const start = this._now();
+    const res = await this.promise<T>(promise);
+    return {
+      ...res,
+      duration: (this._now() - start) as N,
+    };
+  }
+
   public async promiseAll<T>(
     promises: Array<PromiseLike<T> | Promise<T>>,
   ): Promise<ResultType<Array<T>>> {
@@ -63,6 +80,17 @@ export class Result {
     }
   }
 
+  public async timedPromiseAll<T>(
+    promises: Array<PromiseLike<T> | Promise<T>>,
+  ): Promise<ResultType<Array<T>> & { duration: N }> {
+    const start = this._now();
+    const res = await this.promiseAll<T>(promises);
+    return {
+      ...res,
+      duration: (this._now() - start) as N,
+    };
+  }
+
   public async orElse<T, R>(
     p: Promise<T>,
     val?: R,
@@ -70,7 +98,9 @@ export class Result {
     return (await this.promise(p)).orElse(val);
   }
 
-  public static create(): Result {
-    return new Result();
+  public static create<N extends number | bigint = number>(
+    now?: () => N,
+  ): Result<N> {
+    return new Result<N>(now);
   }
 }

@@ -160,4 +160,93 @@ describe('result.ts', () => {
     const errorResult = result.error(new Error(String(thrown)));
     expect(() => errorResult.unwrap()).toThrow('string error');
   });
+
+  it('timedPromise resolves correctly with duration', async () => {
+    const result = Result.create();
+    const promise = new Promise<number>((resolve) =>
+      setTimeout(() => resolve(42), 50),
+    );
+    const res = await result.timedPromise(promise);
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe(42);
+    expect(typeof res.duration).toBe('number');
+    expect(res.duration).toBeGreaterThanOrEqual(50);
+  });
+
+  it('timedPromise rejects correctly with duration', async () => {
+    const result = Result.create();
+    const error = new Error('fail');
+    const promise = new Promise<number>((_, reject) =>
+      setTimeout(() => reject(error), 30),
+    );
+    const res = await result.timedPromise(promise);
+    expect(res.ok).toBe(false);
+    expect(res.value).toBe(error);
+    expect(typeof res.duration).toBe('number');
+    expect(res.duration).toBeGreaterThanOrEqual(30);
+  });
+
+  it('timedPromiseAll resolves correctly with duration', async () => {
+    const result = Result.create();
+    const promises = [
+      new Promise<number>((resolve) => setTimeout(() => resolve(1), 20)),
+      new Promise<number>((resolve) => setTimeout(() => resolve(2), 40)),
+      new Promise<number>((resolve) => setTimeout(() => resolve(3), 10)),
+    ];
+    const res = await result.timedPromiseAll(promises);
+    expect(res.ok).toBe(true);
+    expect(res.value).toEqual([1, 2, 3]);
+    expect(typeof res.duration).toBe('number');
+    expect(res.duration).toBeGreaterThanOrEqual(40);
+  });
+
+  it('timedPromiseAll rejects correctly with duration', async () => {
+    const result = Result.create();
+    const error = new Error('fail');
+    const promises = [
+      Promise.resolve(1),
+      new Promise<number>((_, reject) => setTimeout(() => reject(error), 25)),
+      Promise.resolve(3),
+    ];
+    const res = await result.timedPromiseAll(promises);
+    expect(res.ok).toBe(false);
+    expect(res.value).toBe(error);
+    expect(typeof res.duration).toBe('number');
+    expect(res.duration).toBeGreaterThanOrEqual(25);
+  });
+
+  it('timedPromise resolves and duration is bigint nanoseconds', async () => {
+    let fakeTime = 0n;
+    const now = () => {
+      fakeTime += 100000000n;
+      return fakeTime;
+    };
+    const result = Result.create(now);
+    const promise = Promise.resolve(456);
+    const res = await result.timedPromise(promise);
+
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe(456);
+    expect(typeof res.duration).toBe('bigint');
+    expect(res.duration).toBe(100000000n);
+    expect(res.duration - 100000000n).toBe(0n);
+  });
+
+  test('timedPromise rejects and duration is bigint nanoseconds', async () => {
+    let fakeTime = 0n;
+    const now = () => {
+      fakeTime += 100000000n;
+      return fakeTime;
+    };
+    const result = Result.create(now);
+    const error = new Error('fail');
+    const promise = Promise.reject(error);
+    const res = await result.timedPromise(promise);
+
+    expect(res.ok).toBe(false);
+    expect(res.value).toBe(error);
+    expect(typeof res.duration).toBe('bigint');
+    expect(res.duration).toBe(100000000n);
+    expect(res.duration - 100000000n).toBe(0n);
+  });
 });
