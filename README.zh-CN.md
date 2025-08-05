@@ -95,6 +95,7 @@ Api                  | 描述
 `isBrowser`          | 检查是否处于浏览器环境中。
 `isNil`              | 检查一个值是否是 `null` 或 `undefined`。
 `isNumber`           | 检查一个值是否是 `Number`。
+`isBigInt`           | 检查一个值是否是 `BigInt`。
 `isString`           | 检查一个值是否是 `String`。
 `isFunction`         | 检查一个值是否是 `Function`。
 `isObject`           | 检查一个值是否是 `Object`。
@@ -120,6 +121,7 @@ Api                  | 描述
 `isCNPhone`          | 检查是否是一个 `中国大陆` 有效的 `手机号码`。
 `root`               | 为全局对象提供的别名，兼容不同环境。
 `Result`             | 结果类，用于处理异步操作的结果。
+`Runner`             | 运行器类，用于包装同步/异步函数，统计耗时，状态码，提供调用前后的钩子。
 `KV`                 | 键值对类型。
 `inlineString`       | 将字符串常量化。
 `exec`               | 执行一段 js 代码，可以以 `cjs`，`esm` 和普通模式来执行代码，默认为普通模式。

@@ -1,5 +1,5 @@
 import { isNil } from './is';
-import { once, assert, makeMap, type Nullable } from './index';
+import { once, makeMap, type Nullable } from './index';
 
 export interface CacheUnit<T = unknown> {
   value: T;
@@ -51,8 +51,9 @@ export function createCacheObject<T>(
   // When getting a not exist key, an error will be reported.
   // Should use `has` to check first.
   const get = <U extends T>(key: string) => {
-    assert(data[key], `"${key}" does not exist`);
-
+    if (!data[key]) {
+      throw new Error(`"${key}" does not exist`);
+    }
     data[key].count++;
     if (typeof onGet === 'function') {
       const ref = { ...data[key] };
@@ -156,6 +157,7 @@ export function createCacheObject<T>(
     max,
     remove,
     removeAll,
+
     get size() {
       return allSize;
     },

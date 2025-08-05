@@ -95,6 +95,7 @@ Api                  | Description
 `isBrowser`          | Check if you are in the browser environment.
 `isNil`              | Check if a value is `null` or `undefined`.
 `isNumber`           | Check if a value is a `Number`.
+`isBigInt`           | Check if a value is a `BigInt`.
 `isString`           | Check if a value is a `String`.
 `isFunction`         | Check if a value is a `Function`.
 `isObject`           | Check if a value is an `Object`.
@@ -120,6 +121,7 @@ Api                  | Description
 `isCNPhone`          | Check if it is a valid `mobile phone` number in `mainland China`.
 `root`               | Alias ​​for global objects, compatible with different environments.
 `Result`             | Result class, used to process the results of asynchronous operations.
+`Runner`             | Runner, used to wrap synchronous/asynchronous functions, count time consumption, status code, and provide hooks before and after calls.
 `KV`                 | Key-value pair type.
 `inlineString`       | Quantify the string constant.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.

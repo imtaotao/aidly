@@ -25,6 +25,10 @@ export const isNumber = (val: unknown): val is number => {
   return typeof val === 'number';
 };
 
+export const isBigInt = (val: unknown): val is bigint => {
+  return typeof val === 'bigint';
+};
+
 export const isString = (val: unknown): val is string => {
   return typeof val === 'string';
 };

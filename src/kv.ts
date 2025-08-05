@@ -2,7 +2,7 @@ export class KV<T> {
   private _has = false;
   private _data: T | null = null;
 
-  constructor(private _key: string) {}
+  public constructor(private _key: string) {}
 
   public set(value: T) {
     this._has = true;
