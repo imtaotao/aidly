@@ -44,7 +44,7 @@ export class Result<N extends number | bigint = number> {
   public run<T>(fn: () => T): ResultType<T> {
     try {
       return this.ok(fn());
-    } catch (e: unknown) {
+    } catch (e) {
       return this.error(e);
     }
   }
@@ -54,7 +54,7 @@ export class Result<N extends number | bigint = number> {
   ): Promise<ResultType<T>> {
     try {
       return this.ok((await promise) as T);
-    } catch (e: unknown) {
+    } catch (e) {
       return this.error(e);
     }
   }
@@ -75,7 +75,7 @@ export class Result<N extends number | bigint = number> {
   ): Promise<ResultType<Array<T>>> {
     try {
       return this.ok((await Promise.all(promises)) as T[]);
-    } catch (e: unknown) {
+    } catch (e) {
       return this.error(e);
     }
   }

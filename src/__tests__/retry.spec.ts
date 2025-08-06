@@ -1,14 +1,14 @@
 import { retry } from '../index';
 
 describe('retry function tests', () => {
-  test('should succeed on the first try', async () => {
+  it('should succeed on the first try', async () => {
     const mockFn = jest.fn().mockResolvedValue('success');
     const result = await retry(mockFn, 1);
     expect(result).toBe('success');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
-  test('should retry until success', async () => {
+  it('should retry until success', async () => {
     let attempt = 0;
     const mockFn = jest.fn(() => {
       attempt++;
@@ -23,7 +23,7 @@ describe('retry function tests', () => {
     expect(mockFn).toHaveBeenCalledTimes(4);
   });
 
-  test('should fail after max retries', async () => {
+  it('should fail after max retries', async () => {
     const mockFn = jest.fn(() => {
       throw new Error('fail');
     });
@@ -31,7 +31,7 @@ describe('retry function tests', () => {
     expect(mockFn).toHaveBeenCalledTimes(3);
   });
 
-  test('should use custom callback and manage retries', async () => {
+  it('should use custom callback and manage retries', async () => {
     const error = new Error('custom error');
     let retryCallback = jest.fn((e, n, next) => {
       if (n >= 2) throw e;
@@ -45,7 +45,7 @@ describe('retry function tests', () => {
     expect(mockFn).toHaveBeenCalledTimes(2);
   });
 
-  test('async function succeeds on the first try', async () => {
+  it('async function succeeds on the first try', async () => {
     const asyncFunction = jest.fn(async () => 'Success');
 
     const result = await retry(asyncFunction, 3);
@@ -53,7 +53,7 @@ describe('retry function tests', () => {
     expect(asyncFunction).toHaveBeenCalledTimes(1);
   });
 
-  test('async function succeeds after several retries', async () => {
+  it('async function succeeds after several retries', async () => {
     let attempt = 0;
     const asyncFunction = jest.fn(async () => {
       if (attempt++ < 2) {
@@ -67,7 +67,7 @@ describe('retry function tests', () => {
     expect(asyncFunction).toHaveBeenCalledTimes(3);
   });
 
-  test('async function fails after exceeding max retries', async () => {
+  it('async function fails after exceeding max retries', async () => {
     const asyncFunction = jest.fn(async () => {
       throw new Error('Failure');
     });
@@ -76,7 +76,7 @@ describe('retry function tests', () => {
     expect(asyncFunction).toHaveBeenCalledTimes(3); // Initial + two retries
   });
 
-  test('async function with custom retry logic', async () => {
+  it('async function with custom retry logic', async () => {
     let attempt = 0;
     const asyncFunction = jest.fn(async () => {
       attempt++;
@@ -99,7 +99,7 @@ describe('retry function tests', () => {
     expect(customRetryLogic).toHaveBeenCalledTimes(3);
   });
 
-  test('should handle the error after maximum retries', async () => {
+  it('should handle the error after maximum retries', async () => {
     const errorFunction = jest.fn(() => {
       throw 11;
     });

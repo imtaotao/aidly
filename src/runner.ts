@@ -1,4 +1,4 @@
-import { isNil, isPromise, isPromiseLike } from './is';
+import { isNil, isPromise } from './is';
 
 const INTERNAL = Symbol('Runner');
 
@@ -40,6 +40,19 @@ export class Runner<T extends number | bigint = number, E = unknown> {
     }
   }
 
+  /**
+   * Note:
+   * This Runner does NOT support non-standard thenable objects
+   * (i.e., objects that have a `.then` method but do not fully comply with the Promise/A+ specification).
+   *
+   * Reasons:
+   * 1. Non-standard thenable may have side effects when `.then` is called multiple times,
+   *    leading to unexpected behavior or duplicated execution.
+   * 2. Their `.then` method might not return a new thenable or Promise,
+   *    breaking chaining and error propagation, which makes it hard to guarantee correct state and hook calls.
+   * 3. Since we cannot control the implementation of external thenable,
+   *    safely wrapping or repeatedly calling `.then` is not feasible.
+   */
   public run<R>(fn: (...args: Array<any>) => R, extra?: E, flag?: symbol) {
     if (this._called) {
       throw new Error('Runner can only be called once');
@@ -50,28 +63,28 @@ export class Runner<T extends number | bigint = number, E = unknown> {
 
     try {
       let res = fn();
-      if (isPromiseLike(res)) {
-        res = res.then((val) => {
-          this.code = '0';
-          this._setDuration(start, flag);
-          this._onAfter?.(this, extra, val);
-          return val;
-        }) as R;
-        if (isPromise(res)) {
-          res = res.catch((e: unknown) => {
+      if (isPromise(res)) {
+        res = res.then(
+          (val) => {
+            this.code = '0';
+            this._setDuration(start, flag);
+            this._onAfter?.(this, extra, val);
+            return val;
+          },
+          (e) => {
             this.code = '-1';
             this._setDuration(start, flag);
             this._onAfter?.(this, extra, e);
             throw e;
-          }) as R;
-        }
+          },
+        ) as R;
       } else {
         this.code = '0';
         this._setDuration(start, flag);
         this._onAfter?.(this, extra, res);
       }
       return res;
-    } catch (e: unknown) {
+    } catch (e) {
       this.code = '-1';
       this._setDuration(start, flag);
       this._onAfter?.(this, extra, e);
