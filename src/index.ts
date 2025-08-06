@@ -17,6 +17,7 @@ export {
   type OkResult,
   type ErrorResult,
   type ResultType,
+  type PromiseType,
 } from './result';
 export {
   mathExprEvaluate,
@@ -401,7 +402,7 @@ export const batchProcess = <T = unknown>({
 
 export const retry = <T>(
   fn: () => T,
-  callback:
+  timesOrCustomRetry:
     | number
     | ((
         e: unknown | null,
@@ -410,17 +411,17 @@ export const retry = <T>(
       ) => Promise<Awaited<T>>),
 ) => {
   let n = 0;
-  if (typeof callback === 'number') {
-    const max = callback;
-    callback = (e, n, next) => (n > max ? Promise.reject(e) : next());
+  if (typeof timesOrCustomRetry === 'number') {
+    const max = timesOrCustomRetry;
+    timesOrCustomRetry = (e, n, next) => (n > max ? Promise.reject(e) : next());
   }
   const next = () => {
     try {
       n++;
       const res = fn();
-      return Promise.resolve(res).catch((e) => callback(e, n, next));
+      return Promise.resolve(res).catch((e) => timesOrCustomRetry(e, n, next));
     } catch (e) {
-      return callback(e, n, next);
+      return timesOrCustomRetry(e, n, next);
     }
   };
   return next();

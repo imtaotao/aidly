@@ -1,3 +1,4 @@
+import { retry } from './index';
 import { isNil, isPromise } from './is';
 
 const INTERNAL = Symbol('Runner');
@@ -53,7 +54,7 @@ export class Runner<T extends number | bigint = number, E = unknown> {
    * 3. Since we cannot control the implementation of external thenable,
    *    safely wrapping or repeatedly calling `.then` is not feasible.
    */
-  public run<R>(fn: (...args: Array<any>) => R, extra?: E, flag?: symbol) {
+  public run<R>(fn: () => R, extra?: E, flag?: symbol) {
     if (this._called) {
       throw new Error('Runner can only be called once');
     }
@@ -92,8 +93,24 @@ export class Runner<T extends number | bigint = number, E = unknown> {
     }
   }
 
-  public timedRun<R>(fn: (...args: Array<any>) => R, extra?: E): R {
-    return this.run(fn, extra, INTERNAL);
+  public timedRun<R>(fn: () => R, extra?: E) {
+    return this.run<R>(fn, extra, INTERNAL);
+  }
+
+  public retryRun<R>(
+    fn: () => R,
+    timesOrCustomRetry: Parameters<typeof retry<R>>[1],
+    extra?: E,
+  ) {
+    return this.run(() => retry<R>(fn, timesOrCustomRetry), extra);
+  }
+
+  public timedRetryRun<R>(
+    fn: () => R,
+    timesOrCustomRetry: Parameters<typeof retry<R>>[1],
+    extra?: E,
+  ) {
+    return this.run(() => retry<R>(fn, timesOrCustomRetry), extra, INTERNAL);
   }
 
   public clone() {
@@ -105,7 +122,7 @@ export class Runner<T extends number | bigint = number, E = unknown> {
     });
   }
 
-  static create<CT extends number | bigint = number, CE = unknown>(
+  public static create<CT extends number | bigint = number, CE = unknown>(
     options?: RunnerOptions<CT, CE>,
   ) {
     return new Runner<CT, CE>(options);

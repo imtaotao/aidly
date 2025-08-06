@@ -1,4 +1,4 @@
-import { Runner } from '../index';
+import { sleep, Runner } from '../index';
 
 describe('runner.ts', () => {
   it('run sync function successfully', () => {
@@ -12,7 +12,6 @@ describe('runner.ts', () => {
       expect(fn).toHaveBeenCalled();
       expect(runner.duration).toBeGreaterThanOrEqual(0);
     };
-
     exec('run');
     exec('timedRun');
   });
@@ -207,5 +206,88 @@ describe('runner.ts', () => {
     const result = runner.run(fn);
     expect(result).toBe(thenable);
     expect(runner.code).toBe('0');
+  });
+
+  it('retryRun retries and eventually resolves', async () => {
+    let count = 0;
+    const fn = jest.fn(async () => {
+      await sleep(5);
+      count++;
+      if (count < 3) return Promise.reject(new Error('fail'));
+      return Promise.resolve('success');
+    });
+    const runner = Runner.create();
+    const result = await runner.retryRun(fn, 5);
+    expect(result).toBe('success');
+    expect(fn).toHaveBeenCalledTimes(3);
+    expect(runner.code).toBe('0');
+    expect(runner.duration).toBe(0);
+  });
+
+  it('retryRun retries and eventually rejects', async () => {
+    let count = 0;
+    const error = new Error('fail');
+    const fn = jest.fn(() => {
+      count++;
+      return Promise.reject(error);
+    });
+    const runner = Runner.create();
+    await expect(runner.retryRun(fn, 2)).rejects.toThrow(error);
+    expect(fn).toHaveBeenCalledTimes(3); // initial + 2 retries
+    expect(runner.code).toBe('-1');
+    expect(runner.duration).toBeGreaterThanOrEqual(0);
+  });
+
+  it('retryRun with custom retry callback', async () => {
+    let count = 0;
+    const fn = jest.fn(() => {
+      count++;
+      if (count < 2) return Promise.reject(new Error('fail'));
+      return Promise.resolve('ok');
+    });
+    const customRetry = async (
+      e: unknown,
+      n: number,
+      next: () => Promise<string>,
+    ) => {
+      if (n < 3) return next();
+      throw e;
+    };
+    const runner = Runner.create();
+    const result = await runner.retryRun(fn, customRetry);
+    expect(result).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(runner.code).toBe('0');
+  });
+
+  it('retryRun passes extra to hooks', async () => {
+    const onBefore = jest.fn();
+    const onAfter = jest.fn();
+    const runner = Runner.create({ onBefore, onAfter });
+    const fn = jest.fn(() => Promise.resolve('done'));
+    const extra = { foo: 'bar' };
+    const result = await runner.retryRun(fn, 1, extra);
+    expect(result).toBe('done');
+    expect(onBefore).toHaveBeenCalledWith(runner, extra);
+    expect(onAfter).toHaveBeenCalledWith(runner, extra, 'done');
+  });
+
+  it('timedRetryRun should retry and resolve successfully', async () => {
+    let count = 0;
+    const fn = jest.fn(async () => {
+      await sleep(5);
+      count++;
+      if (count < 3) {
+        return Promise.reject(new Error('fail'));
+      }
+      return Promise.resolve('success');
+    });
+    const runner = Runner.create();
+    const result = await runner.timedRetryRun(fn, 5);
+    expect(result).toBe('success');
+    expect(fn).toHaveBeenCalledTimes(3);
+    expect(runner.code).toBe('0');
+    expect(runner.duration).not.toBe(0);
+    expect(runner.duration).toBeGreaterThanOrEqual(15);
   });
 });

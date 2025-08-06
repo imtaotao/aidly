@@ -14,6 +14,8 @@ export interface ErrorResult {
 
 export type ResultType<T> = OkResult<T> | ErrorResult;
 
+export type PromiseType<T> = T | PromiseLike<T> | Promise<T>;
+
 export class Result<N extends number | bigint = number> {
   private _now: () => N;
 
@@ -50,9 +52,10 @@ export class Result<N extends number | bigint = number> {
   }
 
   public async promise<T>(
-    promise: PromiseLike<T> | Promise<T>,
+    fn: PromiseType<T> | (() => PromiseType<T>),
   ): Promise<ResultType<T>> {
     try {
+      const promise = typeof fn === 'function' ? (fn as Function)() : fn;
       return this.ok((await promise) as T);
     } catch (e) {
       return this.error(e);
@@ -60,10 +63,10 @@ export class Result<N extends number | bigint = number> {
   }
 
   public async timedPromise<T>(
-    promise: PromiseLike<T> | Promise<T>,
+    fn: PromiseType<T> | (() => PromiseType<T>),
   ): Promise<ResultType<T> & { duration: N }> {
     const start = this._now();
-    const res = await this.promise<T>(promise);
+    const res = await this.promise<T>(fn);
     return {
       ...res,
       duration: (this._now() - start) as N,
@@ -71,9 +74,10 @@ export class Result<N extends number | bigint = number> {
   }
 
   public async promiseAll<T>(
-    promises: Array<PromiseLike<T> | Promise<T>>,
+    fn: Array<PromiseType<T>> | (() => Array<PromiseType<T>>),
   ): Promise<ResultType<Array<T>>> {
     try {
+      const promises = typeof fn === 'function' ? fn() : fn;
       return this.ok((await Promise.all(promises)) as T[]);
     } catch (e) {
       return this.error(e);
@@ -81,10 +85,10 @@ export class Result<N extends number | bigint = number> {
   }
 
   public async timedPromiseAll<T>(
-    promises: Array<PromiseLike<T> | Promise<T>>,
+    fn: Array<PromiseType<T>> | (() => Array<PromiseType<T>>),
   ): Promise<ResultType<Array<T>> & { duration: N }> {
     const start = this._now();
-    const res = await this.promiseAll<T>(promises);
+    const res = await this.promiseAll<T>(fn);
     return {
       ...res,
       duration: (this._now() - start) as N,
@@ -92,10 +96,24 @@ export class Result<N extends number | bigint = number> {
   }
 
   public async orElse<T, R>(
-    p: Promise<T>,
+    p: PromiseType<T> | (() => PromiseType<T>),
     val?: R,
   ): Promise<R | T | undefined> {
     return (await this.promise(p)).orElse(val);
+  }
+
+  public static isResult<T>(val: unknown): val is ResultType<T> {
+    return (
+      typeof val === 'object' &&
+      val !== null &&
+      'value' in val &&
+      'ok' in val &&
+      typeof val.ok === 'boolean' &&
+      'unwrap' in val &&
+      typeof val.unwrap === 'function' &&
+      'orElse' in val &&
+      typeof val.orElse === 'function'
+    );
   }
 
   public static create<N extends number | bigint = number>(
