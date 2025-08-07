@@ -13,7 +13,7 @@ describe('result.ts', () => {
       unwrap: () => 123,
       orElse: () => 123,
     };
-    expect(Result.isResult(okObj)).toBe(true);
+    expect(Result.is(okObj)).toBe(true);
   });
 
   it('should return true for ErrorResult object', () => {
@@ -25,33 +25,31 @@ describe('result.ts', () => {
       },
       orElse: <T>(val?: T) => val,
     };
-    expect(Result.isResult(errObj)).toBe(true);
+    expect(Result.is(errObj)).toBe(true);
   });
 
   it('should return false for null or undefined', () => {
-    expect(Result.isResult(null)).toBe(false);
-    expect(Result.isResult(undefined)).toBe(false);
+    expect(Result.is(null)).toBe(false);
+    expect(Result.is(undefined)).toBe(false);
   });
 
   it('should return false for primitives', () => {
-    expect(Result.isResult(123)).toBe(false);
-    expect(Result.isResult('string')).toBe(false);
-    expect(Result.isResult(true)).toBe(false);
-    expect(Result.isResult(Symbol('sym'))).toBe(false);
+    expect(Result.is(123)).toBe(false);
+    expect(Result.is('string')).toBe(false);
+    expect(Result.is(true)).toBe(false);
+    expect(Result.is(Symbol('sym'))).toBe(false);
   });
 
   it('should return false for object missing keys', () => {
-    expect(Result.isResult({})).toBe(false);
-    expect(Result.isResult({ ok: true })).toBe(false);
-    expect(Result.isResult({ value: 1, ok: true })).toBe(false);
-    expect(Result.isResult({ ok: true, value: 1, unwrap: () => 1 })).toBe(
-      false,
-    );
+    expect(Result.is({})).toBe(false);
+    expect(Result.is({ ok: true })).toBe(false);
+    expect(Result.is({ value: 1, ok: true })).toBe(false);
+    expect(Result.is({ ok: true, value: 1, unwrap: () => 1 })).toBe(false);
   });
 
   it('should return false for object with wrong types', () => {
     expect(
-      Result.isResult({
+      Result.is({
         ok: 'true',
         value: 1,
         unwrap: () => 1,
@@ -60,7 +58,7 @@ describe('result.ts', () => {
     ).toBe(false);
 
     expect(
-      Result.isResult({
+      Result.is({
         ok: true,
         value: 1,
         unwrap: 'not a function',
@@ -69,7 +67,7 @@ describe('result.ts', () => {
     ).toBe(false);
 
     expect(
-      Result.isResult({
+      Result.is({
         ok: true,
         value: 1,
         unwrap: () => 1,
@@ -86,7 +84,7 @@ describe('result.ts', () => {
       orElse: () => 42,
       extra: 'hello',
     };
-    expect(Result.isResult(obj)).toBe(true);
+    expect(Result.is(obj)).toBe(true);
   });
 
   it('should return OkResult with correct value and orElse', () => {

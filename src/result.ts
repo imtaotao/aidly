@@ -102,16 +102,13 @@ export class Result<N extends number | bigint = number> {
     return (await this.promise(p)).orElse(val);
   }
 
-  public static isResult<T>(val: unknown): val is ResultType<T> {
+  public static is<T>(val: any): val is ResultType<T> {
     return (
       typeof val === 'object' &&
       val !== null &&
       'value' in val &&
-      'ok' in val &&
       typeof val.ok === 'boolean' &&
-      'unwrap' in val &&
       typeof val.unwrap === 'function' &&
-      'orElse' in val &&
       typeof val.orElse === 'function'
     );
   }
