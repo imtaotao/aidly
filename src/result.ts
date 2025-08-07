@@ -5,7 +5,7 @@ export interface OkResult<T> {
   value: T;
   unwrap: () => T;
   orElse: () => T;
-  orNullish: <R>(val: R) => T | R;
+  orNullish: <R>(val: R) => NonNullable<T> | R;
 }
 
 export interface ErrorResult {
@@ -32,7 +32,8 @@ export class Result<N extends number | bigint = number> {
       value,
       ok: true,
       orElse: () => value,
-      orNullish: <R>(defaultValue: R) => (isNil(value) ? defaultValue : value),
+      orNullish: <R>(defaultValue: R) =>
+        isNil(value) ? defaultValue : (value as NonNullable<T>),
       unwrap: () => value,
     };
   }

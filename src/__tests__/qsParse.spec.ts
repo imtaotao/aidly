@@ -244,6 +244,7 @@ describe('qsParse', () => {
     expect(qsParse('a[]=c&a[]=d')).toEqual({ a: ['c', 'd'] });
     expect(qsParse('a=c,d', { comma: true })).toEqual({ a: ['c', 'd'] });
   });
+
   it('parses brackets holds array of arrays when having two parts of strings with comma as array divider', () => {
     expect(qsParse('foo[]=1,2,3&foo[]=4,5,6', { comma: true })).toEqual({
       foo: [

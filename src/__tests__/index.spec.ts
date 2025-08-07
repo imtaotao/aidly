@@ -12,7 +12,7 @@ import {
   getIteratorFn,
 } from '../index';
 
-describe('test', () => {
+describe('index.ts', () => {
   it('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
