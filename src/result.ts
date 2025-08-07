@@ -9,7 +9,7 @@ export interface ErrorResult {
   ok: false;
   value: unknown;
   unwrap: () => never;
-  orElse: <T>(val?: T) => T | undefined;
+  orElse: <T>(val: T) => T;
 }
 
 export type ResultType<T> = OkResult<T> | ErrorResult;
@@ -36,7 +36,7 @@ export class Result<N extends number | bigint = number> {
     return {
       value,
       ok: false,
-      orElse: <T>(val?: T) => val,
+      orElse: <T>(val: T) => val,
       unwrap: () => {
         throw value;
       },

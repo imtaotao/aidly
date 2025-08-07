@@ -23,7 +23,7 @@ describe('result.ts', () => {
       unwrap: () => {
         throw new Error('fail');
       },
-      orElse: <T>(val?: T) => val,
+      orElse: <T>(val: T) => val,
     };
     expect(Result.is(errObj)).toBe(true);
   });
@@ -101,7 +101,7 @@ describe('result.ts', () => {
     expect(res.ok).toBe(false);
     expect(res.value).toBe(err);
     expect(res.orElse('default')).toBe('default');
-    expect(res.orElse()).toBeUndefined();
+    expect(res.orElse(null)).toBeNull();
   });
 
   it('should return ok result for successful sync function', () => {
