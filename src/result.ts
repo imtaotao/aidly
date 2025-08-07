@@ -1,15 +1,19 @@
+import { isNil } from './is';
+
 export interface OkResult<T> {
   ok: true;
   value: T;
   unwrap: () => T;
   orElse: () => T;
+  orNullish: <R>(val: R) => T | R;
 }
 
 export interface ErrorResult {
   ok: false;
   value: unknown;
   unwrap: () => never;
-  orElse: <T>(val: T) => T;
+  orElse: <R>(val: R) => R;
+  orNullish: <R>(val: R) => R;
 }
 
 export type ResultType<T> = OkResult<T> | ErrorResult;
@@ -28,6 +32,7 @@ export class Result<N extends number | bigint = number> {
       value,
       ok: true,
       orElse: () => value,
+      orNullish: <R>(defaultValue: R) => (isNil(value) ? defaultValue : value),
       unwrap: () => value,
     };
   }
@@ -36,7 +41,8 @@ export class Result<N extends number | bigint = number> {
     return {
       value,
       ok: false,
-      orElse: <T>(val: T) => val,
+      orElse: <R>(val: R) => val,
+      orNullish: <R>(val: R) => val,
       unwrap: () => {
         throw value;
       },
@@ -95,22 +101,24 @@ export class Result<N extends number | bigint = number> {
     };
   }
 
+  public async unwrap<T>(
+    p: PromiseType<T> | (() => PromiseType<T>),
+  ): Promise<T> {
+    return (await this.promise(p)).unwrap();
+  }
+
   public async orElse<T, R>(
     p: PromiseType<T> | (() => PromiseType<T>),
-    val?: R,
+    val: R,
   ): Promise<R | T | undefined> {
     return (await this.promise(p)).orElse(val);
   }
 
-  public static is<T>(val: any): val is ResultType<T> {
-    return (
-      typeof val === 'object' &&
-      val !== null &&
-      'value' in val &&
-      typeof val.ok === 'boolean' &&
-      typeof val.unwrap === 'function' &&
-      typeof val.orElse === 'function'
-    );
+  public async orNullish<T, R>(
+    p: PromiseType<T> | (() => PromiseType<T>),
+    val: R,
+  ): Promise<T | R> {
+    return (await this.promise(p)).orNullish(val);
   }
 
   public static create<N extends number | bigint = number>(

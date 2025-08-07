@@ -1,4 +1,9 @@
-import { Result, type OkResult, type ErrorResult } from '../index';
+import {
+  Result,
+  isResultType,
+  type OkResult,
+  type ErrorResult,
+} from '../index';
 
 describe('result.ts', () => {
   let result: Result;
@@ -12,44 +17,46 @@ describe('result.ts', () => {
       value: 123,
       unwrap: () => 123,
       orElse: () => 123,
+      orNullish: () => 123,
     };
-    expect(Result.is(okObj)).toBe(true);
+    expect(isResultType(okObj)).toBe(true);
   });
 
   it('should return true for ErrorResult object', () => {
     const errObj: ErrorResult = {
       ok: false,
       value: new Error('fail'),
+      orNullish: <T>(val: T) => val,
       unwrap: () => {
         throw new Error('fail');
       },
       orElse: <T>(val: T) => val,
     };
-    expect(Result.is(errObj)).toBe(true);
+    expect(isResultType(errObj)).toBe(true);
   });
 
   it('should return false for null or undefined', () => {
-    expect(Result.is(null)).toBe(false);
-    expect(Result.is(undefined)).toBe(false);
+    expect(isResultType(null)).toBe(false);
+    expect(isResultType(undefined)).toBe(false);
   });
 
   it('should return false for primitives', () => {
-    expect(Result.is(123)).toBe(false);
-    expect(Result.is('string')).toBe(false);
-    expect(Result.is(true)).toBe(false);
-    expect(Result.is(Symbol('sym'))).toBe(false);
+    expect(isResultType(123)).toBe(false);
+    expect(isResultType('string')).toBe(false);
+    expect(isResultType(true)).toBe(false);
+    expect(isResultType(Symbol('sym'))).toBe(false);
   });
 
   it('should return false for object missing keys', () => {
-    expect(Result.is({})).toBe(false);
-    expect(Result.is({ ok: true })).toBe(false);
-    expect(Result.is({ value: 1, ok: true })).toBe(false);
-    expect(Result.is({ ok: true, value: 1, unwrap: () => 1 })).toBe(false);
+    expect(isResultType({})).toBe(false);
+    expect(isResultType({ ok: true })).toBe(false);
+    expect(isResultType({ value: 1, ok: true })).toBe(false);
+    expect(isResultType({ ok: true, value: 1, unwrap: () => 1 })).toBe(false);
   });
 
   it('should return false for object with wrong types', () => {
     expect(
-      Result.is({
+      isResultType({
         ok: 'true',
         value: 1,
         unwrap: () => 1,
@@ -58,7 +65,7 @@ describe('result.ts', () => {
     ).toBe(false);
 
     expect(
-      Result.is({
+      isResultType({
         ok: true,
         value: 1,
         unwrap: 'not a function',
@@ -67,7 +74,7 @@ describe('result.ts', () => {
     ).toBe(false);
 
     expect(
-      Result.is({
+      isResultType({
         ok: true,
         value: 1,
         unwrap: () => 1,
@@ -82,9 +89,10 @@ describe('result.ts', () => {
       value: 42,
       unwrap: () => 42,
       orElse: () => 42,
+      orNullish: () => 42,
       extra: 'hello',
     };
-    expect(Result.is(obj)).toBe(true);
+    expect(isResultType(obj)).toBe(true);
   });
 
   it('should return OkResult with correct value and orElse', () => {
@@ -211,12 +219,6 @@ describe('result.ts', () => {
     expect(res).toBe(val);
   });
 
-  it('should return undefined if promise rejects and no default provided', async () => {
-    const promise = Promise.reject('error');
-    const res = await result.orElse(promise);
-    expect(res).toBeUndefined();
-  });
-
   it('should create a new Result instance', () => {
     const result = Result.create();
     expect(result).toBeInstanceOf(Result);
@@ -331,6 +333,42 @@ describe('result.ts', () => {
     expect(res.duration - 100000000n).toBe(0n);
   });
 
+  it('OkResult with null value returns default from orNullish', () => {
+    const ok = result.ok<string | null>(null);
+    expect(ok.orNullish('default')).toBe('default');
+  });
+
+  it('OkResult with undefined value returns default from orNullish', () => {
+    const ok = result.ok<number | undefined>(undefined);
+    expect(ok.orNullish(123)).toBe(123);
+  });
+
+  it('OkResult with non-nullish value returns original value from orNullish', () => {
+    const ok1 = result.ok('hello');
+    expect(ok1.orNullish('default')).toBe('hello');
+    const ok2 = result.ok(0);
+    expect(ok2.orNullish(123)).toBe(0);
+    const ok3 = result.ok(false);
+    expect(ok3.orNullish(true)).toBe(false);
+    const ok4 = result.ok('');
+    expect(ok4.orNullish('default')).toBe('');
+  });
+
+  it('ErrorResult always returns default from orNullish', () => {
+    const err = result.error(new Error('fail'));
+    expect(err.orNullish('default')).toBe('default');
+    expect(err.orNullish(42)).toBe(42);
+    expect(err.orNullish(null)).toBe(null);
+  });
+
+  it('orNullish works with complex default values', () => {
+    const defaultObj = { a: 1 };
+    const ok = result.ok<object | null>(null);
+    expect(ok.orNullish(defaultObj)).toBe(defaultObj);
+    const err = result.error('error');
+    expect(err.orNullish(defaultObj)).toBe(defaultObj);
+  });
+
   it('promise(fn) resolves OkResult', async () => {
     const fn = () => Promise.resolve('hello');
     const res = await result.promise(fn);
@@ -414,12 +452,5 @@ describe('result.ts', () => {
     const fn = () => Promise.reject(err);
     const val = await result.orElse(fn, 100);
     expect(val).toBe(100);
-  });
-
-  it('orElse(fn) returns undefined if no fallback', async () => {
-    const err = new Error('fail');
-    const fn = () => Promise.reject(err);
-    const val = await result.orElse(fn);
-    expect(val).toBeUndefined();
   });
 });

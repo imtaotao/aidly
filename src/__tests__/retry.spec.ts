@@ -1,4 +1,4 @@
-import { retry } from '../index';
+import { retry, Result } from '../index';
 
 describe('retry function tests', () => {
   it('should succeed on the first try', async () => {
@@ -110,5 +110,54 @@ describe('retry function tests', () => {
     await retry(errorFunction, 2).catch((e: unknown) => {
       expect(e).toEqual(11);
     });
+  });
+
+  it('should succeed immediately with OkResult', async () => {
+    const fn = jest.fn(() => Result.create().ok(42));
+    const res = await retry(fn, 3);
+    expect(res.value).toBe(42);
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('should retry on ErrorResult and eventually succeed', async () => {
+    let count = 0;
+    const fn = jest.fn(() => {
+      count++;
+      if (count < 3) {
+        return Result.create().error('fail');
+      }
+      return Result.create().ok('success');
+    });
+    const res = await retry(fn, 5);
+    expect(res.value).toBe('success');
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it('should reject after max retries with ErrorResult', async () => {
+    const fn = jest.fn(() => Result.create().error('fail'));
+    await expect(retry(fn, 2)).rejects.toBe('fail');
+    expect(fn).toHaveBeenCalledTimes(3); // initial + 2 retries
+  });
+
+  it('should retry on thrown error and eventually succeed', async () => {
+    let count = 0;
+    const fn = jest.fn(() => {
+      count++;
+      if (count < 2) {
+        throw new Error('fail');
+      }
+      return 'ok';
+    });
+    const res = await retry(fn, 3);
+    expect(res).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it('should reject after max retries on thrown error', async () => {
+    const fn = jest.fn(() => {
+      throw new Error('fail');
+    });
+    await expect(retry(fn, 1)).rejects.toThrow('fail');
+    expect(fn).toHaveBeenCalledTimes(2); // initial + 1 retry
   });
 });

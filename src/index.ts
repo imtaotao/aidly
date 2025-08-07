@@ -1,5 +1,12 @@
 import type { Prettify } from './types';
-import { toRawType, isSet, isArray, isAbsolute, isPlainObject } from './is';
+import {
+  toRawType,
+  isSet,
+  isArray,
+  isAbsolute,
+  isPlainObject,
+  isResultType,
+} from './is';
 
 export { Queue } from 'small-queue';
 export { KV } from './kv';
@@ -53,6 +60,7 @@ export {
   isWindow,
   isBrowser,
   isInBounds,
+  isResultType,
   isWhitespace,
   isEmptyObject,
   isPrimitiveValue,
@@ -419,7 +427,15 @@ export const retry = <T>(
     try {
       n++;
       const res = fn();
-      return Promise.resolve(res).catch((e) => timesOrCustomRetry(e, n, next));
+      return Promise.resolve(res).then(
+        (val) => {
+          if (isResultType(val)) {
+            return val.ok ? val : timesOrCustomRetry(val.value, n, next);
+          }
+          return val;
+        },
+        (e) => timesOrCustomRetry(e, n, next),
+      );
     } catch (e) {
       return timesOrCustomRetry(e, n, next);
     }

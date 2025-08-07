@@ -1,4 +1,5 @@
 import { phones } from './phoneRegExp';
+import type { ResultType } from './result';
 import type { TypedArray, PrimitiveType, PhoneLocales } from './types';
 
 const objectToString = Object.prototype.toString;
@@ -77,6 +78,18 @@ export const isWindow = (val: any): boolean => {
   return (
     typeof window !== 'undefined' &&
     objectToString.call(val) === '[object Window]'
+  );
+};
+
+export const isResultType = <T>(val: any): val is ResultType<T> => {
+  return (
+    typeof val === 'object' &&
+    val !== null &&
+    'value' in val &&
+    typeof val.ok === 'boolean' &&
+    typeof val.unwrap === 'function' &&
+    typeof val.orElse === 'function' &&
+    typeof val.orNullish === 'function'
   );
 };
 

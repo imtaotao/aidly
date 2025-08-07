@@ -1,5 +1,5 @@
 import { retry } from './index';
-import { isNil, isPromise } from './is';
+import { isNil, isPromise, isResultType } from './is';
 
 const INTERNAL = Symbol('Runner');
 
@@ -67,7 +67,7 @@ export class Runner<T extends number | bigint = number, E = unknown> {
       if (isPromise(res)) {
         res = res.then(
           (val) => {
-            this.code = '0';
+            this.code = isResultType(val) ? (val.ok ? '0' : '-1') : '0';
             this._setDuration(start, flag);
             this._onAfter?.(this, extra, val);
             return val;
@@ -80,7 +80,7 @@ export class Runner<T extends number | bigint = number, E = unknown> {
           },
         ) as R;
       } else {
-        this.code = '0';
+        this.code = isResultType(res) ? (res.ok ? '0' : '-1') : '0';
         this._setDuration(start, flag);
         this._onAfter?.(this, extra, res);
       }

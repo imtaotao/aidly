@@ -1,4 +1,4 @@
-import { sleep, Runner } from '../index';
+import { sleep, Runner, Result } from '../index';
 
 describe('runner.ts', () => {
   it('run sync function successfully', () => {
@@ -289,5 +289,114 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
     expect(runner.duration).not.toBe(0);
     expect(runner.duration).toBeGreaterThanOrEqual(15);
+  });
+
+  it('sync fn returns OkResult', () => {
+    const runner = Runner.create();
+    const ok = Result.create().ok(100);
+    const fn = jest.fn(() => ok);
+    const res = runner.run(fn);
+    expect(res).toBe(ok);
+    expect(runner.code).toBe('0');
+  });
+
+  it('sync fn returns ErrorResult', () => {
+    const runner = Runner.create();
+    const err = Result.create().error(new Error('error'));
+    const fn = jest.fn(() => err);
+    const res = runner.run(fn);
+    expect(res).toBe(err);
+    expect(runner.code).toBe('-1');
+  });
+
+  it('async fn resolves OkResult', async () => {
+    const runner = Runner.create();
+    const ok = Result.create().ok('ok async');
+    const fn = jest.fn(() => Promise.resolve(ok));
+    const res = await runner.run(fn);
+    expect(res).toBe(ok);
+    expect(runner.code).toBe('0');
+  });
+
+  it('async fn resolves ErrorResult', async () => {
+    const runner = Runner.create();
+    const err = Result.create().error(new Error('async error'));
+    const fn = jest.fn(() => Promise.resolve(err));
+    const res = await runner.run(fn);
+    expect(res).toBe(err);
+    expect(runner.code).toBe('-1');
+  });
+
+  it('retryRun: fn returns OkResult immediately', async () => {
+    const runner = Runner.create();
+    const fn = jest.fn(() => Result.create().ok('success'));
+    const res = await runner.retryRun(fn, 3);
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe('success');
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(runner.code).toBe('0');
+  });
+
+  it('retryRun: fn returns ErrorResult and eventually OkResult', async () => {
+    const runner = Runner.create();
+    let count = 0;
+    const fn = jest.fn(() => {
+      count++;
+      if (count < 3) {
+        return Result.create().error('fail');
+      }
+      return Result.create().ok('ok');
+    });
+    const res = await runner.retryRun(fn, 5);
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(3);
+    expect(runner.code).toBe('0');
+  });
+
+  it('retryRun: fn returns ErrorResult and fails after max retries', async () => {
+    const runner = Runner.create();
+    const fn = jest.fn(() => Result.create().error('fail'));
+    await expect(runner.retryRun(fn, 2)).rejects.toBe('fail');
+    expect(fn).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
+    expect(runner.code).toBe('-1');
+  });
+
+  it('timedRetryRun: fn returns OkResult immediately', async () => {
+    const runner = Runner.create();
+    const fn = jest.fn(() => Result.create().ok(123));
+    const res = await runner.timedRetryRun(fn, 3);
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe(123);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(runner.code).toBe('0');
+    expect(typeof runner.duration).toBe('number');
+  });
+
+  it('timedRetryRun: fn returns ErrorResult and eventually OkResult', async () => {
+    const runner = Runner.create();
+    let count = 0;
+    const fn = jest.fn(() => {
+      count++;
+      if (count < 2) {
+        return Result.create().error(new Error('fail'));
+      }
+      return Result.create().ok('done');
+    });
+    const res = await runner.timedRetryRun(fn, 5);
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe('done');
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(runner.code).toBe('0');
+    expect(typeof runner.duration).toBe('number');
+  });
+
+  it('timedRetryRun: fn returns ErrorResult and fails after retries', async () => {
+    const runner = Runner.create();
+    const fn = jest.fn(() => Result.create().error('fail'));
+    await expect(runner.timedRetryRun(fn, 1)).rejects.toBe('fail');
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(runner.code).toBe('-1');
+    expect(typeof runner.duration).toBe('number');
   });
 });
