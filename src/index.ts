@@ -16,9 +16,9 @@ export { clone } from './clone';
 export { merge } from './merge';
 export { loopSlice } from './loopSlice';
 export { throttle, debounce } from './throttle';
-export { Runner, type RunnerOptions } from './runner';
 export { createCacheObject, type CacheUnit } from './cache';
 export { exec, inlineString, type ExecOptions } from './exec';
+export { Runner, type RunnerOptions, type RunnerReturnType } from './runner';
 export {
   Result,
   type OkResult,
