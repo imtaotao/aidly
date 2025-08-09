@@ -29,33 +29,3 @@ exports[`index.ts unindent: with leading indent 1`] = `
   b()
 }"
 `;
-
-exports[`test unindent: base 1`] = `
-"if (a) {
-  b()
-}"
-`;
-
-exports[`test unindent: indent deep 1`] = `
-"    if (a) {
-    b()
-}"
-`;
-
-exports[`test unindent: multi-start and end 1`] = `
-"    if (a) {
-  b()
-}"
-`;
-
-exports[`test unindent: no start or end 1`] = `
-"if (a) {
-    b()
-  }"
-`;
-
-exports[`test unindent: with leading indent 1`] = `
-"    if (a) {
-  b()
-}"
-`;

@@ -399,4 +399,178 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('-1');
     expect(typeof runner.duration).toBe('number');
   });
+
+  it('should return a Result when options.result is true', () => {
+    const options = { result: true };
+    const runner = Runner.create({ result: true });
+    const fn = () => 42;
+    const res = runner.run(fn, options);
+
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe(42);
+  });
+
+  it('should return a Result with the correct value from a promise', async () => {
+    const options = { result: true };
+    const runner = Runner.create({ result: true });
+    const fn = () => Promise.resolve(100);
+    const res = await runner.run(fn, options);
+
+    expect(res.ok).toBe(true);
+    expect(res.value).toBe(100);
+    expect(runner.code).toBe('0');
+    expect(runner.duration).toBe(0);
+  });
+
+  it('should return an OkResult with duration when using timedPromise', async () => {
+    const options = { result: true };
+    const fn = () =>
+      new Promise((resolve) => setTimeout(() => resolve(50), 10));
+    const runner = Runner.create({ result: true });
+    const timedResult = await runner.timedRun(fn, options);
+
+    expect(timedResult.ok).toBe(true);
+    expect(timedResult.value).toBe(50);
+    expect(runner.code).toBe('0');
+    expect(runner.duration).toBeGreaterThanOrEqual(10);
+  });
+
+  it('should return an OkResult with an array of values from promiseAll', async () => {
+    const options = { result: true };
+    const fn = () => Promise.all([Promise.resolve('A'), Promise.resolve('B')]);
+    const runner = Runner.create({ result: true });
+    const allResult = await runner.run(fn, options);
+
+    expect(allResult.ok).toBe(true);
+    expect(allResult.value).toEqual(['A', 'B']);
+    expect(runner.code).toBe('0');
+    expect(runner.duration).toBe(0);
+  });
+
+  it('should return the same value in orElse when options.result is true', async () => {
+    const options = { result: true };
+    const fn = () => Promise.resolve('Hello');
+    const runner = Runner.create({ result: true });
+    const res = await runner.run(fn, options);
+
+    expect(res.orElse('Default')).toBe('Hello');
+    expect(runner.code).toBe('0');
+  });
+
+  it('should return the fallback value in orNullish when the value is nullish', async () => {
+    const options = { result: true };
+    const fn = () => Promise.resolve(null);
+    const runner = Runner.create({ result: true });
+    const res = await runner.run(fn, options);
+
+    expect(res.orNullish('Fallback Value')).toBe('Fallback Value');
+    expect(runner.code).toBe('0');
+  });
+
+  it('should call onBefore and onAfter hooks with correct parameters', () => {
+    let called = false;
+    const onBefore = jest.fn();
+    const runner = Runner.create({
+      result: true,
+      onBefore,
+      onAfter(r, extra, e) {
+        called = true;
+        expect(r).toBe(runner);
+        expect(extra).toBeUndefined();
+        expect(e.ok).toBe(true);
+        expect(e.value).toBe(42);
+      },
+    });
+
+    const fn = () => 42;
+    runner.run(fn);
+
+    expect(runner.code).toBe('0');
+    expect(onBefore).toHaveBeenCalledWith(runner, undefined);
+    expect(called).toBe(true);
+  });
+
+  it('should return the same value in orElse when options.result is true', async () => {
+    const fn = () => Promise.resolve('Hello');
+    const runner = Runner.create({ result: true });
+    const res = await runner.run(fn);
+
+    expect(runner.code).toBe('0');
+    expect(res.orElse('Default')).toBe('Hello');
+  });
+
+  it('should return the fallback value in orNullish when the value is nullish', async () => {
+    const fn = () => Promise.resolve(null);
+    const runner = Runner.create({ result: true });
+    const res = await runner.run(fn);
+
+    expect(runner.code).toBe('0');
+    expect(res.orNullish('Fallback Value')).toBe('Fallback Value');
+  });
+
+  it('should return an ErrorResult when the function throws an error', () => {
+    const fn = () => {
+      throw new Error('Test Error');
+    };
+    const runner = Runner.create({ result: true });
+    const res = runner.run(fn);
+
+    expect(runner.code).toBe('-1');
+    expect(res.ok).toBe(false);
+    expect(res.value).toBeInstanceOf(Error);
+    expect((res.value as Error).message).toBe('Test Error');
+  });
+
+  it('should return an ErrorResult when the promise is rejected', async () => {
+    const fn = () => Promise.reject(new Error('Rejected Error'));
+    const runner = Runner.create({ result: true });
+    const res = await runner.run(fn);
+
+    expect(runner.code).toBe('-1');
+    expect(res.ok).toBe(false);
+    expect(res.value).toBeInstanceOf(Error);
+    expect((res.value as Error).message).toBe('Rejected Error');
+  });
+
+  it('should call onAfter with error when function throws an error', () => {
+    let called = false;
+    const runner = Runner.create({
+      result: true,
+      onAfter(r, extra, e) {
+        called = true;
+        expect(r).toBe(runner);
+        expect(extra).toBeUndefined();
+        expect(e.ok).toBe(false);
+        expect((e.value as Error).message).toBe('Test Error');
+      },
+    });
+
+    const fn = () => {
+      throw new Error('Test Error');
+    };
+    runner.run(fn);
+
+    expect(runner.code).toBe('-1');
+    expect(called).toBe(true);
+  });
+
+  it('should call onAfter with error when promise is rejected', async () => {
+    let called = false;
+    const runner = Runner.create({
+      result: true,
+      onAfter(r, extra, e) {
+        called = true;
+        expect(r).toBe(runner);
+        expect(extra).toBeUndefined();
+        expect(e.ok).toBe(false);
+        expect((e.value as Error).message).toBe('Rejected Error');
+      },
+    });
+
+    const fn = () => Promise.reject(new Error('Rejected Error'));
+    await runner.run(fn);
+
+    expect(runner.code).toBe('-1');
+    expect(called).toBe(true);
+  });
 });
