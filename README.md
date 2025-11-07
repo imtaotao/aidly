@@ -124,6 +124,7 @@ Api                  | Description
 `Runner`             | Runner, used to wrap synchronous/asynchronous functions, count time consumption, status code, and provide hooks before and after calls.
 `KV`                 | Key-value pair type.
 `inlineString`       | Quantify the string constant.
+`topologicalSort`    | Topological sort for directed acyclic graphs.
 `exec`               | Execute JavaScript code, which can be run in `cjs`, `esm`, or `normal` mode, with normal mode being the default.
 `mathExprEvaluate`   | Execute mathematical expressions.
 `batchProcess`       | Used for transactional batch processing, for example: `const set = batchProcess({ ms: 50, processor(ls) { ... } });`

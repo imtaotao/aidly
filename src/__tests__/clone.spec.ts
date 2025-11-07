@@ -1,7 +1,7 @@
 import { clone, isTypedArray, jsonStringify } from '../index';
 
 describe('clone.ts', () => {
-  it('clone Map', () => {
+  test('clone Map', () => {
     const map = new Map();
     // simple key/value
     map.set('foo', 'bar');
@@ -21,7 +21,7 @@ describe('clone.ts', () => {
     expect((clonedMap as any).circle === clonedMap).toBe(true);
   });
 
-  it('clone Set', () => {
+  test('clone Set', () => {
     const set = new Set();
     // simple entry
     set.add('foo');
@@ -42,7 +42,7 @@ describe('clone.ts', () => {
     expect((clonedSet as any).circle === clonedSet).toBe(true);
   });
 
-  it('clone Array', () => {
+  test('clone Array', () => {
     const a = [{ foo: 'bar' }, 'baz'];
     const b = clone(a);
 
@@ -50,7 +50,7 @@ describe('clone.ts', () => {
     expect(b).toStrictEqual(a);
   });
 
-  it('clone TypeArray', () => {
+  test('clone TypeArray', () => {
     const arr = new Float32Array([10, 11]);
     const cloned = clone(arr);
 
@@ -63,7 +63,7 @@ describe('clone.ts', () => {
     expect(isTypedArray(cloned)).toBe(true);
   });
 
-  it('clone Date', () => {
+  test('clone Date', () => {
     const a = new Date();
     const b = clone(a);
 
@@ -72,7 +72,7 @@ describe('clone.ts', () => {
     expect(a.getTime() === b.getTime()).toBe(true);
   });
 
-  it('clone Error', () => {
+  test('clone Error', () => {
     const a = new Error('err msg!');
     const b = clone(a);
 
@@ -82,7 +82,7 @@ describe('clone.ts', () => {
     expect(b.message === a.message).toBe(true);
   });
 
-  it('clone RegExp', () => {
+  test('clone RegExp', () => {
     const a = /abc123/gi;
     const b = clone(a);
 
@@ -99,7 +99,7 @@ describe('clone.ts', () => {
     expect(d.lastIndex === 4).toBe(true);
   });
 
-  it('clone Promise', async () => {
+  test('clone Promise', async () => {
     const allDonePromises = [];
 
     // Resolving to a value
@@ -151,7 +151,7 @@ describe('clone.ts', () => {
     await Promise.all(allDonePromises);
   });
 
-  it('clone object with circular reference (1)', () => {
+  test('clone object with circular reference (1)', () => {
     const obj = { num: 1, b: null };
     (obj as any).b = obj;
     const cloned = clone(obj);
@@ -163,7 +163,7 @@ describe('clone.ts', () => {
     expect(cloned.num === 1).toBe(true);
   });
 
-  it('clone object with circular reference (2)', () => {
+  test('clone object with circular reference (2)', () => {
     const eq = (x: unknown, y: unknown) =>
       jsonStringify(x) === jsonStringify(y);
     const c = [1, 'foo', { hello: 'bar' }, function () {}, false, [2]];
@@ -190,7 +190,7 @@ describe('clone.ts', () => {
     expect(!eq(a, aCopy)).toBe(true);
   });
 
-  it('clone DefaultMap', () => {
+  test('clone DefaultMap', () => {
     class DefaultMap extends Map {
       public a = 1;
       public o = { num: 2 };
@@ -227,7 +227,7 @@ describe('clone.ts', () => {
     ).toBe(true);
   });
 
-  it('clone getter', () => {
+  test('clone getter', () => {
     const obj = { b: { num: 1 } };
     Object.defineProperty(obj, 'x', {
       enumerable: true,
@@ -246,7 +246,7 @@ describe('clone.ts', () => {
     expect((cloned as any).x.num === (obj as any).x.num).toBe(true);
   });
 
-  it('clone object with no constructor', () => {
+  test('clone object with no constructor', () => {
     const n = null;
     const a = { foo: 'bar' };
     (a as any).__proto__ = n;
@@ -258,14 +258,14 @@ describe('clone.ts', () => {
     expect(a.foo === b.foo).toBe(true);
   });
 
-  it('maintain prototype chain in clones', () => {
+  test('maintain prototype chain in clones', () => {
     function T() {}
     const a = new (T as any)();
     const b = clone(a);
     expect(Object.getPrototypeOf(a) === Object.getPrototypeOf(b)).toBe(true);
   });
 
-  it('check what happens when there is a conflict in inheritance chain functions', () => {
+  test('check what happens when there is a conflict in inheritance chain functions', () => {
     class T {
       constructor() {
         (this as any).a = 1;
@@ -294,7 +294,7 @@ describe('clone.ts', () => {
     );
   });
 
-  it('clone object with symbol properties', () => {
+  test('clone object with symbol properties', () => {
     const symbol = Symbol();
     const obj = {} as Record<PropertyKey, unknown>;
     obj[symbol] = 'foo';
@@ -304,7 +304,7 @@ describe('clone.ts', () => {
     expect(child[symbol] === 'foo').toBe(true);
   });
 
-  it('symbols are treated as primitives', () => {
+  test('symbols are treated as primitives', () => {
     const symbol = Symbol();
     const obj = { foo: symbol };
     const child = clone(obj);
@@ -313,7 +313,7 @@ describe('clone.ts', () => {
     expect(child.foo === obj.foo).toBe(true);
   });
 
-  it('clone only enumerable symbol properties', () => {
+  test('clone only enumerable symbol properties', () => {
     const source = {} as any;
     const symbol1 = Symbol('the first symbol');
     const symbol2 = Symbol('the second symbol');
@@ -332,7 +332,7 @@ describe('clone.ts', () => {
     expect(cloned[symbol3]).toBe(3);
   });
 
-  it('clone should ignore non-enumerable properties by default', () => {
+  test('clone should ignore non-enumerable properties by default', () => {
     const source = {
       x: 1,
       y: 2,
@@ -360,7 +360,7 @@ describe('clone.ts', () => {
     expect(Object.hasOwnProperty.call(cloned, symbol2)).toBe(false);
   });
 
-  it('clone should support cloning non-enumerable properties', () => {
+  test('clone should support cloning non-enumerable properties', () => {
     const source = { x: 1, b: [2] };
     Object.defineProperty(source, 'b', {
       enumerable: false,
@@ -381,7 +381,7 @@ describe('clone.ts', () => {
     expect((cloned as any)[symbol].x === 3).toBe(true);
   });
 
-  it('clone should mark the cloned non-enumerable properties as non-enumerable', () => {
+  test('clone should mark the cloned non-enumerable properties as non-enumerable', () => {
     const source = { x: 1, y: 2 };
     Object.defineProperty(source, 'y', {
       enumerable: false,
@@ -408,7 +408,7 @@ describe('clone.ts', () => {
     );
   });
 
-  it('check exclude', () => {
+  test('check exclude', () => {
     const obj = {
       a: { num: 1 },
       b: { num: 2 },

@@ -1,7 +1,7 @@
 import { uuid } from '../index';
 
 describe('uuid.ts', () => {
-  it('uuid', () => {
+  test('uuid', () => {
     const last = new Set(['00000000-0000-0000-0000-000000000000']);
     for (let i = 0; i < 1000; i++) {
       const id = uuid();

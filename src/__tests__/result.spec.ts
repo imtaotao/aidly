@@ -11,7 +11,7 @@ describe('result.ts', () => {
     result = new Result();
   });
 
-  it('should return true for OkResult object', () => {
+  test('should return true for OkResult object', () => {
     const okObj: OkResult<number> = {
       ok: true,
       value: 123,
@@ -22,7 +22,7 @@ describe('result.ts', () => {
     expect(isResultType(okObj)).toBe(true);
   });
 
-  it('should return true for ErrorResult object', () => {
+  test('should return true for ErrorResult object', () => {
     const errObj: ErrorResult = {
       ok: false,
       value: new Error('fail'),
@@ -35,26 +35,26 @@ describe('result.ts', () => {
     expect(isResultType(errObj)).toBe(true);
   });
 
-  it('should return false for null or undefined', () => {
+  test('should return false for null or undefined', () => {
     expect(isResultType(null)).toBe(false);
     expect(isResultType(undefined)).toBe(false);
   });
 
-  it('should return false for primitives', () => {
+  test('should return false for primitives', () => {
     expect(isResultType(123)).toBe(false);
     expect(isResultType('string')).toBe(false);
     expect(isResultType(true)).toBe(false);
     expect(isResultType(Symbol('sym'))).toBe(false);
   });
 
-  it('should return false for object missing keys', () => {
+  test('should return false for object missing keys', () => {
     expect(isResultType({})).toBe(false);
     expect(isResultType({ ok: true })).toBe(false);
     expect(isResultType({ value: 1, ok: true })).toBe(false);
     expect(isResultType({ ok: true, value: 1, unwrap: () => 1 })).toBe(false);
   });
 
-  it('should return false for object with wrong types', () => {
+  test('should return false for object with wrong types', () => {
     expect(
       isResultType({
         ok: 'true',
@@ -83,7 +83,7 @@ describe('result.ts', () => {
     ).toBe(false);
   });
 
-  it('should return true for object with extra properties', () => {
+  test('should return true for object with extra properties', () => {
     const obj = {
       ok: true,
       value: 42,
@@ -95,7 +95,7 @@ describe('result.ts', () => {
     expect(isResultType(obj)).toBe(true);
   });
 
-  it('should return OkResult with correct value and orElse', () => {
+  test('should return OkResult with correct value and orElse', () => {
     const val = 123;
     const res = result.ok(val);
     expect(res.ok).toBe(true);
@@ -103,7 +103,7 @@ describe('result.ts', () => {
     expect(res.orElse()).toBe(val);
   });
 
-  it('should return ErrorResult with error and originalError', () => {
+  test('should return ErrorResult with error and originalError', () => {
     const err = new Error('test error');
     const res = result.error(err);
     expect(res.ok).toBe(false);
@@ -112,7 +112,7 @@ describe('result.ts', () => {
     expect(res.orElse(null)).toBeNull();
   });
 
-  it('should return ok result for successful sync function', () => {
+  test('should return ok result for successful sync function', () => {
     const fn = jest.fn(() => 42);
     const res = result.run(fn);
     expect(fn).toHaveBeenCalled();
@@ -123,7 +123,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return error result for sync function throwing Error', () => {
+  test('should return error result for sync function throwing Error', () => {
     const error = new Error('fail');
     const fn = jest.fn(() => {
       throw error;
@@ -136,7 +136,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should wrap non-Error thrown values', () => {
+  test('should wrap non-Error thrown values', () => {
     const thrown = 'string error';
     const fn = jest.fn(() => {
       throw thrown;
@@ -148,7 +148,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return ok result for resolved promise', async () => {
+  test('should return ok result for resolved promise', async () => {
     const promise = Promise.resolve('success');
     const res = await result.promise(promise);
     expect(res.ok).toBe(true);
@@ -158,7 +158,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return error result for rejected promise with Error', async () => {
+  test('should return error result for rejected promise with Error', async () => {
     const error = new Error('fail');
     const promise = Promise.reject(error);
     const res = await result.promise(promise);
@@ -168,7 +168,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should wrap non-Error rejection values', async () => {
+  test('should wrap non-Error rejection values', async () => {
     const thrown = 12345;
     const promise = Promise.reject(thrown);
     const res = await result.promise(promise);
@@ -178,7 +178,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return ok result with array for all resolved promises', async () => {
+  test('should return ok result with array for all resolved promises', async () => {
     const promises = [
       Promise.resolve(1),
       Promise.resolve(2),
@@ -191,7 +191,7 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return error result if any promise rejects', async () => {
+  test('should return error result if any promise rejects', async () => {
     const error = new Error('fail');
     const promises = [
       Promise.resolve(1),
@@ -205,46 +205,46 @@ describe('result.ts', () => {
     }
   });
 
-  it('should return resolved value if promise resolves', async () => {
+  test('should return resolved value if promise resolves', async () => {
     const promise = Promise.resolve('value');
     const val = 'default';
     const res = await result.orElse(promise, val);
     expect(res).toBe('value');
   });
 
-  it('should return default value if promise rejects', async () => {
+  test('should return default value if promise rejects', async () => {
     const promise = Promise.reject('error');
     const val = 'default';
     const res = await result.orElse(promise, val);
     expect(res).toBe(val);
   });
 
-  it('should create a new Result instance', () => {
+  test('should create a new Result instance', () => {
     const result = Result.create();
     expect(result).toBeInstanceOf(Result);
   });
 
-  it('should return the value when unwrap is called on OkResult', () => {
+  test('should return the value when unwrap is called on OkResult', () => {
     const val = 123;
     const okResult = result.ok(val);
     expect(okResult.ok).toBe(true);
     expect(okResult.unwrap()).toBe(val);
   });
 
-  it('should throw the original error when unwrap is called on ErrorResult', () => {
+  test('should throw the original error when unwrap is called on ErrorResult', () => {
     const error = new Error('test error');
     const errorResult = result.error(error);
     expect(errorResult.ok).toBe(false);
     expect(() => errorResult.unwrap()).toThrowError(error);
   });
 
-  it('should throw a normalized error when unwrap is called on ErrorResult created from non-Error', () => {
+  test('should throw a normalized error when unwrap is called on ErrorResult created from non-Error', () => {
     const thrown = 'string error';
     const errorResult = result.error(new Error(String(thrown)));
     expect(() => errorResult.unwrap()).toThrow('string error');
   });
 
-  it('timedPromise resolves correctly with duration', async () => {
+  test('timedPromise resolves correctly with duration', async () => {
     const result = Result.create();
     const promise = new Promise<number>((resolve) =>
       setTimeout(() => resolve(42), 50),
@@ -256,7 +256,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(50);
   });
 
-  it('timedPromise rejects correctly with duration', async () => {
+  test('timedPromise rejects correctly with duration', async () => {
     const result = Result.create();
     const error = new Error('fail');
     const promise = new Promise<number>((_, reject) =>
@@ -269,7 +269,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(30);
   });
 
-  it('timedPromiseAll resolves correctly with duration', async () => {
+  test('timedPromiseAll resolves correctly with duration', async () => {
     const result = Result.create();
     const promises = [
       new Promise<number>((resolve) => setTimeout(() => resolve(1), 20)),
@@ -283,7 +283,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(40);
   });
 
-  it('timedPromiseAll rejects correctly with duration', async () => {
+  test('timedPromiseAll rejects correctly with duration', async () => {
     const result = Result.create();
     const error = new Error('fail');
     const promises = [
@@ -298,7 +298,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(25);
   });
 
-  it('timedPromise resolves and duration is bigint nanoseconds', async () => {
+  test('timedPromise resolves and duration is bigint nanoseconds', async () => {
     let fakeTime = 0n;
     const now = () => {
       fakeTime += 100000000n;
@@ -315,7 +315,7 @@ describe('result.ts', () => {
     expect(res.duration - 100000000n).toBe(0n);
   });
 
-  it('timedPromise rejects and duration is bigint nanoseconds', async () => {
+  test('timedPromise rejects and duration is bigint nanoseconds', async () => {
     let fakeTime = 0n;
     const now = () => {
       fakeTime += 100000000n;
@@ -333,17 +333,17 @@ describe('result.ts', () => {
     expect(res.duration - 100000000n).toBe(0n);
   });
 
-  it('OkResult with null value returns default from orNullish', () => {
+  test('OkResult with null value returns default from orNullish', () => {
     const ok = result.ok<string | null>(null);
     expect(ok.orNullish('default')).toBe('default');
   });
 
-  it('OkResult with undefined value returns default from orNullish', () => {
+  test('OkResult with undefined value returns default from orNullish', () => {
     const ok = result.ok<number | undefined>(undefined);
     expect(ok.orNullish(123)).toBe(123);
   });
 
-  it('OkResult with non-nullish value returns original value from orNullish', () => {
+  test('OkResult with non-nullish value returns original value from orNullish', () => {
     const ok1 = result.ok('hello');
     expect(ok1.orNullish('default')).toBe('hello');
     const ok2 = result.ok(0);
@@ -354,14 +354,14 @@ describe('result.ts', () => {
     expect(ok4.orNullish('default')).toBe('');
   });
 
-  it('ErrorResult always returns default from orNullish', () => {
+  test('ErrorResult always returns default from orNullish', () => {
     const err = result.error(new Error('fail'));
     expect(err.orNullish('default')).toBe('default');
     expect(err.orNullish(42)).toBe(42);
     expect(err.orNullish(null)).toBe(null);
   });
 
-  it('orNullish works with complex default values', () => {
+  test('orNullish works with complex default values', () => {
     const defaultObj = { a: 1 };
     const ok = result.ok<object | null>(null);
     expect(ok.orNullish(defaultObj)).toBe(defaultObj);
@@ -369,14 +369,14 @@ describe('result.ts', () => {
     expect(err.orNullish(defaultObj)).toBe(defaultObj);
   });
 
-  it('promise(fn) resolves OkResult', async () => {
+  test('promise(fn) resolves OkResult', async () => {
     const fn = () => Promise.resolve('hello');
     const res = await result.promise(fn);
     expect(res.ok).toBe(true);
     expect(res.value).toBe('hello');
   });
 
-  it('promise(fn) returns ErrorResult on rejection', async () => {
+  test('promise(fn) returns ErrorResult on rejection', async () => {
     const err = new Error('fail');
     const fn = () => Promise.reject(err);
     const res = await result.promise(fn);
@@ -384,7 +384,7 @@ describe('result.ts', () => {
     expect(res.value).toBe(err);
   });
 
-  it('timedPromise(fn) resolves OkResult with duration', async () => {
+  test('timedPromise(fn) resolves OkResult with duration', async () => {
     const fn = () =>
       new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 10));
     const res = await result.timedPromise(fn);
@@ -394,7 +394,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(10);
   });
 
-  it('timedPromise(fn) returns ErrorResult with duration on reject', async () => {
+  test('timedPromise(fn) returns ErrorResult with duration on reject', async () => {
     const err = new Error('fail');
     const fn = () =>
       new Promise<string>((_, reject) => setTimeout(() => reject(err), 10));
@@ -405,7 +405,7 @@ describe('result.ts', () => {
     expect(res.duration).toBeGreaterThanOrEqual(10);
   });
 
-  it('promiseAll(fn) resolves OkResult with array', async () => {
+  test('promiseAll(fn) resolves OkResult with array', async () => {
     const fn = () => [
       Promise.resolve(1),
       Promise.resolve(2),
@@ -416,7 +416,7 @@ describe('result.ts', () => {
     expect(res.value).toEqual([1, 2, 3]);
   });
 
-  it('promiseAll(fn) returns ErrorResult on any rejection', async () => {
+  test('promiseAll(fn) returns ErrorResult on any rejection', async () => {
     const err = new Error('fail');
     const fn = () => [Promise.resolve(1), Promise.reject(err)];
     const res = await result.promiseAll(fn);
@@ -424,7 +424,7 @@ describe('result.ts', () => {
     expect(res.value).toBe(err);
   });
 
-  it('timedPromiseAll(fn) resolves OkResult with duration', async () => {
+  test('timedPromiseAll(fn) resolves OkResult with duration', async () => {
     const fn = () => [Promise.resolve(1), Promise.resolve(2)];
     const res = await result.timedPromiseAll(fn);
     expect(res.ok).toBe(true);
@@ -432,7 +432,7 @@ describe('result.ts', () => {
     expect(typeof res.duration).toBe('number');
   });
 
-  it('timedPromiseAll(fn) returns ErrorResult with duration on reject', async () => {
+  test('timedPromiseAll(fn) returns ErrorResult with duration on reject', async () => {
     const err = new Error('fail');
     const fn = () => [Promise.resolve(1), Promise.reject(err)];
     const res = await result.timedPromiseAll(fn);
@@ -441,13 +441,13 @@ describe('result.ts', () => {
     expect(typeof res.duration).toBe('number');
   });
 
-  it('orElse(fn) returns resolved value', async () => {
+  test('orElse(fn) returns resolved value', async () => {
     const fn = () => Promise.resolve(42);
     const val = await result.orElse(fn, 100);
     expect(val).toBe(42);
   });
 
-  it('orElse(fn) returns fallback on reject', async () => {
+  test('orElse(fn) returns fallback on reject', async () => {
     const err = new Error('fail');
     const fn = () => Promise.reject(err);
     const val = await result.orElse(fn, 100);

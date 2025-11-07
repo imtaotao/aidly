@@ -124,6 +124,7 @@ Api                  | 描述
 `Runner`             | 运行器类，用于包装同步/异步函数，统计耗时，状态码，提供调用前后的钩子。
 `KV`                 | 键值对类型。
 `inlineString`       | 将字符串常量化。
+`topologicalSort`    | 对有向无环图进行拓扑排序。
 `exec`               | 执行一段 js 代码，可以以 `cjs`，`esm` 和普通模式来执行代码，默认为普通模式。
 `mathExprEvaluate`   | 数学计算表达式求值。
 `batchProcess`       | 用于事务的批量处理，例如: `const set = batchProcess({ ms: 50, process(ls) { ... } });`。

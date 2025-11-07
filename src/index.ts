@@ -20,6 +20,11 @@ export { createCacheObject, type CacheUnit } from './cache';
 export { exec, inlineString, type ExecOptions } from './exec';
 export { Runner, type RunnerOptions, type RunnerReturnType } from './runner';
 export {
+  topologicalSort,
+  type TopologicalSortNode,
+  type TopologicalSortError,
+} from './topologicalSort';
+export {
   Result,
   type OkResult,
   type ErrorResult,

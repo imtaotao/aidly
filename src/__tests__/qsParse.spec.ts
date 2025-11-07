@@ -1,7 +1,7 @@
 import { qsParse } from '../index';
 
 describe('qsParse', () => {
-  it('parses', () => {
+  test('parses', () => {
     expect(qsParse('0=foo')).toEqual({ 0: 'foo' });
     expect(qsParse('foo=c++')).toEqual({ foo: 'c  ' });
     expect(qsParse('a[>=]=23')).toEqual({ a: { '>=': '23' } });
@@ -34,7 +34,7 @@ describe('qsParse', () => {
     });
   });
 
-  it('comma: false', () => {
+  test('comma: false', () => {
     expect(qsParse('a[]=b&a[]=c', { comma: false })).toEqual({ a: ['b', 'c'] });
     expect(qsParse('a[0]=b&a[1]=c', { comma: false })).toEqual({
       a: ['b', 'c'],
@@ -43,7 +43,7 @@ describe('qsParse', () => {
     expect(qsParse('a=b&a=c', { comma: false })).toEqual({ a: ['b', 'c'] });
   });
 
-  it('comma: default true', () => {
+  test('comma: default true', () => {
     expect(qsParse('a[]=b&a[]=c')).toEqual({ a: ['b', 'c'] });
     expect(qsParse('a[0]=b&a[1]=c')).toEqual({
       a: ['b', 'c'],
@@ -52,7 +52,7 @@ describe('qsParse', () => {
     expect(qsParse('a=b&a=c')).toEqual({ a: ['b', 'c'] });
   });
 
-  it('decode dot keys correctly', () => {
+  test('decode dot keys correctly', () => {
     expect(qsParse('name%252Eobj.first=John&name%252Eobj.last=Doe')).toEqual({
       'name%2Eobj.first': 'John',
       'name%2Eobj.last': 'Doe',
@@ -71,34 +71,34 @@ describe('qsParse', () => {
     });
   });
 
-  it('array index', () => {
+  test('array index', () => {
     expect(qsParse('a[20]=a', { allowSparse: false })).toEqual({ a: ['a'] });
     expect(qsParse('a[12b]=c')).toEqual({ a: { '12b': 'c' } });
   });
 
-  it('supports encoded = signs', () => {
+  test('supports encoded = signs', () => {
     expect(qsParse('he%3Dllo=th%3Dere')).toEqual({ 'he=llo': 'th=ere' });
   });
 
-  it('is ok with url encoded strings', () => {
+  test('is ok with url encoded strings', () => {
     expect(qsParse('a[b%20c]=d')).toEqual({ a: { 'b c': 'd' } });
     expect(qsParse('a[b]=c%20d')).toEqual({ a: { b: 'c d' } });
   });
 
-  it('allows brackets in the value', () => {
+  test('allows brackets in the value', () => {
     expect(qsParse('pets=["tobi"]')).toEqual({ pets: '["tobi"]' });
     expect(qsParse('operators=[">=", "<="]', { comma: false })).toEqual({
       operators: '[">=", "<="]',
     });
   });
 
-  it('allows empty values', () => {
+  test('allows empty values', () => {
     expect(qsParse('')).toEqual({});
     expect(qsParse(null)).toEqual({});
     expect(qsParse(undefined)).toEqual({});
   });
 
-  it('transforms arrays to objects', () => {
+  test('transforms arrays to objects', () => {
     expect(qsParse('foo[0]=bar&foo[bad]=baz')).toEqual({
       foo: { 0: 'bar', bad: 'baz' },
     });
@@ -130,13 +130,13 @@ describe('qsParse', () => {
     });
   });
 
-  it('correctly prunes undefined values when converting an array to an object', () => {
+  test('correctly prunes undefined values when converting an array to an object', () => {
     expect(qsParse('a[2]=b&a[99999999]=c')).toEqual({
       a: { 2: 'b', 99999999: 'c' },
     });
   });
 
-  it('supports malformed uri characters', () => {
+  test('supports malformed uri characters', () => {
     expect(qsParse('{%:%}=')).toEqual({ '{%:%}': '' });
     expect(qsParse('foo=%:%}')).toEqual({ foo: '%:%}' });
   });
@@ -145,18 +145,18 @@ describe('qsParse', () => {
     expect(qsParse('_r=1&')).toEqual({ _r: '1' });
   });
 
-  it('cannot access Object prototype', () => {
+  test('cannot access Object prototype', () => {
     qsParse('constructor[prototype][bad]=bad');
     qsParse('bad[constructor][prototype][bad]=bad');
     expect(typeof (Object.prototype as any).bad === 'undefined').toBe(true);
   });
 
-  it('parses arrays of objects', () => {
+  test('parses arrays of objects', () => {
     expect(qsParse('a[][b]=c')).toEqual({ a: [{ b: 'c' }] });
     expect(qsParse('a[0][b]=c')).toEqual({ a: [{ b: 'c' }] });
   });
 
-  it('allows for empty strings in arrays', () => {
+  test('allows for empty strings in arrays', () => {
     expect(qsParse('a[]=b&a[]=&a[]=c')).toEqual({ a: ['b', '', 'c'] });
 
     expect(
@@ -169,7 +169,7 @@ describe('qsParse', () => {
     expect(qsParse('a[]=&a[]=b&a[]=c')).toEqual({ a: ['', 'b', 'c'] });
   });
 
-  it('compacts sparse arrays', () => {
+  test('compacts sparse arrays', () => {
     expect(qsParse('a[10]=1&a[2]=2', { allowSparse: false })).toEqual({
       a: ['2', '1'],
     });
@@ -184,7 +184,7 @@ describe('qsParse', () => {
     });
   });
 
-  it('parses sparse arrays: default true', () => {
+  test('parses sparse arrays: default true', () => {
     expect(qsParse('a[4]=1&a[1]=2')).toEqual({
       a: [, '2', , , '1'],
     });
@@ -199,7 +199,7 @@ describe('qsParse', () => {
     });
   });
 
-  it('parses jquery-param strings', () => {
+  test('parses jquery-param strings', () => {
     // readable = 'filter[0][]=int1&filter[0][]==&filter[0][]=77&filter[]=and&filter[2][]=int2&filter[2][]==&filter[2][]=8'
     const encoded =
       'filter%5B0%5D%5B%5D=int1&filter%5B0%5D%5B%5D=%3D&filter%5B0%5D%5B%5D=77&filter%5B%5D=and&filter%5B2%5D%5B%5D=int2&filter%5B2%5D%5B%5D=%3D&filter%5B2%5D%5B%5D=8';
@@ -209,7 +209,7 @@ describe('qsParse', () => {
     expect(qsParse(encoded)).toEqual(expected);
   });
 
-  it('continues parsing when no parent is found', () => {
+  test('continues parsing when no parent is found', () => {
     expect(qsParse('[]=&a=b')).toEqual({ a: 'b' });
     expect(qsParse('[]&a=b')).toEqual({
       a: 'b',
@@ -217,7 +217,7 @@ describe('qsParse', () => {
     expect(qsParse('[foo]=bar')).toEqual({ foo: 'bar' });
   });
 
-  it('does not error when parsing a very long array', () => {
+  test('does not error when parsing a very long array', () => {
     let str = 'a[]=a';
     while (Buffer.byteLength(str) < 128 * 1024) {
       str = str + '&' + str;
@@ -225,7 +225,7 @@ describe('qsParse', () => {
     expect(() => qsParse(str)).not.toThrowError();
   });
 
-  it('parses string with comma as array divider', () => {
+  test('parses string with comma as array divider', () => {
     expect(qsParse('foo=bar,tee', { comma: true })).toEqual({
       foo: ['bar', 'tee'],
     });
@@ -245,7 +245,7 @@ describe('qsParse', () => {
     expect(qsParse('a=c,d', { comma: true })).toEqual({ a: ['c', 'd'] });
   });
 
-  it('parses brackets holds array of arrays when having two parts of strings with comma as array divider', () => {
+  test('parses brackets holds array of arrays when having two parts of strings with comma as array divider', () => {
     expect(qsParse('foo[]=1,2,3&foo[]=4,5,6', { comma: true })).toEqual({
       foo: [
         ['1', '2', '3'],
@@ -266,7 +266,7 @@ describe('qsParse', () => {
     });
   });
 
-  it('parses comma delimited array while having percent-encoded comma treated as normal text', () => {
+  test('parses comma delimited array while having percent-encoded comma treated as normal text', () => {
     expect(qsParse('foo=a%2Cb', { comma: true })).toEqual({ foo: 'a,b' });
     expect(qsParse('foo=a%2C%20b,d', { comma: true })).toEqual({
       foo: ['a, b', 'd'],

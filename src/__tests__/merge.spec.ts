@@ -1,7 +1,7 @@
 import { merge } from '../index';
 
 describe('merge.ts', () => {
-  it('add keys in target that do not exist at the root', () => {
+  test('add keys in target that do not exist at the root', () => {
     const src = { key1: 'value1', key2: 'value2' };
     const target = {};
 
@@ -11,7 +11,7 @@ describe('merge.ts', () => {
     expect(res).toStrictEqual(src);
   });
 
-  it('merge existing simple keys in target at the roots', () => {
+  test('merge existing simple keys in target at the roots', () => {
     const src = { key1: 'changed', key2: 'value2' };
     const target = { key1: 'value1', key3: 'value3' };
 
@@ -25,7 +25,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('merge nested objects into target', () => {
+  test('merge nested objects into target', () => {
     const src = {
       key1: {
         subkey1: 'changed',
@@ -56,7 +56,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('replace simple key with nested object in target', () => {
+  test('replace simple key with nested object in target', () => {
     const src = {
       key1: {
         subkey1: 'subvalue1',
@@ -80,7 +80,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should add nested object in target', () => {
+  test('should add nested object in target', () => {
     const src = {
       b: {
         c: {},
@@ -101,7 +101,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should clone source and target', () => {
+  test('should clone source and target', () => {
     const src = {
       b: {
         c: 'foo',
@@ -130,7 +130,7 @@ describe('merge.ts', () => {
     expect(merged.b !== src.b).toBe(true);
   });
 
-  it('should clone source and target', () => {
+  test('should clone source and target', () => {
     const src = {
       b: {
         c: 'foo',
@@ -148,7 +148,7 @@ describe('merge.ts', () => {
     expect(merged.a !== src.b).toBe(true);
   });
 
-  it('should replace object with simple key in target', () => {
+  test('should replace object with simple key in target', () => {
     const src = { key1: 'value1' };
     const target = {
       key1: {
@@ -170,7 +170,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should replace objects with arrays', () => {
+  test('should replace objects with arrays', () => {
     const target = { key1: { subkey: 'one' } };
 
     const src = { key1: ['subkey'] };
@@ -180,7 +180,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should replace arrays with objects', () => {
+  test('should replace arrays with objects', () => {
     const target = { key1: ['subkey'] };
 
     const src = { key1: { subkey: 'one' } };
@@ -190,7 +190,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should replace dates with arrays', () => {
+  test('should replace dates with arrays', () => {
     const target = { key1: new Date() };
 
     const src = { key1: ['subkey'] };
@@ -200,7 +200,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should replace null with arrays', () => {
+  test('should replace null with arrays', () => {
     const target = {
       key1: null,
     };
@@ -216,7 +216,7 @@ describe('merge.ts', () => {
     expect(merge(target, src)).toStrictEqual(expected);
   });
 
-  it('should work on simple array', () => {
+  test('should work on simple array', () => {
     const src = ['one', 'three'];
     const target = ['one', 'two'];
 
@@ -226,7 +226,7 @@ describe('merge.ts', () => {
     expect(Array.isArray(merge(target, src))).toBe(true);
   });
 
-  it('should work on another simple array', () => {
+  test('should work on another simple array', () => {
     const target = ['a1', 'a2', 'c1', 'f1', 'p1'];
     const src = ['t1', 's1', 'c2', 'r1', 'p2', 'p3'];
 
@@ -248,7 +248,7 @@ describe('merge.ts', () => {
     expect(Array.isArray(merge(target, src))).toBe(true);
   });
 
-  it('should work on array properties', () => {
+  test('should work on array properties', () => {
     const src = {
       key1: ['one', 'three'],
       key2: ['four'],
@@ -267,7 +267,7 @@ describe('merge.ts', () => {
     expect(Array.isArray(merge<typeof src>(target, src).key2)).toBe(true);
   });
 
-  it('should work on array properties with clone option', () => {
+  test('should work on array properties with clone option', () => {
     const src = {
       key1: ['one', 'three'],
       key2: ['four'],
@@ -285,7 +285,7 @@ describe('merge.ts', () => {
     expect(merged.key2 !== src.key2).toBe(true);
   });
 
-  it('should work on array of objects', () => {
+  test('should work on array of objects', () => {
     const src = [{ key1: ['one', 'three'], key2: ['one'] }, { key3: ['five'] }];
     const target = [{ key1: ['one', 'two'] }, { key3: ['four'] }];
 
@@ -301,7 +301,7 @@ describe('merge.ts', () => {
     expect(Array.isArray(merge<any>(target, src)[0].key1)).toBe(true);
   });
 
-  it('should work on array of objects with clone option', () => {
+  test('should work on array of objects with clone option', () => {
     const src = [{ key1: ['one', 'three'], key2: ['one'] }, { key3: ['five'] }];
     const target = [{ key1: ['one', 'two'] }, { key3: ['four'] }];
 
@@ -323,7 +323,7 @@ describe('merge.ts', () => {
     expect(merged[1].key3 !== target[1].key3);
   });
 
-  it('should treat regular expressions like primitive values', () => {
+  test('should treat regular expressions like primitive values', () => {
     const target = { key1: /abc/ };
     const src = { key1: /efg/ };
     const expected = { key1: /efg/ };
@@ -332,7 +332,7 @@ describe('merge.ts', () => {
     expect(merge<any>(target, src).key1.test('efg')).toBe(true);
   });
 
-  it('should treat regular expressions like primitive values and should not clone even with clone option', () => {
+  test('should treat regular expressions like primitive values and should not clone even with clone option', () => {
     const target = { key1: /abc/ };
     const src = { key1: /efg/ };
 
@@ -341,7 +341,7 @@ describe('merge.ts', () => {
     expect(output.key1).toEqual(src.key1);
   });
 
-  it('should treat dates like primitives', () => {
+  test('should treat dates like primitives', () => {
     const monday = new Date('2016-09-27T01:08:12.761Z');
     const tuesday = new Date('2016-09-28T01:18:12.761Z');
 
@@ -361,7 +361,7 @@ describe('merge.ts', () => {
     expect(actual.key.valueOf()).toEqual(tuesday.valueOf());
   });
 
-  it('should treat dates like primitives and should not clone even with clone option', () => {
+  test('should treat dates like primitives and should not clone even with clone option', () => {
     const monday = new Date('2016-09-27T01:08:12.761Z');
     const tuesday = new Date('2016-09-28T01:18:12.761Z');
 
@@ -377,7 +377,7 @@ describe('merge.ts', () => {
     expect(actual.key).toEqual(tuesday);
   });
 
-  it('should work on array with null in it', () => {
+  test('should work on array with null in it', () => {
     const target = [] as Array<unknown>;
 
     const src = [null];
@@ -398,7 +398,7 @@ describe('merge.ts', () => {
     expect(output[0].key).toEqual('yup');
   });
 
-  it('should clone an array property when there is no target array', () => {
+  test('should clone an array property when there is no target array', () => {
     const someObject = {};
     const target = {};
     const source = { ary: [someObject] };
@@ -408,7 +408,7 @@ describe('merge.ts', () => {
     expect(output.ary[0] !== someObject).toBe(true);
   });
 
-  it('should overwrite values when property is initialised but undefined', () => {
+  test('should overwrite values when property is initialised but undefined', () => {
     const target1 = { value: [] };
     const target2 = { value: null };
     const target3 = { value: 2 };
@@ -425,7 +425,7 @@ describe('merge.ts', () => {
     hasUndefinedProperty(merge(target3, src));
   });
 
-  it('dates should copy correctly in an array', () => {
+  test('dates should copy correctly in an array', () => {
     const monday = new Date('2016-09-27T01:08:12.761Z');
     const tuesday = new Date('2016-09-28T01:18:12.761Z');
 
@@ -438,7 +438,7 @@ describe('merge.ts', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('copy symbol keys in target that do not exist on the target', () => {
+  test('copy symbol keys in target that do not exist on the target', () => {
     const mySymbol = Symbol();
     const src = { [mySymbol]: 'value1' };
     const target = {};
@@ -451,7 +451,7 @@ describe('merge.ts', () => {
     );
   });
 
-  it('copy symbol keys in target that do exist on the target', () => {
+  test('copy symbol keys in target that do exist on the target', () => {
     const mySymbol = Symbol();
     const src = { [mySymbol]: 'value1' };
     const target = { [mySymbol]: 'wat' };
@@ -461,7 +461,7 @@ describe('merge.ts', () => {
     expect(res[mySymbol]).toBe('value1');
   });
 
-  it('exclude set', () => {
+  test('exclude set', () => {
     const source = {
       a: { key: 1 },
       b: { key: 2 },
@@ -524,7 +524,7 @@ describe('merge.ts', () => {
     expect(res.c === src.c).toBe(true);
   });
 
-  it('filter undefined (1)', () => {
+  test('filter undefined (1)', () => {
     const source = {
       a: 1,
       b: 2,
@@ -554,7 +554,7 @@ describe('merge.ts', () => {
     });
   });
 
-  it('filter undefined (2)', () => {
+  test('filter undefined (2)', () => {
     const res = merge(
       {
         a: 'a',
@@ -590,7 +590,7 @@ describe('merge.ts', () => {
     });
   });
 
-  it('array strategy', () => {
+  test('array strategy', () => {
     const target = { arr: [1, 2, 3] };
     const src = { arr: [4, 5, 6] };
     const res = merge(target, src, { arrayStrategy: 'replace' });

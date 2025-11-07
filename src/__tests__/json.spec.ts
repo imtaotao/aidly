@@ -9,13 +9,13 @@ import {
 } from '../index';
 
 describe('json.ts', () => {
-  it('normal stringify', () => {
+  test('normal stringify', () => {
     const obj = { a: 1, b: [1, 2, { num: 2 }], c: {} };
     const json = jsonStringify(obj);
     expect(json.includes('@@ref*')).toBe(false);
   });
 
-  it('simple stringify', () => {
+  test('simple stringify', () => {
     const obj = {} as any;
     obj.self = obj;
     expect(obj.self === obj).toBe(true);
@@ -23,7 +23,7 @@ describe('json.ts', () => {
     expect(json.includes('@@ref*')).toBe(true);
   });
 
-  it('should handle simple circular references', () => {
+  test('should handle simple circular references', () => {
     const obj = {} as any;
     obj.self = obj;
     const json = jsonStringify(obj);
@@ -31,7 +31,7 @@ describe('json.ts', () => {
     expect(parsed.self).toStrictEqual(parsed);
   });
 
-  it('should handle nested circular references', () => {
+  test('should handle nested circular references', () => {
     const obj = { child: { parent: null } } as any;
     obj.child.parent = obj;
     const json = jsonStringify(obj);
@@ -39,7 +39,7 @@ describe('json.ts', () => {
     expect(parsed.child.parent).toStrictEqual(parsed);
   });
 
-  it('should handle arrays with circular references', () => {
+  test('should handle arrays with circular references', () => {
     const obj = {} as any;
     obj.arr = [obj, obj];
     const json = jsonStringify(obj);
@@ -56,7 +56,7 @@ describe('json.ts', () => {
     expect(parsed.arr[1]).toStrictEqual(parsed);
   });
 
-  it('should handle numbers, strings, and booleans correctly', () => {
+  test('should handle numbers, strings, and booleans correctly', () => {
     const obj = {
       number: 123,
       string: 'hello',
@@ -70,14 +70,14 @@ describe('json.ts', () => {
     expect(parsed.boolean).toBe(true);
   });
 
-  it('should handle null correctly', () => {
+  test('should handle null correctly', () => {
     const obj = { nullable: null };
     const json = jsonStringify(obj);
     const parsed = jsonParse(json);
     expect(parsed.nullable).toBeNull();
   });
 
-  it('handles complex nested objects with multiple cross-references', () => {
+  test('handles complex nested objects with multiple cross-references', () => {
     const obj: any = {
       user: {
         name: 'Alice',
@@ -139,7 +139,7 @@ describe('json.ts', () => {
     expect(parsed.favorites.user !== obj.favorites.user).toBe(true);
   });
 
-  it('correctly replacer alters the behavior of the stringification process', () => {
+  test('correctly replacer alters the behavior of the stringification process', () => {
     const obj = {
       name: 'Alice',
       age: 30,
@@ -155,7 +155,7 @@ describe('json.ts', () => {
     );
   });
 
-  it('correctly reviver modifies the structure of the parsed object', () => {
+  test('correctly reviver modifies the structure of the parsed object', () => {
     const jsonString = '{"name":"Alice","age":"30"}';
     function reviver(key: string, value: unknown) {
       if (key === 'age') return parseInt(value as any);
@@ -166,7 +166,7 @@ describe('json.ts', () => {
     expect(parsedObj.age).toBe(30);
   });
 
-  it('handles circular references with custom replacer and reviver functions', () => {
+  test('handles circular references with custom replacer and reviver functions', () => {
     const obj: any = {
       name: 'Alice',
       nested: {
@@ -200,7 +200,7 @@ describe('json.ts', () => {
     expect(parsedObj.nested.relation).toBeUndefined();
   });
 
-  it('correctly formats JSON with numeric space argument', () => {
+  test('correctly formats JSON with numeric space argument', () => {
     const obj = {
       name: 'Alice',
       details: {
@@ -223,7 +223,7 @@ describe('json.ts', () => {
     expect(jsonString).toBe(expectedOutput);
   });
 
-  it('correctly formats JSON with string space argument', () => {
+  test('correctly formats JSON with string space argument', () => {
     const obj = {
       name: 'Alice',
       details: {
@@ -246,7 +246,7 @@ describe('json.ts', () => {
     expect(jsonString).toBe(expectedOutput);
   });
 
-  it('disable resolve `ref` in jsonStringify', () => {
+  test('disable resolve `ref` in jsonStringify', () => {
     const obj = {} as any;
     obj.a = obj;
     expect(() => jsonStringify(obj)).not.toThrow();
@@ -258,7 +258,7 @@ describe('json.ts', () => {
     expect(() => jsonStringify(obj)).not.toThrow();
   });
 
-  it('disable resolve `ref` in jsonParse', () => {
+  test('disable resolve `ref` in jsonParse', () => {
     const obj = {} as any;
     obj.a = obj;
     const json = jsonStringify(obj);
@@ -273,7 +273,7 @@ describe('json.ts', () => {
     expect(parsed.a === parsed).toBe(true);
   });
 
-  it('ref string', () => {
+  test('ref string', () => {
     const str = `{
       "name": "taotao",
       "refName": "@@ref*name"
@@ -285,7 +285,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('ref number', () => {
+  test('ref number', () => {
     const str = `{
       "num": { "val": 1 },
       "refNum": "@@ref*num.val"
@@ -297,7 +297,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('ref `ref string` (1)', () => {
+  test('ref `ref string` (1)', () => {
     const str = `{
       "num": { "val": 1 },
       "refNum": "@@ref*num.val",
@@ -311,7 +311,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('ref `ref string` (2)', () => {
+  test('ref `ref string` (2)', () => {
     const str = `{
       "num": { "val": 1 },
       "refNum": "@@ref*num.val",
@@ -327,7 +327,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('ref `ref string` (3)', () => {
+  test('ref `ref string` (3)', () => {
     const str = `{
       "num": { "val": 1 },
       "refNum": "@@ref*num.val",
@@ -342,7 +342,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('ref `ref string` (4)', () => {
+  test('ref `ref string` (4)', () => {
     const str = `{
       "num": { "val": 1 },
       "refNum": "@@ref*refStr2",
@@ -357,7 +357,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('json5 parse', () => {
+  test('json5 parse', () => {
     const _parse = createJSONParse({
       parse,
       flag: '',
@@ -380,7 +380,7 @@ describe('json.ts', () => {
     });
   });
 
-  it('json5 stringify', () => {
+  test('json5 stringify', () => {
     const _stringify = createJSONStringify({
       stringify,
       flag: '',

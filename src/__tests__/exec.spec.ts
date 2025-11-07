@@ -1,14 +1,14 @@
 import { exec } from '../index';
 
 describe('exec.ts', () => {
-  it('cjs', () => {
+  test('cjs', () => {
     const value = exec<number>('module.exports = 1;', 'cjs');
     expect(value).toBe(1);
     const obj = exec<{ a: number }>('exports.a = 1;', 'cjs');
     expect(obj).toMatchObject({ a: 1 });
   });
 
-  it('esm:data', async () => {
+  test('esm:data', async () => {
     const value = await exec<{ default: number }>(
       'export default 1;',
       'esm:data',
@@ -18,7 +18,7 @@ describe('exec.ts', () => {
     expect(obj).toMatchObject({ a: 1 });
   });
 
-  it('normal', () => {
+  test('normal', () => {
     const value = exec<{ default: number }>('1;');
     expect(value).toBe(undefined);
     const obj = exec<{ a: number }>('const a = 1;');
@@ -32,7 +32,7 @@ describe('exec.ts', () => {
     }).toThrow();
   });
 
-  it('throw error', async () => {
+  test('throw error', async () => {
     expect(() => {
       exec('throw new Error("cjs error")', 'cjs');
     }).toThrow('cjs error');
@@ -49,7 +49,7 @@ describe('exec.ts', () => {
     expect(i).toBe(1);
   });
 
-  it('useStrict', () => {
+  test('useStrict', () => {
     expect(exec('module.exports = this', 'cjs') === globalThis).toBe(true);
     expect(
       exec('module.exports = this', 'cjs', { useStrict: true }) === undefined,
@@ -63,7 +63,7 @@ describe('exec.ts', () => {
     ).not.toThrow();
   });
 
-  it('require', () => {
+  test('require', () => {
     expect(() => {
       exec('if (typeof require === "undefined") throw new Error("error")');
     }).toThrow();
@@ -109,14 +109,14 @@ describe('exec.ts', () => {
     expect(i).toBe(1);
   });
 
-  it('cjs env', () => {
+  test('cjs env', () => {
     const res = exec('module.exports = 1 + num', 'cjs', {
       env: { num: 2 },
     });
     expect(res).toBe(3);
   });
 
-  it('esm env', async () => {
+  test('esm env', async () => {
     const res = await exec<{ default: number }>(
       'export default (1 + num)',
       'esm:data',
@@ -127,7 +127,7 @@ describe('exec.ts', () => {
     expect(res.default).toBe(3);
   });
 
-  it('normal mode env', () => {
+  test('normal mode env', () => {
     let i = 0;
     try {
       exec('throw (1 + num)', null, {
@@ -140,11 +140,11 @@ describe('exec.ts', () => {
     expect(i).toBe(1);
   });
 
-  it('check normal mode return value', () => {
+  test('check normal mode return value', () => {
     expect(exec('return { a: 1 }')).toMatchObject({ a: 1 });
   });
 
-  it('check sourceUrl', async () => {
+  test('check sourceUrl', async () => {
     try {
       await exec('throw new Error("Test Error")', 'esm:data', {
         sourceUrl: 'test.js',

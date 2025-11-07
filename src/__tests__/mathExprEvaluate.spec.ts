@@ -1,49 +1,49 @@
 import { mathExprEvaluate, type MathExprEvaluateOptions } from '../index';
 
 describe('mathExprEvaluate.ts', () => {
-  it('addition: 3 + 7 should equal 10', () => {
+  test('addition: 3 + 7 should equal 10', () => {
     expect(mathExprEvaluate('3 + 7')).toBe(3 + 7);
   });
 
-  it('subtraction: 10 - 4 should equal 6', () => {
+  test('subtraction: 10 - 4 should equal 6', () => {
     expect(mathExprEvaluate('10-4')).toBe(10 - 4);
   });
 
-  it('multiplication: 6 * 7 should equal 42', () => {
+  test('multiplication: 6 * 7 should equal 42', () => {
     expect(mathExprEvaluate('6 * 7')).toBe(6 * 7);
   });
 
-  it('division: 8 / 2 should equal 4', () => {
+  test('division: 8 / 2 should equal 4', () => {
     expect(mathExprEvaluate('8/2')).toBe(8 / 2);
   });
 
-  it('complex Expression: 3 + 5 * 2 should equal 13', () => {
+  test('complex Expression: 3 + 5 * 2 should equal 13', () => {
     expect(mathExprEvaluate('3+5*2')).toBe(3 + 5 * 2);
   });
 
-  it('complex Expression with Subtraction and Division: 18 / 2 - 3 * 2 should equal 3', () => {
+  test('complex Expression with Subtraction and Division: 18 / 2 - 3 * 2 should equal 3', () => {
     expect(mathExprEvaluate('18/ 2 -3* 2')).toBe(18 / 2 - 3 * 2);
   });
 
-  it('error on division by zero', () => {
+  test('error on division by zero', () => {
     expect(mathExprEvaluate('1/0')).toBe(1 / 0);
   });
 
-  it('only one number returns the same number', () => {
+  test('only one number returns the same number', () => {
     expect(mathExprEvaluate('42')).toBe(42);
   });
 
-  it('handles whitespace and line breaks', () => {
+  test('handles whitespace and line breaks', () => {
     const expr = `5+
     2`;
     expect(mathExprEvaluate(expr)).toBe(5 + 2);
   });
 
-  it('handles inputs with NaN', () => {
+  test('handles inputs with NaN', () => {
     expect(mathExprEvaluate('NaN+2')).toBeNaN();
   });
 
-  it('handles inputs with initial positive sign', () => {
+  test('handles inputs with initial positive sign', () => {
     expect(mathExprEvaluate('+3')).toBe(3);
   });
 
@@ -51,37 +51,37 @@ describe('mathExprEvaluate.ts', () => {
     expect(mathExprEvaluate('-3')).toBe(-3);
   });
 
-  it('complex Expression with initial negative and whitespace', () => {
+  test('complex Expression with initial negative and whitespace', () => {
     expect(mathExprEvaluate('-10+5*\t2-3')).toBe(-10 + 5 * 2 - 3);
   });
 
-  it('expression with invalid characters should handle errors', () => {
+  test('expression with invalid characters should handle errors', () => {
     expect(mathExprEvaluate('5 * x')).toBeNaN();
   });
 
-  it('single set of brackets: (3 + 2) * 5 should equal 25', () => {
+  test('single set of brackets: (3 + 2) * 5 should equal 25', () => {
     expect(mathExprEvaluate('(3 + 2) * 5')).toBe((3 + 2) * 5);
   });
 
-  it('nested brackets: ((3 + 2) * (2 + 3)) should equal 25', () => {
+  test('nested brackets: ((3 + 2) * (2 + 3)) should equal 25', () => {
     expect(mathExprEvaluate('((3 + 2) * (2 + 3))')).toBe((3 + 2) * (2 + 3));
   });
 
-  it('complex nested brackets: (2 + (3 * (4 - 1))) should equal 11', () => {
+  test('complex nested brackets: (2 + (3 * (4 - 1))) should equal 11', () => {
     expect(mathExprEvaluate('(2 + (3 * (4 - 1)))')).toBe(2 + 3 * (4 - 1));
   });
 
-  it('expressions with nested brackets and division: (8 / (4 / (1 + 1))) should equal 4', () => {
+  test('expressions with nested brackets and division: (8 / (4 / (1 + 1))) should equal 4', () => {
     expect(mathExprEvaluate('(8 / (4 / (1 + 1)))')).toBe(8 / (4 / (1 + 1)));
   });
 
-  it('mixed operations with deeply nested brackets: 5 + ((1 + 2) * 10) - (3 / (1 + 1))', () => {
+  test('mixed operations with deeply nested brackets: 5 + ((1 + 2) * 10) - (3 / (1 + 1))', () => {
     expect(mathExprEvaluate('5 + ((1 + 2) * 10) - (3 / (1 + 1))')).toBe(
       5 + (1 + 2) * 10 - 3 / (1 + 1),
     );
   });
 
-  it('execExpression', () => {
+  test('execExpression', () => {
     expect(mathExprEvaluate('10+-20', { verify: true })).toBe(10 + -20);
     expect(mathExprEvaluate('10 + -20', { verify: true })).toBe(10 + -20);
     expect(mathExprEvaluate('10+20+(10*5 %10)', { verify: true })).toBe(
@@ -114,7 +114,7 @@ describe('mathExprEvaluate.ts', () => {
     );
   });
 
-  it('verify execExpression', () => {
+  test('verify execExpression', () => {
     const exps = [
       "'1'",
       '`1`',

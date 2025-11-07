@@ -10,7 +10,7 @@ import {
 } from '../index';
 
 describe('color.ts', () => {
-  it('simple check', () => {
+  test('simple check', () => {
     const map = (ls: Array<number> | number) =>
       isArray(ls)
         ? ls.map((v, i) => (i === 3 ? +v.toFixed(4) : +v.toFixed(0)))
@@ -40,7 +40,7 @@ describe('color.ts', () => {
     ]);
   });
 
-  it('randomColor', () => {
+  test('randomColor', () => {
     const rgb1 = randomColor();
     expect(isArray(rgb1)).toBe(true);
     expect(rgb1.length === 3).toBe(true);

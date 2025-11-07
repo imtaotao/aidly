@@ -4,7 +4,7 @@ describe('qsStringify', () => {
   const qsStringify = (obj: unknown, options?: object) =>
     s(obj, { addQueryPrefix: false, ...options });
 
-  it('stringifies a querystring object', () => {
+  test('stringifies a querystring object', () => {
     expect(qsStringify({ a: 'b' })).toEqual('a=b');
     expect(qsStringify({ a: 1 })).toEqual('a=1');
     expect(qsStringify({ a: 1, b: 2 })).toEqual('a=1&b=2');
@@ -18,22 +18,22 @@ describe('qsStringify', () => {
     );
   });
 
-  it('adds query prefix', () => {
+  test('adds query prefix', () => {
     expect(qsStringify({ a: 'b' }, { addQueryPrefix: true })).toEqual('?a=b');
   });
 
-  it('with query prefix, outputs blank string given an empty object', () => {
+  test('with query prefix, outputs blank string given an empty object', () => {
     expect(qsStringify({}, { addQueryPrefix: true })).toEqual('');
   });
 
-  it('stringifies falsy values', () => {
+  test('stringifies falsy values', () => {
     expect(qsStringify(undefined)).toEqual('');
     expect(qsStringify(null)).toEqual('');
     expect(qsStringify(false)).toEqual('');
     expect(qsStringify(0)).toEqual('');
   });
 
-  it('stringifies symbols', () => {
+  test('stringifies symbols', () => {
     expect(qsStringify(Symbol.iterator)).toEqual('');
     expect(qsStringify([Symbol.iterator])).toEqual(
       '0=Symbol%28Symbol.iterator%29',
@@ -43,28 +43,28 @@ describe('qsStringify', () => {
     );
   });
 
-  it('stringifies bigints', () => {
+  test('stringifies bigints', () => {
     const three = BigInt(3);
     expect(qsStringify(three)).toEqual('');
     expect(qsStringify([three])).toEqual('0=3');
     expect(qsStringify({ a: three })).toEqual('a=3');
   });
 
-  it('stringifies nested falsy values', () => {
+  test('stringifies nested falsy values', () => {
     expect(qsStringify({ a: { b: { c: null } } })).toEqual('a%5Bb%5D%5Bc%5D=');
     expect(qsStringify({ a: { b: { c: false } } })).toEqual(
       'a%5Bb%5D%5Bc%5D=false',
     );
   });
 
-  it('stringifies a nested object', () => {
+  test('stringifies a nested object', () => {
     expect(qsStringify({ a: { b: 'c' } })).toEqual('a%5Bb%5D=c');
     expect(qsStringify({ a: { b: { c: { d: 'e' } } } })).toEqual(
       'a%5Bb%5D%5Bc%5D%5Bd%5D=e',
     );
   });
 
-  it('stringifies an array value', () => {
+  test('stringifies an array value', () => {
     expect(
       qsStringify({ a: ['b', 'c', 'd'] }, { arrayFormat: 'indices' }),
     ).toEqual('a%5B0%5D=b&a%5B1%5D=c&a%5B2%5D=d');
@@ -85,7 +85,7 @@ describe('qsStringify', () => {
     );
   });
 
-  it('stringifies comma and empty array values', () => {
+  test('stringifies comma and empty array values', () => {
     expect(
       qsStringify(
         { a: [',', '', 'c,d%'] },
@@ -137,7 +137,7 @@ describe('qsStringify', () => {
     ).toEqual('a=%2C&a=&a=c%2Cd%25');
   });
 
-  it('stringifies an empty array in different arrayFormat', () => {
+  test('stringifies an empty array in different arrayFormat', () => {
     expect(
       qsStringify({ a: [], b: [null], c: 'c' }, { encode: false }),
     ).toEqual('b[0]=&c=c');
@@ -174,71 +174,71 @@ describe('qsStringify', () => {
     ).toEqual('b[]=&c=c');
   });
 
-  it('stringifies a null object', () => {
+  test('stringifies a null object', () => {
     const obj = Object.create(null);
     obj.a = 'b';
     expect(qsStringify(obj)).toEqual('a=b');
   });
 
-  it('returns an empty string for invalid input', () => {
+  test('returns an empty string for invalid input', () => {
     expect(qsStringify(undefined)).toEqual('');
     expect(qsStringify(false)).toEqual('');
     expect(qsStringify(null)).toEqual('');
     expect(qsStringify('')).toEqual('');
   });
 
-  it('stringifies an object with a null object as a child', () => {
+  test('stringifies an object with a null object as a child', () => {
     const obj = { a: Object.create(null) };
 
     obj.a.b = 'c';
     expect(qsStringify(obj)).toEqual('a%5Bb%5D=c');
   });
 
-  it('drops keys with a value of undefined', () => {
+  test('drops keys with a value of undefined', () => {
     expect(qsStringify({ a: undefined })).toEqual('');
 
     expect(qsStringify({ a: { b: undefined, c: null } })).toEqual('a%5Bc%5D=');
     expect(qsStringify({ a: { b: undefined, c: '' } })).toEqual('a%5Bc%5D=');
   });
 
-  it('url encodes values', () => {
+  test('url encodes values', () => {
     expect(qsStringify({ a: 'b c' })).toEqual('a=b%20c');
   });
 
-  it('stringifies a date', () => {
+  test('stringifies a date', () => {
     const now = new Date();
     const str = 'a=' + encodeURIComponent(now.toISOString());
     expect(qsStringify({ a: now })).toEqual(str);
   });
 
-  it('stringifies the weird object from qs', () => {
+  test('stringifies the weird object from qs', () => {
     expect(qsStringify({ 'my weird field': '~q1!2"\'w$5&7/z8)?' })).toEqual(
       'my%20weird%20field=~q1%212%22%27w%245%267%2Fz8%29%3F',
     );
   });
 
-  it('skips properties that are part of the object prototype', () => {
+  test('skips properties that are part of the object prototype', () => {
     (Object.prototype as any).crash = { value: 'test' };
     expect(qsStringify({ a: 'b' })).toEqual('a=b');
     expect(qsStringify({ a: { b: 'c' } })).toEqual('a%5Bb%5D=c');
     delete (Object.prototype as any).crash;
   });
 
-  it('stringifies boolean values', () => {
+  test('stringifies boolean values', () => {
     expect(qsStringify({ a: true })).toEqual('a=true');
     expect(qsStringify({ a: { b: true } })).toEqual('a%5Bb%5D=true');
     expect(qsStringify({ b: false })).toEqual('b=false');
     expect(qsStringify({ b: { c: false } })).toEqual('b%5Bc%5D=false');
   });
 
-  it('stringifies buffer values', () => {
+  test('stringifies buffer values', () => {
     expect(qsStringify({ a: Buffer.from('test') })).toEqual('a=test');
     expect(qsStringify({ a: { b: Buffer.from('test') } })).toEqual(
       'a%5Bb%5D=test',
     );
   });
 
-  it('does not crash when parsing circular references', () => {
+  test('does not crash when parsing circular references', () => {
     const a = {} as any;
     a.b = a;
     expect(() =>
@@ -255,12 +255,12 @@ describe('qsStringify', () => {
     expect(() => qsStringify({ x: arr, y: arr })).not.toThrowError();
   });
 
-  it('can disable uri encoding', () => {
+  test('can disable uri encoding', () => {
     expect(qsStringify({ a: 'b' }, { encode: false })).toEqual('a=b');
     expect(qsStringify({ a: { b: 'c' } }, { encode: false })).toEqual('a[b]=c');
   });
 
-  it('serializeDate option', () => {
+  test('serializeDate option', () => {
     const date = new Date();
     expect(qsStringify({ a: date })).toEqual(
       'a=' + date.toISOString().replace(/:/g, '%3A'),
@@ -273,17 +273,17 @@ describe('qsStringify', () => {
     expect(() => qsStringify({ a: mutatedDate })).toThrowError();
   });
 
-  it('respects an explicit charset of utf-8 (the default)', () => {
+  test('respects an explicit charset of utf-8 (the default)', () => {
     expect(qsStringify({ a: 'æ' })).toEqual('a=%C3%A6');
   });
 
-  it('does not mutate the options argument', () => {
+  test('does not mutate the options argument', () => {
     const options = {};
     qsStringify({}, options);
     expect(options).toStrictEqual({});
   });
 
-  it('objects inside arrays', () => {
+  test('objects inside arrays', () => {
     const obj = { a: { b: { c: 'd', e: 'f' } } };
     const withArray = { a: { b: [{ c: 'd', e: 'f' }] } };
 
@@ -318,7 +318,7 @@ describe('qsStringify', () => {
     ).toEqual('a[b][]=[object Object]');
   });
 
-  it('encodes a very long string', () => {
+  test('encodes a very long string', () => {
     const chars = [];
     const expected = [];
     for (let i = 0; i < 5e3; i++) {
@@ -336,7 +336,7 @@ describe('qsStringify', () => {
     );
   });
 
-  it('edge case with object/arrays', () => {
+  test('edge case with object/arrays', () => {
     expect(qsStringify({ '': { '': [2, 3] } }, { encode: false })).toEqual(
       '[][0]=2&[][1]=3',
     );

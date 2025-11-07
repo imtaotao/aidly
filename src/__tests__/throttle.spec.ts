@@ -29,7 +29,7 @@ describe('throttle.ts', () => {
     setTimeout(start, pause);
   }
 
-  it('delay, callback: throttle', () => {
+  test('delay, callback: throttle', () => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         stop = true;

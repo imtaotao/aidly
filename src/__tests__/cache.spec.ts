@@ -1,7 +1,7 @@
 import { createCacheObject } from '../index';
 
 describe('cache.ts', () => {
-  it('allSize', () => {
+  test('allSize', () => {
     const cache = createCacheObject(10);
     expect(cache.max).toBe(10);
     expect(cache.size).toBe(0);
@@ -26,7 +26,7 @@ describe('cache.ts', () => {
     expect(cache.max).toBe(10);
   });
 
-  it('has', () => {
+  test('has', () => {
     const cache = createCacheObject(10);
     expect(cache.has('a')).toBe(false);
 
@@ -37,7 +37,7 @@ describe('cache.ts', () => {
     expect(cache.has('a')).toBe(false);
   });
 
-  it('get', () => {
+  test('get', () => {
     const cache = createCacheObject(10);
     expect(() => cache.get('a')).toThrow();
 
@@ -51,7 +51,7 @@ describe('cache.ts', () => {
     expect(cache.get<string>('a')).toBe('tao');
   });
 
-  it('set', () => {
+  test('set', () => {
     const cache = createCacheObject(10);
 
     expect(cache.set('a', 'a', 1)).toBe(true);
@@ -90,7 +90,7 @@ describe('cache.ts', () => {
     expect(cache.size).toBe(10);
   });
 
-  it('permanents', () => {
+  test('permanents', () => {
     const cache = createCacheObject(10, { permanents: ['a'] });
     cache.set('a', 'a', 1);
     cache.set('b', 'b', 1);
@@ -110,7 +110,7 @@ describe('cache.ts', () => {
     expect(cache.size).toBe(10);
   });
 
-  it('force', () => {
+  test('force', () => {
     // normal
     let cache = createCacheObject(10);
     expect(cache.max).toBe(10);
@@ -183,7 +183,7 @@ describe('cache.ts', () => {
     expect(cache.max).toBe(10);
   });
 
-  it('onGet', () => {
+  test('onGet', () => {
     let lock = false;
     const cache = createCacheObject(10, {
       onGet(key, ref) {
@@ -209,7 +209,7 @@ describe('cache.ts', () => {
     expect(cache.max).toBe(10);
   });
 
-  it('onSet', () => {
+  test('onSet', () => {
     const cache = createCacheObject<string>(10, {
       onSet(key, ref) {
         expect(key).toBe('a');
@@ -223,7 +223,7 @@ describe('cache.ts', () => {
     expect(cache.size).toBe(2);
   });
 
-  it('onRemove', () => {
+  test('onRemove', () => {
     let i = 0;
     const cache = createCacheObject(10, {
       onRemove(key, ref) {
@@ -252,7 +252,7 @@ describe('cache.ts', () => {
     expect(cache.keys).toMatchObject([]);
   });
 
-  it('check priority (1)', () => {
+  test('check priority (1)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'bb', 2);
@@ -264,7 +264,7 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(false);
   });
 
-  it('check priority (2)', () => {
+  test('check priority (2)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'bb', 2);
@@ -276,7 +276,7 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(false);
   });
 
-  it('check priority (3)', () => {
+  test('check priority (3)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'bb', 2);
@@ -288,7 +288,7 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(true);
   });
 
-  it('check priority (4)', () => {
+  test('check priority (4)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'aaaaa', 5);
     cache.set('b', 'bbbbb', 5);
@@ -299,7 +299,7 @@ describe('cache.ts', () => {
     expect(cache.has('b')).toBe(false);
   });
 
-  it('check priority (5)', () => {
+  test('check priority (5)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'a', 1);
     cache.set('b', 'bbbbbbb', 7);
@@ -321,7 +321,7 @@ describe('cache.ts', () => {
     expect(cache2.has('b')).toBe(false);
   });
 
-  it('check priority (6)', () => {
+  test('check priority (6)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'aaaa', 4);
     cache.set('b', 'bbb', 3);
@@ -351,7 +351,7 @@ describe('cache.ts', () => {
 
   // When the number of visits is the same,
   // the one with a larger size has a higher priority.
-  it('check priority (7)', () => {
+  test('check priority (7)', () => {
     const cache = createCacheObject(10);
     cache.set('a', 'aaaa', 4);
     cache.set('b', 'bbb', 3);
@@ -372,7 +372,7 @@ describe('cache.ts', () => {
     expect(cache.has('c')).toBe(false);
   });
 
-  it('init key', () => {
+  test('init key', () => {
     const cache = createCacheObject(0);
     expect(cache.set('a', 'a', 1)).toBe(false);
     expect(cache.has('a')).toBe(false);

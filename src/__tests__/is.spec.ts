@@ -11,7 +11,7 @@ import {
 } from '../index';
 
 describe('is.ts', () => {
-  it('isAbsolute', () => {
+  test('isAbsolute', () => {
     expect(isAbsolute('a.js')).toBe(false);
     expect(isAbsolute('/a.js')).toBe(false);
     expect(isAbsolute('./a.js')).toBe(false);
@@ -23,18 +23,18 @@ describe('is.ts', () => {
     ).toBe(true);
   });
 
-  it('isPromiseLike', () => {
+  test('isPromiseLike', () => {
     expect(isPromiseLike({ then() {} })).toBe(true);
     expect(isPromiseLike({ then1() {} })).toBe(false);
     expect(isPromiseLike(Promise.resolve())).toBe(true);
   });
 
-  it('isPromise', () => {
+  test('isPromise', () => {
     expect(isPromise(Promise.resolve())).toBe(true);
     expect(isPromise({ then() {} })).toBe(false);
   });
 
-  it('should validate ports', () => {
+  test('should validate ports', () => {
     const obj = {
       valid: [0, -0, 22, 80, 443, 3000, 8080, 65535],
       invalid: [65536, 80.1, -1, -80.1],
@@ -47,13 +47,13 @@ describe('is.ts', () => {
     });
   });
 
-  it('should validate domain names.', () => {
+  test('should validate domain names.', () => {
     expect(isDomain('127.0.0.1.com')).toBe(true);
     expect(isDomain('google.com')).toBe(true);
     expect(isDomain('google.l33t')).toBe(false);
   });
 
-  it('should validate domain', () => {
+  test('should validate domain', () => {
     const domains = {
       valid: [
         'domain.com',
@@ -99,7 +99,7 @@ describe('is.ts', () => {
     });
   });
 
-  it('should validate email addresses', () => {
+  test('should validate email addresses', () => {
     const obj = {
       valid: [
         'foo@bar.com',
@@ -172,7 +172,7 @@ describe('is.ts', () => {
     });
   });
 
-  it('should validate email addresses with allowed IPs', () => {
+  test('should validate email addresses with allowed IPs', () => {
     const obj = {
       valid: ['email@[123.123.123.123]', 'email@255.255.255.255'],
       invalid: [
@@ -191,7 +191,7 @@ describe('is.ts', () => {
     });
   });
 
-  it('Verify long emails', () => {
+  test('Verify long emails', () => {
     expect(
       isEmail(
         'Deleted-user-id-19430-Team-5051deleted-user-id-19430-team-5051XX@example.com',
@@ -204,7 +204,7 @@ describe('is.ts', () => {
     ).toBe(false);
   });
 
-  it('should validate IP addresses', () => {
+  test('should validate IP addresses', () => {
     const obj = {
       valid: [
         '127.0.0.1',
@@ -336,7 +336,7 @@ describe('is.ts', () => {
     });
   });
 
-  it('should validate base64 strings', () => {
+  test('should validate base64 strings', () => {
     const strs = {
       valid: [
         '',
@@ -408,7 +408,7 @@ describe('is.ts', () => {
     }
   });
 
-  it('should validate strings by byte length', () => {
+  test('should validate strings by byte length', () => {
     const obj1 = {
       valid: ['abc', 'de', 'abcd', 'ｇｍａｉｌ'],
       invalid: ['', 'a'],

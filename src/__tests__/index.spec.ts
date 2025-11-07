@@ -13,19 +13,19 @@ import {
 } from '../index';
 
 describe('index.ts', () => {
-  it('root', () => {
+  test('root', () => {
     expect(root === global).toBe(true);
     expect(root === globalThis).toBe(true);
   });
 
-  it('should invoke `func` once', () => {
+  test('should invoke `func` once', () => {
     let count = 0;
     const resultFunc = once(() => ++count);
     expect(resultFunc()).toBe(1);
     expect(count).toBe(1);
   });
 
-  it('should ignore recursive calls', () => {
+  test('should ignore recursive calls', () => {
     let count = 0;
     const resultFunc = once(() => {
       resultFunc();
@@ -36,7 +36,7 @@ describe('index.ts', () => {
     expect(resultFunc()).toBe(1);
   });
 
-  it('should not throw more than once', () => {
+  test('should not throw more than once', () => {
     const resultFunc = once(() => {
       throw new Error();
     });
@@ -44,7 +44,7 @@ describe('index.ts', () => {
     expect(resultFunc).not.toThrow();
   });
 
-  it('getIteratorFn', () => {
+  test('getIteratorFn', () => {
     expect(getIteratorFn(1) === undefined).toBe(true);
     expect(getIteratorFn(() => {}) === undefined).toBe(true);
     expect(typeof getIteratorFn([]) === 'function').toBe(true);
@@ -61,7 +61,7 @@ describe('index.ts', () => {
     ).toBe(true);
   });
 
-  it('deferred', async () => {
+  test('deferred', async () => {
     const d = deferred<number>();
     setTimeout(() => {
       d.resolve(1);
@@ -71,13 +71,13 @@ describe('index.ts', () => {
     });
   });
 
-  it('slash', () => {
+  test('slash', () => {
     expect(slash('\\123')).toEqual('/123');
     expect(slash('\\\\')).toEqual('//');
     expect(slash('\\h\\i')).toEqual('/h/i');
   });
 
-  it('capitalize', () => {
+  test('capitalize', () => {
     expect(capitalize('hello World')).toEqual('Hello world');
     expect(capitalize('123')).toEqual('123');
     expect(capitalize('中国')).toEqual('中国');
@@ -85,7 +85,7 @@ describe('index.ts', () => {
     expect(capitalize('a')).toEqual('A');
   });
 
-  it('decimalPlaces', () => {
+  test('decimalPlaces', () => {
     expect(decimalPlaces(0)).toBe(0);
     expect(decimalPlaces(123.456)).toBe(3);
     expect(decimalPlaces(123.4)).toBe(1);
@@ -105,7 +105,7 @@ describe('index.ts', () => {
     expect(decimalPlaces(-0.11)).toBe(2);
   });
 
-  it('random', () => {
+  test('random', () => {
     const a = 10;
     for (let i = 0; i < 100; i++) {
       const res = random(a);
@@ -128,14 +128,14 @@ describe('index.ts', () => {
     }
   });
 
-  it('clearUndef', () => {
+  test('clearUndef', () => {
     const obj = { a: 1, b: undefined, c: 2 };
     const res = clearUndef(obj);
     expect(obj).toStrictEqual({ a: 1, c: 2 });
     expect(Object.keys(res)).toEqual(['a', 'c']);
   });
 
-  it('batchProcess(1)', async () => {
+  test('batchProcess(1)', async () => {
     let p: Promise<void>;
     const list = [] as Array<number>;
     const set = batchProcess<() => void>({
@@ -160,7 +160,7 @@ describe('index.ts', () => {
     expect(list).toEqual([1, 2, 3]);
   });
 
-  it('batchProcess(2)', async () => {
+  test('batchProcess(2)', async () => {
     let p: Promise<void>;
     const list = [] as Array<number>;
     const set = batchProcess<() => void>({
@@ -179,7 +179,7 @@ describe('index.ts', () => {
     expect(list).toEqual([1, 2, 3]);
   });
 
-  it('batchProcess(3)', async () => {
+  test('batchProcess(3)', async () => {
     const list = [] as Array<number>;
     const set = batchProcess<() => void>({
       ms: 100,
@@ -204,7 +204,7 @@ describe('index.ts', () => {
     expect(list.length === 100).toBe(true);
   });
 
-  it('unindent', () => {
+  test('unindent', () => {
     expect(
       unindent`
         if (a) {

@@ -1,7 +1,7 @@
 import { sleep, Runner, Result } from '../index';
 
 describe('runner.ts', () => {
-  it('run sync function successfully', () => {
+  test('run sync function successfully', () => {
     const exec = (method: 'run' | 'timedRun') => {
       const runner = Runner.create();
       const fn = jest.fn(() => 42);
@@ -16,7 +16,7 @@ describe('runner.ts', () => {
     exec('timedRun');
   });
 
-  it('run async function successfully', async () => {
+  test('run async function successfully', async () => {
     const exec = async (method: 'run' | 'timedRun') => {
       const runner = Runner.create();
       const fn = jest.fn(async () => {
@@ -35,7 +35,7 @@ describe('runner.ts', () => {
     await exec('timedRun');
   });
 
-  it('run async function throws error', async () => {
+  test('run async function throws error', async () => {
     const exec = async (method: 'run' | 'timedRun') => {
       const runner = Runner.create();
       const error = new Error('fail');
@@ -54,7 +54,7 @@ describe('runner.ts', () => {
     await exec('timedRun');
   });
 
-  it('run sync function throws error', () => {
+  test('run sync function throws error', () => {
     const exec = (method: 'run' | 'timedRun') => {
       const runner = Runner.create();
       const error = new Error('fail');
@@ -70,7 +70,7 @@ describe('runner.ts', () => {
     exec('timedRun');
   });
 
-  it('run called twice throws error', () => {
+  test('run called twice throws error', () => {
     const exec = (method: 'run' | 'timedRun') => {
       const runner = Runner.create();
       const fn = jest.fn(() => 1);
@@ -81,7 +81,7 @@ describe('runner.ts', () => {
     exec('timedRun');
   });
 
-  it('clone returns new Runner with same options', () => {
+  test('clone returns new Runner with same options', () => {
     const onBefore = jest.fn();
     const onAfter = jest.fn();
     const now = jest.fn(() => 100);
@@ -100,7 +100,7 @@ describe('runner.ts', () => {
     expect((clone as any)._diff).toBe(diff);
   });
 
-  it('onBefore is called before sync function', () => {
+  test('onBefore is called before sync function', () => {
     const onBefore = jest.fn();
     const runner = Runner.create({ onBefore });
     const fn = jest.fn(() => 123);
@@ -111,7 +111,7 @@ describe('runner.ts', () => {
     expect(onBefore).toHaveBeenCalledWith(runner, extra);
   });
 
-  it('onAfter is called after sync function with result', () => {
+  test('onAfter is called after sync function with result', () => {
     const onAfter = jest.fn();
     const runner = Runner.create({ onAfter });
     const fn = jest.fn(() => 'hello');
@@ -122,7 +122,7 @@ describe('runner.ts', () => {
     expect(onAfter).toHaveBeenCalledWith(runner, extra, 'hello');
   });
 
-  it('onBefore and onAfter called correctly for async success', async () => {
+  test('onBefore and onAfter called correctly for async success', async () => {
     const onBefore = jest.fn();
     const onAfter = jest.fn();
     const runner = Runner.create({ onBefore, onAfter });
@@ -140,7 +140,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBeGreaterThanOrEqual(10);
   });
 
-  it('onAfter is called with error for async rejection', async () => {
+  test('onAfter is called with error for async rejection', async () => {
     const onAfter = jest.fn();
     const runner = Runner.create({ onAfter });
     const error = new Error('fail');
@@ -154,7 +154,7 @@ describe('runner.ts', () => {
     expect(onAfter).toHaveBeenCalledWith(runner, extra, error);
   });
 
-  it('onAfter is called with error for sync throw', () => {
+  test('onAfter is called with error for sync throw', () => {
     const onAfter = jest.fn();
     const runner = Runner.create({ onAfter });
     const error = new Error('sync fail');
@@ -167,7 +167,7 @@ describe('runner.ts', () => {
     expect(onAfter).toHaveBeenCalledWith(runner, extra, error);
   });
 
-  it('timedRun triggers duration update and hooks', () => {
+  test('timedRun triggers duration update and hooks', () => {
     const onBefore = jest.fn();
     const onAfter = jest.fn();
     const runner = Runner.create({ onBefore, onAfter });
@@ -180,13 +180,13 @@ describe('runner.ts', () => {
     expect(onAfter).toHaveBeenCalledWith(runner, extra, 99);
   });
 
-  it('duration defaults to 0 (number) when no defaultDuration provided', () => {
+  test('duration defaults to 0 (number) when no defaultDuration provided', () => {
     const runner = Runner.create();
     expect(runner.duration).toBe(0);
     expect(typeof runner.duration).toBe('number');
   });
 
-  it('duration defaults to 0n (bigint) when no defaultDuration provided and T=bigint', () => {
+  test('duration defaults to 0n (bigint) when no defaultDuration provided and T=bigint', () => {
     const runner = Runner.create({
       now: process.hrtime.bigint,
       defaultDuration: 1n,
@@ -195,7 +195,7 @@ describe('runner.ts', () => {
     expect(typeof runner.duration).toBe('bigint');
   });
 
-  it('does not specially handle non-standard thenable', () => {
+  test('does not specially handle non-standard thenable', () => {
     const runner = Runner.create();
     const thenable = {
       then(onFulfilled: (val: any) => void) {
@@ -208,7 +208,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('retryRun retries and eventually resolves', async () => {
+  test('retryRun retries and eventually resolves', async () => {
     let count = 0;
     const fn = jest.fn(async () => {
       await sleep(5);
@@ -224,7 +224,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBe(0);
   });
 
-  it('retryRun retries and eventually rejects', async () => {
+  test('retryRun retries and eventually rejects', async () => {
     let count = 0;
     const error = new Error('fail');
     const fn = jest.fn(() => {
@@ -238,7 +238,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBeGreaterThanOrEqual(0);
   });
 
-  it('retryRun with custom retry callback', async () => {
+  test('retryRun with custom retry callback', async () => {
     let count = 0;
     const fn = jest.fn(() => {
       count++;
@@ -260,7 +260,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('retryRun passes extra to hooks', async () => {
+  test('retryRun passes extra to hooks', async () => {
     const onBefore = jest.fn();
     const onAfter = jest.fn();
     const runner = Runner.create({ onBefore, onAfter });
@@ -272,7 +272,7 @@ describe('runner.ts', () => {
     expect(onAfter).toHaveBeenCalledWith(runner, extra, 'done');
   });
 
-  it('timedRetryRun should retry and resolve successfully', async () => {
+  test('timedRetryRun should retry and resolve successfully', async () => {
     let count = 0;
     const fn = jest.fn(async () => {
       await sleep(5);
@@ -291,7 +291,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBeGreaterThanOrEqual(15);
   });
 
-  it('sync fn returns OkResult', () => {
+  test('sync fn returns OkResult', () => {
     const runner = Runner.create();
     const ok = Result.create().ok(100);
     const fn = jest.fn(() => ok);
@@ -300,7 +300,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('sync fn returns ErrorResult', () => {
+  test('sync fn returns ErrorResult', () => {
     const runner = Runner.create();
     const err = Result.create().error(new Error('error'));
     const fn = jest.fn(() => err);
@@ -309,7 +309,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('-1');
   });
 
-  it('async fn resolves OkResult', async () => {
+  test('async fn resolves OkResult', async () => {
     const runner = Runner.create();
     const ok = Result.create().ok('ok async');
     const fn = jest.fn(() => Promise.resolve(ok));
@@ -318,7 +318,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('async fn resolves ErrorResult', async () => {
+  test('async fn resolves ErrorResult', async () => {
     const runner = Runner.create();
     const err = Result.create().error(new Error('async error'));
     const fn = jest.fn(() => Promise.resolve(err));
@@ -327,7 +327,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('-1');
   });
 
-  it('retryRun: fn returns OkResult immediately', async () => {
+  test('retryRun: fn returns OkResult immediately', async () => {
     const runner = Runner.create();
     const fn = jest.fn(() => Result.create().ok('success'));
     const res = await runner.retryRun(fn, 3);
@@ -337,7 +337,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('retryRun: fn returns ErrorResult and eventually OkResult', async () => {
+  test('retryRun: fn returns ErrorResult and eventually OkResult', async () => {
     const runner = Runner.create();
     let count = 0;
     const fn = jest.fn(() => {
@@ -354,7 +354,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('retryRun: fn returns ErrorResult and fails after max retries', async () => {
+  test('retryRun: fn returns ErrorResult and fails after max retries', async () => {
     const runner = Runner.create();
     const fn = jest.fn(() => Result.create().error('fail'));
     await expect(runner.retryRun(fn, 2)).rejects.toBe('fail');
@@ -362,7 +362,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('-1');
   });
 
-  it('timedRetryRun: fn returns OkResult immediately', async () => {
+  test('timedRetryRun: fn returns OkResult immediately', async () => {
     const runner = Runner.create();
     const fn = jest.fn(() => Result.create().ok(123));
     const res = await runner.timedRetryRun(fn, 3);
@@ -373,7 +373,7 @@ describe('runner.ts', () => {
     expect(typeof runner.duration).toBe('number');
   });
 
-  it('timedRetryRun: fn returns ErrorResult and eventually OkResult', async () => {
+  test('timedRetryRun: fn returns ErrorResult and eventually OkResult', async () => {
     const runner = Runner.create();
     let count = 0;
     const fn = jest.fn(() => {
@@ -391,7 +391,7 @@ describe('runner.ts', () => {
     expect(typeof runner.duration).toBe('number');
   });
 
-  it('timedRetryRun: fn returns ErrorResult and fails after retries', async () => {
+  test('timedRetryRun: fn returns ErrorResult and fails after retries', async () => {
     const runner = Runner.create();
     const fn = jest.fn(() => Result.create().error('fail'));
     await expect(runner.timedRetryRun(fn, 1)).rejects.toBe('fail');
@@ -400,7 +400,7 @@ describe('runner.ts', () => {
     expect(typeof runner.duration).toBe('number');
   });
 
-  it('should return a Result when options.result is true', () => {
+  test('should return a Result when options.result is true', () => {
     const options = { result: true };
     const runner = Runner.create({ result: true });
     const fn = () => 42;
@@ -410,7 +410,7 @@ describe('runner.ts', () => {
     expect(res.value).toBe(42);
   });
 
-  it('should return a Result with the correct value from a promise', async () => {
+  test('should return a Result with the correct value from a promise', async () => {
     const options = { result: true };
     const runner = Runner.create({ result: true });
     const fn = () => Promise.resolve(100);
@@ -422,7 +422,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBe(0);
   });
 
-  it('should return an OkResult with duration when using timedPromise', async () => {
+  test('should return an OkResult with duration when using timedPromise', async () => {
     const options = { result: true };
     const fn = () =>
       new Promise((resolve) => setTimeout(() => resolve(50), 10));
@@ -435,7 +435,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBeGreaterThanOrEqual(10);
   });
 
-  it('should return an OkResult with an array of values from promiseAll', async () => {
+  test('should return an OkResult with an array of values from promiseAll', async () => {
     const options = { result: true };
     const fn = () => Promise.all([Promise.resolve('A'), Promise.resolve('B')]);
     const runner = Runner.create({ result: true });
@@ -447,7 +447,7 @@ describe('runner.ts', () => {
     expect(runner.duration).toBe(0);
   });
 
-  it('should return the same value in orElse when options.result is true', async () => {
+  test('should return the same value in orElse when options.result is true', async () => {
     const options = { result: true };
     const fn = () => Promise.resolve('Hello');
     const runner = Runner.create({ result: true });
@@ -457,7 +457,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('should return the fallback value in orNullish when the value is nullish', async () => {
+  test('should return the fallback value in orNullish when the value is nullish', async () => {
     const options = { result: true };
     const fn = () => Promise.resolve(null);
     const runner = Runner.create({ result: true });
@@ -467,7 +467,7 @@ describe('runner.ts', () => {
     expect(runner.code).toBe('0');
   });
 
-  it('should call onBefore and onAfter hooks with correct parameters', () => {
+  test('should call onBefore and onAfter hooks with correct parameters', () => {
     let called = false;
     const onBefore = jest.fn();
     const runner = Runner.create({
@@ -490,7 +490,7 @@ describe('runner.ts', () => {
     expect(called).toBe(true);
   });
 
-  it('should return the same value in orElse when options.result is true', async () => {
+  test('should return the same value in orElse when options.result is true', async () => {
     const fn = () => Promise.resolve('Hello');
     const runner = Runner.create({ result: true });
     const res = await runner.run(fn);
@@ -499,7 +499,7 @@ describe('runner.ts', () => {
     expect(res.orElse('Default')).toBe('Hello');
   });
 
-  it('should return the fallback value in orNullish when the value is nullish', async () => {
+  test('should return the fallback value in orNullish when the value is nullish', async () => {
     const fn = () => Promise.resolve(null);
     const runner = Runner.create({ result: true });
     const res = await runner.run(fn);
@@ -508,7 +508,7 @@ describe('runner.ts', () => {
     expect(res.orNullish('Fallback Value')).toBe('Fallback Value');
   });
 
-  it('should return an ErrorResult when the function throws an error', () => {
+  test('should return an ErrorResult when the function throws an error', () => {
     const fn = () => {
       throw new Error('Test Error');
     };
@@ -521,7 +521,7 @@ describe('runner.ts', () => {
     expect((res.value as Error).message).toBe('Test Error');
   });
 
-  it('should return an ErrorResult when the promise is rejected', async () => {
+  test('should return an ErrorResult when the promise is rejected', async () => {
     const fn = () => Promise.reject(new Error('Rejected Error'));
     const runner = Runner.create({ result: true });
     const res = await runner.run(fn);
@@ -532,7 +532,7 @@ describe('runner.ts', () => {
     expect((res.value as Error).message).toBe('Rejected Error');
   });
 
-  it('should call onAfter with error when function throws an error', () => {
+  test('should call onAfter with error when function throws an error', () => {
     let called = false;
     const runner = Runner.create({
       result: true,
@@ -554,7 +554,7 @@ describe('runner.ts', () => {
     expect(called).toBe(true);
   });
 
-  it('should call onAfter with error when promise is rejected', async () => {
+  test('should call onAfter with error when promise is rejected', async () => {
     let called = false;
     const runner = Runner.create({
       result: true,
